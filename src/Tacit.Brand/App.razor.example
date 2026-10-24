@@ -1,0 +1,83 @@
+@* Wzór App.razor i MainLayout.razor dla serwisu Tacit. Ścieżki _content/Tacit.Brand/ daje paczka NuGet
+   Tacit.Brand (ten projekt). W _Imports.razor aplikacji dodaj: @using Tacit.Brand *@
+
+@* ───────────────────────── App.razor ───────────────────────── *@
+<!DOCTYPE html>
+@* Język strony jest obowiązkowy (WCAG 3.1.1): czytnik ekranu dobiera po nim wymowę. *@
+<html lang="@CultureInfo.CurrentUICulture.TwoLetterISOLanguageName">
+<head>
+    <meta charset="utf-8" />
+    @* Bez maximum-scale i user-scalable=no: użytkownik musi móc powiększać stronę (WCAG 1.4.4). *@
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <base href="/" />
+
+    @* Najpierw motyw (blokująco, bez defer), potem style: inaczej strona mignie w złym motywie. *@
+    <script src="_content/Tacit.Brand/tacit-theme.js"></script>
+    <link rel="preload" href="_content/Tacit.Brand/fonts/public-sans-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="@Assets["_content/Tacit.Brand/tacit-fonts.css"]" />
+    <link rel="stylesheet" href="@Assets["_content/Tacit.Brand/tacit-tokens.css"]" />
+    <link rel="stylesheet" href="@Assets["_content/Tacit.Brand/tacit-site.css"]" />
+    <link rel="stylesheet" href="@Assets["Tacit.Web.styles.css"]" />  @* izolowane style komponentów *@
+
+    <meta name="theme-color" content="#1F3A5F" />  @* kolor paska przeglądarki = granat nagłówka *@
+    <link rel="icon" href="_content/Tacit.Brand/icons/favicon.ico" sizes="32x32" />
+    <link rel="icon" href="_content/Tacit.Brand/icons/icon-rounded.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="_content/Tacit.Brand/icons/icon-rounded-180.png" />
+    <ImportMap />
+    <HeadOutlet />
+</head>
+<body>
+    <Routes />
+    <script src="_framework/blazor.web.js"></script>
+</body>
+</html>
+
+@* ───────────────────────── MainLayout.razor ───────────────────────── *@
+@inherits LayoutComponentBase
+
+<div class="t-page">
+    @* Pierwszy element strony, widoczny po Tab (WCAG 2.4.1) *@
+    <a class="t-skip-link" href="#main">Przejdź do treści</a>
+
+    <header class="t-header">
+        <div class="t-wrap t-header__inner">
+            <a class="t-brand" href="/">
+                <img src="_content/Tacit.Brand/icons/icon-rounded.svg" alt="" width="32" height="32" />  @* alt="" bo nazwa jest obok w tekście *@
+                Tacit
+            </a>
+            <nav class="t-nav" aria-label="Główna">
+                <ul>
+                    <li><NavLink href="katalog">Katalog</NavLink></li>
+                    <li><a href="/docs/pl/">Dokumentacja</a></li>
+                    <li><a href="/api/">API</a></li>
+                </ul>
+            </nav>
+            <div class="t-header__end">
+                <ThemeSwitch />
+                @* Przełącznik języka: nazwa każdego języka w nim samym, z lang i hreflang (WCAG 3.1.2) *@
+                <nav class="t-segmented" aria-label="Język">
+                    <a href="/pl/" lang="pl" hreflang="pl" aria-current="page">PL</a>
+                    <a href="/en/" lang="en" hreflang="en">EN</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    @* tabindex="-1" pozwala linkowi „Przejdź do treści” przenieść tam fokus *@
+    <main id="main" tabindex="-1" class="t-wrap t-main">
+        @Body
+    </main>
+
+    <footer class="t-footer">
+        <div class="t-wrap t-footer__inner">
+            <span>© Tacit</span>
+            <ul>
+                <li><a href="/dostepnosc">Deklaracja dostępności</a></li>
+                <li><a href="/prywatnosc">Prywatność</a></li>
+            </ul>
+        </div>
+    </footer>
+</div>
+
+@* FocusOnNavigate w Routes.razor przenosi fokus na <h1> po nawigacji (czytnik ogłasza nową stronę):
+   <FocusOnNavigate RouteData="routeData" Selector="h1" /> *@

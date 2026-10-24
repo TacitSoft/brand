@@ -1,0 +1,1305 @@
+/*
+ * Style serwisu Tacit (Blazor). Wszystkie wartości pochodzą z tacit-tokens.css.
+ * Kolejność dołączania: tacit-fonts.css → tacit-tokens.css → tacit-site.css.
+ *
+ * Wszystko jest w warstwach @layer, więc style izolowane komponentów Blazora (*.razor.css, bez warstwy)
+ * zawsze wygrywają bez podbijania specyficzności i bez !important.
+ * Klasy komponentów mają prefiks `t-`, żeby nie zderzały się z Bootstrapem z szablonu Blazora
+ * (Bootstrapa w serwisie nie używamy; usuń go z wwwroot/lib i z App.razor).
+ *
+ * Dostępność: zasady, które te style zapewniają, i te, które musi zapewnić znacznik, są w DOSTEPNOSC.md.
+ */
+
+@layer tacit.reset, tacit.base, tacit.layout, tacit.components, tacit.utilities;
+
+/* ════════════════════════════════════════════════════════════════════════════
+   Reset
+   ════════════════════════════════════════════════════════════════════════════ */
+@layer tacit.reset {
+	*,
+	*::before,
+	*::after {
+		box-sizing: border-box;
+	}
+
+	html {
+		-webkit-text-size-adjust: 100%;
+		text-size-adjust: 100%;
+		/* Lepki nagłówek nie może zasłaniać elementu z fokusem ani celu kotwicy (WCAG 2.4.11). */
+		scroll-padding-top: calc(var(--tacit-header-height) + var(--tacit-header-border) + var(--tacit-space-4));
+	}
+
+	@media (prefers-reduced-motion: no-preference) {
+		html {
+			scroll-behavior: smooth;
+		}
+	}
+
+	body,
+	h1, h2, h3, h4, h5, h6,
+	p, figure, blockquote, dl, dd {
+		margin: 0;
+	}
+
+	img,
+	svg,
+	video,
+	canvas {
+		display: block;
+		max-width: 100%;
+		height: auto;
+	}
+
+	input,
+	button,
+	textarea,
+	select {
+		font: inherit;
+		color: inherit;
+		letter-spacing: inherit;
+	}
+
+	button {
+		cursor: pointer;
+	}
+
+	[hidden]:not([hidden="until-found" i]) {
+		display: none !important;
+	}
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   Elementy bazowe
+   ════════════════════════════════════════════════════════════════════════════ */
+@layer tacit.base {
+	body {
+		min-height: 100vh;
+		min-height: 100dvh;
+		background: var(--tacit-color-bg);
+		color: var(--tacit-color-fg);
+		font-family: var(--tacit-font-sans);
+		font-size: var(--tacit-text-base);
+		line-height: var(--tacit-leading-body);
+		/* Długie wyrazy (np. nazwy typów .NET) nie mogą rozpychać strony przy 320 px (WCAG 1.4.10). */
+		overflow-wrap: break-word;
+		-webkit-font-smoothing: antialiased;
+	}
+
+	::selection {
+		background: var(--tacit-color-selection);
+		color: var(--tacit-color-fg);
+	}
+
+	h1, h2, h3, h4 {
+		font-family: var(--tacit-font-display);
+		font-weight: 700;
+		line-height: var(--tacit-leading-tight);
+		letter-spacing: var(--tacit-tracking-display);
+		text-wrap: balance;
+	}
+
+	h1 { font-size: var(--tacit-text-3xl); }
+	h2 { font-size: var(--tacit-text-2xl); line-height: var(--tacit-leading-snug); }
+	h3 { font-size: var(--tacit-text-xl); line-height: var(--tacit-leading-snug); letter-spacing: -0.01em; }
+	h4 { font-size: var(--tacit-text-lg); line-height: var(--tacit-leading-snug); letter-spacing: 0; }
+
+	p,
+	li {
+		text-wrap: pretty;
+	}
+
+	/* Link w tekście jest podkreślony, bo sam kolor nie wystarcza do jego rozpoznania (WCAG 1.4.1). */
+	a {
+		color: var(--tacit-color-link);
+		text-decoration-line: underline;
+		text-decoration-thickness: 1px;
+		text-underline-offset: 0.2em;
+		transition: color var(--tacit-duration) var(--tacit-easing);
+	}
+
+	a:hover {
+		color: var(--tacit-color-link-hover);
+		text-decoration-thickness: 2px;
+	}
+
+	/* Fokus widoczny tylko z klawiatury, ale zawsze wyraźny: 3 px, kontrast ≥ 3:1 (WCAG 2.4.7, 2.4.13). */
+	:focus-visible {
+		outline: var(--tacit-focus-width) solid var(--tacit-color-focus);
+		outline-offset: var(--tacit-focus-offset);
+		border-radius: var(--tacit-radius-sm);
+	}
+
+	/* Blazor (FocusOnNavigate) i link „Przejdź do treści” ustawiają fokus programowo na nagłówku lub <main>.
+	   Taki fokus nie potrzebuje ramki, bo element nie jest interaktywny. */
+	[tabindex="-1"]:focus:not(:focus-visible) {
+		outline: none;
+	}
+
+	code,
+	kbd,
+	samp,
+	pre {
+		font-family: var(--tacit-font-mono);
+		font-size: 0.9em;
+	}
+
+	:not(pre) > code {
+		padding: 0.1em 0.35em;
+		border-radius: var(--tacit-radius-sm);
+		background: var(--tacit-color-code-inline-bg);
+		overflow-wrap: anywhere;
+	}
+
+	pre {
+		padding: var(--tacit-space-4);
+		border-radius: var(--tacit-radius);
+		background: var(--tacit-color-code-bg);
+		color: var(--tacit-color-code-fg);
+		overflow-x: auto;
+		line-height: 1.5;
+		tab-size: 4;
+	}
+
+	/* Przewijany blok kodu musi być osiągalny z klawiatury: dodaj mu tabindex="0" w znaczniku. */
+	pre:focus-visible {
+		outline-color: var(--tacit-brand-accent);
+	}
+
+	kbd {
+		padding: 0.1em 0.4em;
+		border: var(--tacit-border-width) solid var(--tacit-color-line-strong);
+		border-bottom-width: 2px;
+		border-radius: var(--tacit-radius-sm);
+		background: var(--tacit-color-surface);
+	}
+
+	hr {
+		border: 0;
+		border-top: var(--tacit-border-width) solid var(--tacit-color-line);
+		margin-block: var(--tacit-space-8);
+	}
+
+	abbr[title] {
+		text-decoration: underline dotted;
+		cursor: help;
+	}
+
+	mark {
+		background: var(--tacit-color-accent-soft);
+		color: var(--tacit-color-fg);
+		padding-inline: 0.15em;
+	}
+
+	table {
+		border-collapse: collapse;
+		width: 100%;
+		font-variant-numeric: tabular-nums;
+	}
+
+	th,
+	td {
+		text-align: start;
+		padding: var(--tacit-space-3) var(--tacit-space-4);
+		border-bottom: var(--tacit-border-width) solid var(--tacit-color-line);
+		vertical-align: top;
+	}
+
+	thead th {
+		font-family: var(--tacit-font-display);
+		font-weight: 700;
+	}
+
+	caption {
+		text-align: start;
+		padding-bottom: var(--tacit-space-2);
+		color: var(--tacit-color-fg-muted);
+		font-size: var(--tacit-text-sm);
+	}
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   Układ strony
+   ════════════════════════════════════════════════════════════════════════════ */
+@layer tacit.layout {
+	.t-wrap {
+		width: 100%;
+		max-width: calc(var(--tacit-container) + 2 * var(--tacit-gutter-wide));
+		margin-inline: auto;
+		padding-inline: max(var(--tacit-gutter), env(safe-area-inset-left, 0px));
+	}
+
+	@media (min-width: 45em) {
+		.t-wrap {
+			padding-inline: var(--tacit-gutter-wide);
+		}
+	}
+
+	.t-page {
+		display: flex;
+		flex-direction: column;
+		min-height: 100vh;
+		min-height: 100dvh;
+	}
+
+	.t-page > main {
+		flex: 1;
+	}
+
+	.t-main {
+		padding-block: var(--tacit-space-8) var(--tacit-space-16);
+	}
+
+	/* Szpalta czytelnicza */
+	.t-prose {
+		max-width: var(--tacit-measure);
+	}
+
+	.t-prose > * + * {
+		margin-top: var(--tacit-space-4);
+	}
+
+	.t-prose > :is(h2, h3, h4) {
+		margin-top: var(--tacit-space-10);
+	}
+
+	.t-prose > :is(h2, h3, h4) + * {
+		margin-top: var(--tacit-space-3);
+	}
+
+	.t-prose ul,
+	.t-prose ol {
+		padding-inline-start: 1.4em;
+	}
+
+	.t-prose li + li {
+		margin-top: var(--tacit-space-1);
+	}
+
+	.t-stack {
+		display: grid;
+		gap: var(--tacit-stack-gap, var(--tacit-space-4));
+		align-content: start;
+	}
+
+	.t-cluster {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: var(--tacit-cluster-gap, var(--tacit-space-3));
+	}
+
+	/* Siatka kart: 1 → 2 → 3 kolumny */
+	.t-grid {
+		display: grid;
+		gap: var(--tacit-space-4);
+		grid-template-columns: 1fr;
+	}
+
+	@media (min-width: 40em) {
+		.t-grid {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+	}
+
+	@media (min-width: 64em) {
+		.t-grid {
+			grid-template-columns: repeat(3, minmax(0, 1fr));
+		}
+	}
+
+	/* Treść + boczna kolumna (strona produktu) */
+	.t-split {
+		display: grid;
+		gap: var(--tacit-space-8);
+	}
+
+	@media (min-width: 60em) {
+		.t-split {
+			grid-template-columns: minmax(0, 1fr) 20rem;
+			align-items: start;
+		}
+
+		.t-split > aside {
+			position: sticky;
+			top: calc(var(--tacit-header-height) + var(--tacit-header-border) + var(--tacit-space-5));
+		}
+	}
+
+	.t-section + .t-section {
+		margin-top: var(--tacit-space-10);
+	}
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   Komponenty
+   ════════════════════════════════════════════════════════════════════════════ */
+@layer tacit.components {
+
+	/* ── Link „Przejdź do treści” (WCAG 2.4.1). Pierwszy element w <body>, widoczny po fokusie. ── */
+	.t-skip-link {
+		position: absolute;
+		top: var(--tacit-space-2);
+		left: var(--tacit-space-2);
+		z-index: 100;
+		padding: var(--tacit-space-3) var(--tacit-space-4);
+		border-radius: var(--tacit-radius);
+		background: var(--tacit-color-surface);
+		color: var(--tacit-color-fg);
+		font-weight: 600;
+		text-decoration: none;
+		box-shadow: var(--tacit-shadow-raised);
+		transform: translateY(-200%);
+	}
+
+	.t-skip-link:focus,
+	.t-skip-link:focus-visible {
+		transform: none;
+	}
+
+	/* ── Nagłówek serwisu: granatowy w obu motywach, wspólny z Starlight i DocFX ── */
+	.t-header {
+		/* Granatowe tło to zawsze „ciemny” kontekst, więc tokeny w środku rozwiązują się w wariancie ciemnym. */
+		color-scheme: dark;
+		position: sticky;
+		top: 0;
+		z-index: 50;
+		background: var(--tacit-color-header-bg);
+		color: var(--tacit-color-header-fg);
+		border-bottom: var(--tacit-header-border) solid var(--tacit-color-header-accent);
+		padding-top: env(safe-area-inset-top, 0px);
+	}
+
+	.t-header__inner {
+		display: flex;
+		align-items: center;
+		gap: var(--tacit-space-4);
+		min-height: var(--tacit-header-height);
+	}
+
+	.t-header__end {
+		margin-inline-start: auto;
+		display: flex;
+		align-items: center;
+		gap: var(--tacit-space-2);
+	}
+
+	.t-brand {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--tacit-space-2);
+		min-height: var(--tacit-target-min);
+		color: var(--tacit-color-header-fg);
+		font: 700 1.25rem/1 var(--tacit-font-display);
+		letter-spacing: -0.01em;
+		text-decoration: none;
+	}
+
+	.t-brand:hover {
+		color: var(--tacit-color-header-fg);
+	}
+
+	.t-brand img,
+	.t-brand svg {
+		width: 2rem;
+		height: 2rem;
+		flex: none;
+	}
+
+	.t-brand__tag {
+		font: 500 var(--tacit-text-xs)/1 var(--tacit-font-mono);
+		color: var(--tacit-color-header-muted);
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+	}
+
+	/* Nawigacja główna. Na wąskich ekranach przewija się poziomo zamiast łamać nagłówek. */
+	.t-nav {
+		min-width: 0;
+	}
+
+	.t-nav ul {
+		display: flex;
+		gap: var(--tacit-space-1);
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		overflow-x: auto;
+		scrollbar-width: none;
+	}
+
+	.t-nav a {
+		display: inline-flex;
+		align-items: center;
+		min-height: var(--tacit-target-min);
+		padding-inline: var(--tacit-space-3);
+		border-radius: var(--tacit-radius);
+		color: var(--tacit-color-header-muted);
+		font-weight: 500;
+		text-decoration: none;
+		white-space: nowrap;
+	}
+
+	.t-nav a:hover {
+		color: var(--tacit-color-header-fg);
+		background: rgb(255 255 255 / 0.06);
+	}
+
+	/* Bieżąca strona: aria-current="page" (Blazor NavLink dodaje też klasę .active). Oznaczona nie tylko kolorem. */
+	.t-nav a[aria-current="page"],
+	.t-nav a.active {
+		color: var(--tacit-color-header-fg);
+		box-shadow: inset 0 -3px 0 var(--tacit-color-header-accent);
+		border-radius: var(--tacit-radius) var(--tacit-radius) 0 0;
+	}
+
+	@media (max-width: 47.99em) {
+		.t-header__inner {
+			flex-wrap: wrap;
+			row-gap: 0;
+		}
+
+		.t-nav {
+			order: 3;
+			flex-basis: 100%;
+			margin-inline: calc(-1 * var(--tacit-space-3));
+		}
+	}
+
+	/* ── Przełącznik segmentowy: motyw (jasny/ciemny/systemowy) i język ── */
+	.t-segmented {
+		display: inline-flex;
+		padding: 3px;
+		gap: 2px;
+		border: var(--tacit-border-width) solid var(--tacit-color-line-strong);
+		border-radius: var(--tacit-radius-pill);
+		background: var(--tacit-color-surface);
+	}
+
+	.t-segmented button,
+	.t-segmented a {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: var(--tacit-space-1);
+		min-width: var(--tacit-target-min-compact);
+		min-height: var(--tacit-target-min-compact);
+		padding: 0 var(--tacit-space-3);
+		border: 0;
+		border-radius: var(--tacit-radius-pill);
+		background: none;
+		color: var(--tacit-color-fg-muted);
+		font-size: var(--tacit-text-sm);
+		font-weight: 600;
+		letter-spacing: 0.02em;
+		text-decoration: none;
+		transition: background-color var(--tacit-duration) var(--tacit-easing), color var(--tacit-duration) var(--tacit-easing);
+	}
+
+	.t-segmented button:hover,
+	.t-segmented a:hover {
+		color: var(--tacit-color-fg);
+	}
+
+	.t-segmented [aria-pressed="true"],
+	.t-segmented [aria-current="true"],
+	.t-segmented [aria-current="page"] {
+		background: var(--tacit-color-primary);
+		color: var(--tacit-color-on-primary);
+	}
+
+	.t-segmented svg {
+		width: 1.125rem;
+		height: 1.125rem;
+		flex: none;
+	}
+
+	/* W nagłówku przełącznik leży na granacie. */
+	.t-header .t-segmented {
+		background: transparent;
+		border-color: rgb(255 255 255 / 0.28);
+	}
+
+	.t-header .t-segmented button,
+	.t-header .t-segmented a {
+		color: var(--tacit-color-header-muted);
+	}
+
+	.t-header .t-segmented button:hover,
+	.t-header .t-segmented a:hover {
+		color: var(--tacit-color-header-fg);
+	}
+
+	.t-header .t-segmented [aria-pressed="true"],
+	.t-header .t-segmented [aria-current="true"],
+	.t-header .t-segmented [aria-current="page"] {
+		color: var(--tacit-color-on-primary);
+	}
+
+	/* Na wąskim ekranie etykiety motywu chowają się wizualnie; czytnik ekranu nadal je czyta. */
+	@media (max-width: 35.99em) {
+		.t-theme-switch .t-theme-switch__label {
+			position: absolute;
+			width: 1px;
+			height: 1px;
+			overflow: hidden;
+			clip-path: inset(50%);
+			white-space: nowrap;
+		}
+
+		.t-theme-switch button {
+			padding: 0;
+		}
+	}
+
+	/* ── Przyciski ── */
+	.t-btn {
+		--_bg: var(--tacit-color-surface);
+		--_fg: var(--tacit-color-fg);
+		--_border: var(--tacit-color-line-strong);
+		--_bg-hover: var(--tacit-color-surface-sunken);
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: var(--tacit-space-2);
+		min-height: var(--tacit-target-min);
+		padding: var(--tacit-space-2) var(--tacit-space-5);
+		border: var(--tacit-border-width) solid var(--_border);
+		border-radius: var(--tacit-radius);
+		background: var(--_bg);
+		color: var(--_fg);
+		font-weight: 600;
+		line-height: 1.2;
+		text-align: center;
+		text-decoration: none;
+		transition: background-color var(--tacit-duration) var(--tacit-easing), border-color var(--tacit-duration) var(--tacit-easing);
+	}
+
+	.t-btn:hover {
+		background: var(--_bg-hover);
+		color: var(--_fg);
+	}
+
+	.t-btn--primary {
+		--_bg: var(--tacit-color-primary);
+		--_fg: var(--tacit-color-on-primary);
+		--_border: var(--tacit-color-primary);
+		--_bg-hover: var(--tacit-color-primary-hover);
+	}
+
+	.t-btn--ghost {
+		--_bg: transparent;
+		--_border: transparent;
+		--_fg: var(--tacit-color-link);
+		--_bg-hover: var(--tacit-color-primary-soft);
+	}
+
+	.t-btn--danger {
+		--_bg: var(--tacit-color-danger);
+		--_fg: var(--tacit-color-surface);
+		--_border: var(--tacit-color-danger);
+		--_bg-hover: var(--tacit-color-danger);
+	}
+
+	.t-btn--block {
+		display: flex;
+		width: 100%;
+	}
+
+	.t-btn--sm {
+		min-height: var(--tacit-target-min-compact);
+		padding: var(--tacit-space-1) var(--tacit-space-3);
+		font-size: var(--tacit-text-sm);
+	}
+
+	.t-btn svg {
+		width: 1.125em;
+		height: 1.125em;
+		flex: none;
+	}
+
+	/* Wyłączony przycisk: używaj aria-disabled="true" zamiast disabled, jeśli ma zostać w kolejności tabulacji
+	   z podpowiedzią. Wygląd ten sam w obu przypadkach. WCAG nie wymaga kontrastu dla nieaktywnych kontrolek. */
+	.t-btn:disabled,
+	.t-btn[aria-disabled="true"] {
+		opacity: 0.55;
+		cursor: not-allowed;
+	}
+
+	/* Stan ładowania: aria-busy="true" na przycisku */
+	.t-btn[aria-busy="true"] {
+		cursor: progress;
+	}
+
+	.t-btn[aria-busy="true"]::before {
+		content: "";
+		width: 1em;
+		height: 1em;
+		border: 2px solid currentColor;
+		border-right-color: transparent;
+		border-radius: 50%;
+		animation: t-spin 0.8s linear infinite;
+	}
+
+	@keyframes t-spin {
+		to { transform: rotate(360deg); }
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.t-btn[aria-busy="true"]::before {
+			animation-duration: 2.4s;
+		}
+	}
+
+	/* ── Hero ── */
+	.t-hero {
+		display: grid;
+		gap: var(--tacit-space-4);
+		padding-block: var(--tacit-space-10) var(--tacit-space-6);
+	}
+
+	.t-hero h1 {
+		font-size: var(--tacit-text-display);
+		line-height: 1.05;
+		letter-spacing: -0.025em;
+		max-width: 20ch;
+	}
+
+	.t-lead {
+		max-width: 60ch;
+		color: var(--tacit-color-fg-muted);
+		font-size: var(--tacit-text-lg);
+	}
+
+	/* Etykieta nad nagłówkiem (eyebrow) z pomarańczowym znacznikiem jak końcówka przykładnicy w logo */
+	.t-eyebrow {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--tacit-space-2);
+		color: var(--tacit-color-fg-muted);
+		font-size: var(--tacit-text-xs);
+		font-weight: 600;
+		letter-spacing: var(--tacit-tracking-caps);
+		text-transform: uppercase;
+	}
+
+	.t-eyebrow::before {
+		content: "";
+		width: 1rem;
+		height: 0.25rem;
+		background: var(--tacit-color-accent);
+	}
+
+	/* ── Karta ── */
+	.t-card {
+		position: relative;
+		display: flex;
+		flex-direction: column;
+		gap: var(--tacit-space-3);
+		min-width: 0;
+		padding: var(--tacit-space-5);
+		border: var(--tacit-border-width) solid var(--tacit-color-line);
+		border-radius: var(--tacit-radius-lg);
+		background: var(--tacit-color-surface);
+		color: inherit;
+		transition: border-color var(--tacit-duration) var(--tacit-easing), transform var(--tacit-duration) var(--tacit-easing);
+	}
+
+	.t-card h2,
+	.t-card h3 {
+		font-size: var(--tacit-text-xl);
+	}
+
+	.t-card p {
+		color: var(--tacit-color-fg-muted);
+	}
+
+	/* Cała karta klikalna, ale w drzewie dostępności jest jeden link: tytuł.
+	   Wzór: <article class="t-card"><h3><a class="t-card__link" href="…">Nazwa</a></h3>…</article>
+	   Nie owijaj całej karty w <a>, bo czytnik przeczyta wtedy całą jej treść jako nazwę linku. */
+	.t-card__link {
+		color: inherit;
+		text-decoration: none;
+	}
+
+	.t-card__link::after {
+		content: "";
+		position: absolute;
+		inset: 0;
+		border-radius: inherit;
+	}
+
+	.t-card__link:focus-visible {
+		outline: none;
+	}
+
+	.t-card:has(.t-card__link:focus-visible) {
+		outline: var(--tacit-focus-width) solid var(--tacit-color-focus);
+		outline-offset: var(--tacit-focus-offset);
+	}
+
+	.t-card:has(.t-card__link):hover {
+		border-color: var(--tacit-color-line-strong);
+		transform: translateY(-2px);
+	}
+
+	.t-card:has(.t-card__link):hover .t-card__link {
+		text-decoration: underline;
+		text-decoration-thickness: 2px;
+		text-underline-offset: 0.2em;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.t-card:has(.t-card__link):hover {
+			transform: none;
+		}
+	}
+
+	.t-card__head {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: var(--tacit-space-2);
+	}
+
+	.t-card__foot {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--tacit-space-1) var(--tacit-space-4);
+		margin-top: auto;
+		padding-top: var(--tacit-space-3);
+		border-top: var(--tacit-border-width) solid var(--tacit-color-line);
+		color: var(--tacit-color-fg-muted);
+		font: 400 var(--tacit-text-sm) var(--tacit-font-mono);
+	}
+
+	/* Mała etykieta wersalikami (rodzaj produktu, nagłówek panelu) */
+	.t-kicker {
+		color: var(--tacit-color-fg-muted);
+		font-size: var(--tacit-text-xs);
+		font-weight: 600;
+		letter-spacing: var(--tacit-tracking-caps);
+		text-transform: uppercase;
+	}
+
+	/* ── Panel (boczna kolumna) ── */
+	.t-panel {
+		display: grid;
+		gap: var(--tacit-space-3);
+		padding: var(--tacit-space-5);
+		border: var(--tacit-border-width) solid var(--tacit-color-line);
+		border-radius: var(--tacit-radius-lg);
+		background: var(--tacit-color-surface);
+	}
+
+	.t-panel > h2,
+	.t-panel > h3 {
+		color: var(--tacit-color-fg-muted);
+		font: 600 var(--tacit-text-xs)/1.3 var(--tacit-font-sans);
+		letter-spacing: var(--tacit-tracking-caps);
+		text-transform: uppercase;
+	}
+
+	/* ── Lista definicji klucz–wartość ── */
+	.t-facts {
+		display: grid;
+		grid-template-columns: auto 1fr;
+		gap: var(--tacit-space-2) var(--tacit-space-4);
+		font-size: var(--tacit-text-sm);
+	}
+
+	.t-facts dt {
+		color: var(--tacit-color-fg-muted);
+	}
+
+	.t-facts dd {
+		text-align: end;
+		font-family: var(--tacit-font-mono);
+		overflow-wrap: anywhere;
+	}
+
+	/* ── Odznaki i tagi ── */
+	.t-badge {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--tacit-space-1);
+		padding: 0.15em 0.55em;
+		border: var(--tacit-border-width) solid transparent;
+		border-radius: var(--tacit-radius-sm);
+		background: var(--tacit-color-primary-soft);
+		color: var(--tacit-color-on-primary-soft);
+		font-size: var(--tacit-text-xs);
+		font-weight: 600;
+		line-height: 1.5;
+		white-space: nowrap;
+	}
+
+	.t-badge--accent  { background: var(--tacit-color-accent-soft);  color: var(--tacit-color-accent-text); }
+	.t-badge--success { background: var(--tacit-color-success-soft); color: var(--tacit-color-success); }
+	.t-badge--danger  { background: transparent; border-color: var(--tacit-color-danger); color: var(--tacit-color-danger); }
+
+	.t-tags {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--tacit-space-2);
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.t-tags > li {
+		padding: 0.2em 0.6em;
+		border-radius: var(--tacit-radius-sm);
+		background: var(--tacit-color-primary-soft);
+		color: var(--tacit-color-on-primary-soft);
+		font-size: var(--tacit-text-sm);
+	}
+
+	/* ── Filtry (chipy). Przycisk z aria-pressed, zaznaczenie widać też po ikonie, nie tylko po kolorze. ── */
+	.t-chips {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--tacit-space-2);
+	}
+
+	.t-chip {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--tacit-space-1);
+		min-height: var(--tacit-target-min-compact);
+		padding: var(--tacit-space-1) var(--tacit-space-4);
+		border: var(--tacit-border-width) solid var(--tacit-color-line-strong);
+		border-radius: var(--tacit-radius-pill);
+		background: var(--tacit-color-surface);
+		color: var(--tacit-color-fg);
+		font-size: var(--tacit-text-sm);
+		white-space: nowrap;
+	}
+
+	.t-chip:hover {
+		border-color: var(--tacit-color-primary);
+	}
+
+	.t-chip[aria-pressed="true"] {
+		border-color: var(--tacit-color-primary);
+		background: var(--tacit-color-primary-soft);
+		color: var(--tacit-color-on-primary-soft);
+		font-weight: 600;
+	}
+
+	.t-chip[aria-pressed="true"]::before {
+		content: "✓" / "";  /* ikona tylko wizualna: stan ogłasza aria-pressed */
+		font-weight: 700;
+	}
+
+	.t-chip__count {
+		color: var(--tacit-color-fg-muted);
+		font: 500 var(--tacit-text-xs) var(--tacit-font-mono);
+	}
+
+	/* ── Formularze ── */
+	.t-field {
+		display: grid;
+		gap: var(--tacit-space-1);
+	}
+
+	.t-label {
+		font-weight: 600;
+	}
+
+	/* Pole wymagane: gwiazdka jest dodatkiem wizualnym; w znaczniku daj też required/aria-required. */
+	.t-label[data-required]::after {
+		content: " *";
+		color: var(--tacit-color-danger);
+	}
+
+	.t-hint {
+		color: var(--tacit-color-fg-muted);
+		font-size: var(--tacit-text-sm);
+	}
+
+	.t-input,
+	.t-select,
+	.t-textarea {
+		width: 100%;
+		min-height: var(--tacit-target-min);
+		padding: var(--tacit-space-2) var(--tacit-space-3);
+		border: var(--tacit-border-width) solid var(--tacit-color-line-strong);
+		border-radius: var(--tacit-radius);
+		background: var(--tacit-color-surface);
+		color: var(--tacit-color-fg);
+		transition: border-color var(--tacit-duration) var(--tacit-easing);
+	}
+
+	.t-textarea {
+		min-height: 8rem;
+		resize: vertical;
+	}
+
+	.t-input::placeholder,
+	.t-textarea::placeholder {
+		color: var(--tacit-color-fg-muted);
+		opacity: 1;
+	}
+
+	.t-input:hover,
+	.t-select:hover,
+	.t-textarea:hover {
+		border-color: var(--tacit-color-fg-muted);
+	}
+
+	.t-input:focus-visible,
+	.t-select:focus-visible,
+	.t-textarea:focus-visible {
+		outline-offset: 0;
+		border-color: var(--tacit-color-focus);
+	}
+
+	/* Błąd: czerwona ramka + komunikat tekstowy z ikoną (sam kolor nie wystarcza, WCAG 1.4.1, 3.3.1).
+	   aria-invalid ustawia się ręcznie; .invalid i .validation-message dodaje EditForm w Blazorze. */
+	.t-input[aria-invalid="true"],
+	.t-select[aria-invalid="true"],
+	.t-textarea[aria-invalid="true"],
+	.modified.invalid,
+	input.invalid,
+	select.invalid,
+	textarea.invalid {
+		border-color: var(--tacit-color-danger);
+		border-width: 2px;
+	}
+
+	.t-error,
+	.validation-message {
+		display: flex;
+		gap: var(--tacit-space-1);
+		color: var(--tacit-color-danger);
+		font-size: var(--tacit-text-sm);
+		font-weight: 500;
+	}
+
+	.t-error::before,
+	.validation-message::before {
+		content: "⚠" / "";
+		flex: none;
+	}
+
+	/* Podsumowanie błędów nad formularzem (<ValidationSummary /> w Blazorze) */
+	.validation-errors {
+		margin: 0 0 var(--tacit-space-4);
+		padding: var(--tacit-space-4) var(--tacit-space-4) var(--tacit-space-4) var(--tacit-space-8);
+		border: var(--tacit-border-width) solid var(--tacit-color-danger);
+		border-inline-start-width: 4px;
+		border-radius: var(--tacit-radius);
+		background: var(--tacit-color-danger-soft);
+		color: var(--tacit-color-fg);
+	}
+
+	.t-select {
+		appearance: none;
+		padding-inline-end: var(--tacit-space-10);
+		background-image: linear-gradient(45deg, transparent 50%, currentColor 50%), linear-gradient(135deg, currentColor 50%, transparent 50%);
+		background-position: calc(100% - 1.15rem) 50%, calc(100% - 0.8rem) 50%;
+		background-size: 0.35rem 0.35rem;
+		background-repeat: no-repeat;
+	}
+
+	.t-check {
+		display: flex;
+		align-items: flex-start;
+		gap: var(--tacit-space-3);
+		min-height: var(--tacit-target-min-compact);
+		cursor: pointer;
+	}
+
+	.t-check input {
+		flex: none;
+		width: 1.25rem;
+		height: 1.25rem;
+		margin-top: 0.15em;
+		accent-color: var(--tacit-color-primary);
+	}
+
+	/* Pole wyszukiwania z ikoną */
+	.t-search {
+		position: relative;
+	}
+
+	.t-search .t-input {
+		padding-inline-start: var(--tacit-space-10);
+	}
+
+	.t-search svg {
+		position: absolute;
+		inset-inline-start: var(--tacit-space-3);
+		top: 50%;
+		width: 1.125rem;
+		height: 1.125rem;
+		translate: 0 -50%;
+		stroke: var(--tacit-color-fg-muted);
+		fill: none;
+		pointer-events: none;
+	}
+
+	/* ── Komunikaty (callout). Typ komunikatu wynika z ikony i tytułu, nie tylko z koloru. ── */
+	.t-callout {
+		--_tone: var(--tacit-color-info);
+		--_tone-bg: var(--tacit-color-info-soft);
+		display: grid;
+		gap: var(--tacit-space-1);
+		padding: var(--tacit-space-4) var(--tacit-space-5);
+		border-inline-start: 4px solid var(--_tone);
+		border-radius: var(--tacit-radius);
+		background: var(--_tone-bg);
+	}
+
+	.t-callout__title {
+		color: var(--_tone);
+		font-weight: 700;
+	}
+
+	.t-callout--success { --_tone: var(--tacit-color-success); --_tone-bg: var(--tacit-color-success-soft); }
+	.t-callout--warning { --_tone: var(--tacit-color-warning); --_tone-bg: var(--tacit-color-warning-soft); }
+	.t-callout--danger  { --_tone: var(--tacit-color-danger);  --_tone-bg: var(--tacit-color-danger-soft); }
+
+	/* ── Tabela w ramce, przewijana poziomo na wąskich ekranach.
+	   Znacznik: <div class="t-table" role="region" aria-label="…" tabindex="0"><table>…</table></div> ── */
+	.t-table {
+		overflow-x: auto;
+		border: var(--tacit-border-width) solid var(--tacit-color-line);
+		border-radius: var(--tacit-radius-lg);
+		background: var(--tacit-color-surface);
+	}
+
+	.t-table tbody th {
+		color: var(--tacit-color-fg-muted);
+		font-weight: 500;
+	}
+
+	.t-table tr:last-child > * {
+		border-bottom: 0;
+	}
+
+	/* ── Polecenie do skopiowania (instalacja paczki) ── */
+	.t-command {
+		display: flex;
+		align-items: center;
+		gap: var(--tacit-space-2);
+		min-width: 0;
+		padding: var(--tacit-space-1) var(--tacit-space-1) var(--tacit-space-1) var(--tacit-space-4);
+		border-radius: var(--tacit-radius);
+		background: var(--tacit-color-code-bg);
+		color: var(--tacit-color-code-fg);
+		color-scheme: dark;
+	}
+
+	.t-command code {
+		flex: 1;
+		min-width: 0;
+		padding-block: var(--tacit-space-2);
+		background: none;
+		font-size: var(--tacit-text-sm);
+		white-space: nowrap;
+		overflow-x: auto;
+	}
+
+	.t-command .t-btn {
+		--_bg: transparent;
+		--_fg: var(--tacit-color-code-fg);
+		--_border: rgb(255 255 255 / 0.35);
+		--_bg-hover: rgb(255 255 255 / 0.08);
+	}
+
+	/* ── Okruszki ── */
+	.t-breadcrumbs ol {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--tacit-space-1) var(--tacit-space-2);
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		font-size: var(--tacit-text-sm);
+		color: var(--tacit-color-fg-muted);
+	}
+
+	.t-breadcrumbs li + li::before {
+		content: "/";
+		margin-inline-end: var(--tacit-space-2);
+		color: var(--tacit-color-line-strong);
+	}
+
+	/* ── Lista powiązań (link + rodzaj) ── */
+	.t-links {
+		display: grid;
+		gap: var(--tacit-space-2);
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.t-links a {
+		display: flex;
+		justify-content: space-between;
+		gap: var(--tacit-space-2);
+		min-height: var(--tacit-target-min);
+		align-items: center;
+		padding: var(--tacit-space-2) var(--tacit-space-3);
+		border: var(--tacit-border-width) solid var(--tacit-color-line);
+		border-radius: var(--tacit-radius);
+		color: var(--tacit-color-fg);
+		text-decoration: none;
+	}
+
+	.t-links a:hover {
+		border-color: var(--tacit-color-primary);
+	}
+
+	.t-links small {
+		color: var(--tacit-color-fg-muted);
+		font-family: var(--tacit-font-mono);
+	}
+
+	/* ── Stan pusty ── */
+	.t-empty {
+		grid-column: 1 / -1;
+		padding: var(--tacit-space-12) var(--tacit-space-4);
+		border: var(--tacit-border-width) dashed var(--tacit-color-line-strong);
+		border-radius: var(--tacit-radius-lg);
+		color: var(--tacit-color-fg-muted);
+		text-align: center;
+	}
+
+	/* ── Stopka ── */
+	.t-footer {
+		padding-block: var(--tacit-space-8);
+		border-top: var(--tacit-border-width) solid var(--tacit-color-line);
+		color: var(--tacit-color-fg-muted);
+		font-size: var(--tacit-text-sm);
+	}
+
+	.t-footer__inner {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: space-between;
+		gap: var(--tacit-space-4);
+	}
+
+	.t-footer ul {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--tacit-space-2) var(--tacit-space-5);
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.t-footer a {
+		color: inherit;
+	}
+
+	.t-footer a:hover {
+		color: var(--tacit-color-fg);
+	}
+
+	/* ── Blazor: pasek błędu i okno ponownego łączenia (tryb interaktywny) ── */
+	#blazor-error-ui {
+		display: none;
+		position: fixed;
+		inset: auto 0 0 0;
+		z-index: 1000;
+		padding: var(--tacit-space-3) var(--tacit-space-12) var(--tacit-space-3) var(--tacit-space-5);
+		background: var(--tacit-color-danger-soft);
+		color: var(--tacit-color-fg);
+		border-top: 3px solid var(--tacit-color-danger);
+		box-shadow: var(--tacit-shadow-raised);
+	}
+
+	#blazor-error-ui .dismiss {
+		position: absolute;
+		top: 50%;
+		right: var(--tacit-space-4);
+		translate: 0 -50%;
+		cursor: pointer;
+	}
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   Narzędzia
+   ════════════════════════════════════════════════════════════════════════════ */
+@layer tacit.utilities {
+	/* Ukryte wizualnie, dostępne dla czytników ekranu */
+	.t-visually-hidden:not(:focus):not(:active) {
+		position: absolute !important;
+		width: 1px !important;
+		height: 1px !important;
+		overflow: hidden !important;
+		clip-path: inset(50%) !important;
+		white-space: nowrap !important;
+	}
+
+	.t-muted { color: var(--tacit-color-fg-muted); }
+	.t-mono { font-family: var(--tacit-font-mono); }
+	.t-small { font-size: var(--tacit-text-sm); }
+	.t-nowrap { white-space: nowrap; }
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   Tryb wymuszonych kolorów (Windows „Kontrast wysoki”). Przeglądarka podmienia kolory,
+   więc elementy, które odróżniały się tylko tłem, dostają ramkę w kolorze systemowym.
+   ════════════════════════════════════════════════════════════════════════════ */
+@media (forced-colors: active) {
+	@layer tacit.components {
+		.t-btn,
+		.t-chip,
+		.t-badge,
+		.t-tags > li,
+		.t-callout,
+		.t-command,
+		.t-segmented button,
+		.t-segmented a {
+			border: 1px solid ButtonText;
+		}
+
+		.t-segmented [aria-pressed="true"],
+		.t-segmented [aria-current="true"],
+		.t-segmented [aria-current="page"],
+		.t-chip[aria-pressed="true"] {
+			forced-color-adjust: none;
+			background: Highlight;
+			color: HighlightText;
+		}
+
+		.t-header {
+			border-bottom-color: CanvasText;
+		}
+
+		.t-nav a[aria-current="page"],
+		.t-nav a.active {
+			text-decoration: underline;
+			text-decoration-thickness: 3px;
+		}
+
+		.t-eyebrow::before {
+			background: CanvasText;
+		}
+	}
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   Druk
+   ════════════════════════════════════════════════════════════════════════════ */
+@media print {
+	@layer tacit.components {
+		.t-header,
+		.t-skip-link,
+		.t-theme-switch,
+		.t-footer,
+		#blazor-error-ui {
+			display: none !important;
+		}
+
+		.t-prose a[href^="http"]::after {
+			content: " (" attr(href) ")";
+			font-size: 0.85em;
+			color: var(--tacit-color-fg-muted);
+		}
+	}
+}

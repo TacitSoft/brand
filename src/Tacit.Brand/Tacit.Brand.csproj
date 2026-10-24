@@ -1,0 +1,52 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+	<!-- Razor Class Library z marką Tacit dla serwisu Blazor. Pliki statyczne nie leżą w tym projekcie:
+	     jedynym źródłem jest katalog web/ (ten sam, z którego powstaje paczka npm @tacitsoft/brand).
+	     Podpinamy je tu jako static web assets, więc w aplikacji są pod _content/Tacit.Brand/…  -->
+
+	<PropertyGroup>
+		<!-- Sam znacznik i pliki statyczne, bez kodu zależnego od wersji runtime, więc net10.0 obsługuje
+		     też aplikacje na net11.0. -->
+		<TargetFramework>net10.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<LangVersion>latest</LangVersion>
+		<RootNamespace>Tacit.Brand</RootNamespace>
+		<PackageId>Tacit.Brand</PackageId>
+		<Description>Marka Tacit dla Blazora: tokeny --tacit-*, fonty, style .t-*, przełącznik motywu.</Description>
+		<RepositoryUrl>https://github.com/TacitSoft/brand</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<Company>TacitSoft</Company>
+		<Authors>Andrzej Świstowski</Authors>
+		<Copyright>Copyright © 2026 TacitSoft</Copyright>
+		<PackageIcon>icon.png</PackageIcon>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+
+		<!-- Wersja z tagu vX.Y.Z (ADR-C-0003). Ten sam tag daje wersję paczki npm. -->
+		<MinVerTagPrefix>v</MinVerTagPrefix>
+		<MinVerVerbosity>minimal</MinVerVerbosity>
+		<MinVerMinimumMajorMinor>0.1</MinVerMinimumMajorMinor>
+		<MinVerDefaultPreReleaseIdentifiers Condition="'$(GITHUB_REF_TYPE)' != 'tag'">preview</MinVerDefaultPreReleaseIdentifiers>
+
+		<BrandWebDir>$(MSBuildThisFileDirectory)../../web/</BrandWebDir>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="MinVer" Version="7.0.0" PrivateAssets="all" />
+		<!-- Components.Web zamiast całego ASP.NET Core: komponent działa też w projekcie .Client (WebAssembly). -->
+		<PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="10.0.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- To, czego używa serwis. Adaptery Starlight/DocFX, podgląd i narzędzia zostają tylko w npm i repo. -->
+		<Content Include="$(BrandWebDir)tacit-tokens.css;$(BrandWebDir)tacit-fonts.css;$(BrandWebDir)tacit-site.css;$(BrandWebDir)tacit-theme.js"
+		         Link="wwwroot/%(Filename)%(Extension)" />
+		<Content Include="$(BrandWebDir)fonts/*.woff2;$(BrandWebDir)fonts/OFL-*.txt"
+		         Link="wwwroot/fonts/%(Filename)%(Extension)" />
+		<Content Include="$(MSBuildThisFileDirectory)../../favicon.ico;$(MSBuildThisFileDirectory)../../icon-rounded.svg;$(MSBuildThisFileDirectory)../../icon-rounded-180.png;$(MSBuildThisFileDirectory)../../icon-rounded-192.png;$(MSBuildThisFileDirectory)../../icon-rounded-512.png"
+		         Link="wwwroot/icons/%(Filename)%(Extension)" />
+
+		<None Include="$(MSBuildThisFileDirectory)../../icon-rounded-128.png" Pack="true" PackagePath="icon.png" Visible="false" />
+		<None Include="README.md" Pack="true" PackagePath="\" />
+		<None Include="App.razor.example" />
+	</ItemGroup>
+</Project>

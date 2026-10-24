@@ -1,0 +1,104 @@
+/*
+ * Mapowanie tokenów Tacit na zmienne Starlight (--sl-*). Bez własnych wartości: tylko var(--tacit-*).
+ *
+ * astro.config.mjs:
+ *   starlight({
+ *     customCss: ['@tacit/brand/tacit-fonts.css', '@tacit/brand/tacit-tokens.css', '@tacit/brand/adapters/starlight.css'],
+ *     head: [{ tag: 'script', attrs: { src: '/docs/tacit-theme-sync.js' } }],
+ *   })
+ * (ścieżki zależą od tego, jak pliki z TacitSoft/brand trafią do projektu, patrz web/README.md).
+ *
+ * Style Starlight są w warstwie @layer, a te nie, więc wygrywają bez !important. Zgodnie z ADR-C-0026
+ * kolory przypisujemy do :root[data-theme='dark'] i :root[data-theme='light'], a nie do samego :root.
+ * Jedna reguła wystarcza dla obu motywów, bo tokeny same przełączają wartość przez light-dark().
+ */
+
+:root[data-theme='dark'],
+:root[data-theme='light'] {
+	--sl-font: var(--tacit-font-sans);
+	--sl-font-mono: var(--tacit-font-mono);
+	--sl-nav-height: calc(var(--tacit-header-height) + var(--tacit-header-border));
+
+	/* Skala szarości Starlight: white = najwyższy kontrast z tłem, black = tło (w obu motywach). */
+	--sl-color-white: var(--tacit-color-fg);
+	--sl-color-gray-1: var(--tacit-color-fg);
+	--sl-color-gray-2: var(--tacit-color-fg);
+	--sl-color-gray-3: var(--tacit-color-fg-muted);
+	--sl-color-gray-4: var(--tacit-color-fg-muted);
+	--sl-color-gray-5: var(--tacit-color-line);
+	--sl-color-gray-6: var(--tacit-color-surface-sunken);
+	--sl-color-gray-7: var(--tacit-color-surface-sunken);
+	--sl-color-black: var(--tacit-color-bg);
+
+	--sl-color-accent-low: var(--tacit-color-primary-soft);
+	--sl-color-accent: var(--tacit-color-primary);
+	--sl-color-accent-high: var(--tacit-color-on-primary-soft);
+	--sl-color-text-accent: var(--tacit-color-link);
+	--sl-color-text-invert: var(--tacit-color-on-primary);
+
+	--sl-color-bg-sidebar: var(--tacit-color-bg);
+	--sl-color-bg-inline-code: var(--tacit-color-code-inline-bg);
+	--sl-color-hairline-light: var(--tacit-color-line);
+	--sl-color-hairline: var(--tacit-color-line);
+	--sl-color-hairline-shade: var(--tacit-color-line);
+
+	/* Ramki <Aside>: note = info, tip = sukces, caution = ostrzeżenie, danger = błąd */
+	--sl-color-blue-low: var(--tacit-color-info-soft);
+	--sl-color-blue: var(--tacit-color-info);
+	--sl-color-blue-high: var(--tacit-color-fg);
+	--sl-color-green-low: var(--tacit-color-success-soft);
+	--sl-color-green: var(--tacit-color-success);
+	--sl-color-green-high: var(--tacit-color-fg);
+	--sl-color-orange-low: var(--tacit-color-warning-soft);
+	--sl-color-orange: var(--tacit-color-warning);
+	--sl-color-orange-high: var(--tacit-color-fg);
+	--sl-color-red-low: var(--tacit-color-danger-soft);
+	--sl-color-red: var(--tacit-color-danger);
+	--sl-color-red-high: var(--tacit-color-fg);
+	--sl-color-purple-low: var(--tacit-color-primary-soft);
+	--sl-color-purple: var(--tacit-color-primary);
+	--sl-color-purple-high: var(--tacit-color-fg);
+}
+
+/* Nagłówek: granatowy pasek z pomarańczową krawędzią, ten sam co .t-header w serwisie.
+   color-scheme: dark sprawia, że tokeny (i zmienne --sl-* na nich oparte) rozwiązują się w środku jak w ciemnym motywie. */
+.header {
+	color-scheme: dark;
+	background-color: var(--tacit-color-header-bg);
+	border-bottom: var(--tacit-header-border) solid var(--tacit-color-header-accent);
+	--sl-color-bg-nav: var(--tacit-color-header-bg);
+	--sl-color-white: var(--tacit-color-header-fg);
+	--sl-color-gray-1: var(--tacit-color-header-fg);
+	--sl-color-gray-2: var(--tacit-color-header-muted);
+	--sl-color-text-accent: var(--tacit-color-header-accent);
+}
+
+.site-title {
+	color: var(--tacit-color-header-fg);
+	font-family: var(--tacit-font-display);
+	font-weight: 700;
+	letter-spacing: -0.01em;
+}
+
+/* Nagłówki treści fontem marki */
+h1#_top,
+.sl-markdown-content :is(h1, h2, h3, h4) {
+	font-family: var(--tacit-font-display);
+	letter-spacing: var(--tacit-tracking-display);
+}
+
+/* Fokus jak w serwisie (3 px, kontrast ≥ 3:1) */
+:focus-visible {
+	outline: var(--tacit-focus-width) solid var(--tacit-color-focus);
+	outline-offset: var(--tacit-focus-offset);
+}
+
+/* Linki w treści podkreślone (WCAG 1.4.1); Starlight robi to domyślnie, pilnujemy grubości i odstępu. */
+.sl-markdown-content a:not(:where(.not-content *)) {
+	text-underline-offset: 0.2em;
+}
+
+/* Lepki nagłówek nie może zasłaniać fokusu ani celu kotwicy (WCAG 2.4.11). */
+html {
+	scroll-padding-top: calc(var(--sl-nav-height) + var(--tacit-space-4));
+}

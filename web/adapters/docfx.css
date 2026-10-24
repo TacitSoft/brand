@@ -1,0 +1,122 @@
+/*
+ * Mapowanie tokenów Tacit na zmienne Bootstrap 5 w szablonie DocFX modern. Bez własnych wartości: tylko var(--tacit-*).
+ *
+ * template/public/main.css:
+ *   @import url("tacit-fonts.css");
+ *   @import url("tacit-tokens.css");
+ *   @import url("docfx.css");          ← ten plik
+ * template/public/main.js:
+ *   import './tacit-theme-sync.js';
+ * (pliki z web/ i katalog fonts/ kopiuje do template/public/ skrypt builda, patrz web/README.md).
+ *
+ * DocFX przełącza motyw atrybutem data-bs-theme na <html>; tacit-tokens.css rozumie go tak samo jak data-theme.
+ * Bootstrap liczy część kolorów z trójek RGB (--bs-link-color-rgb itp.), których nie da się wyprowadzić
+ * z tokenu hex w czystym CSS, więc kolory linków ustawiamy bezpośrednio na <a>.
+ */
+
+:root,
+:root[data-bs-theme] {
+	--bs-font-sans-serif: var(--tacit-font-sans);
+	--bs-font-monospace: var(--tacit-font-mono);
+	--bs-body-font-family: var(--tacit-font-sans);
+
+	--bs-body-bg: var(--tacit-color-bg);
+	--bs-body-color: var(--tacit-color-fg);
+	--bs-emphasis-color: var(--tacit-color-fg);
+	--bs-heading-color: var(--tacit-color-fg);
+	--bs-secondary-color: var(--tacit-color-fg-muted);
+	--bs-tertiary-color: var(--tacit-color-fg-muted);
+	--bs-secondary-bg: var(--tacit-color-surface-sunken);
+	--bs-tertiary-bg: var(--tacit-color-surface-sunken);
+	--bs-border-color: var(--tacit-color-line);
+	--bs-code-color: var(--tacit-color-fg);
+	--bs-highlight-bg: var(--tacit-color-accent-soft);
+	--bs-highlight-color: var(--tacit-color-fg);
+
+	--bs-border-radius: var(--tacit-radius);
+	--bs-border-radius-sm: var(--tacit-radius-sm);
+	--bs-border-radius-lg: var(--tacit-radius-lg);
+
+	--bs-focus-ring-color: var(--tacit-color-focus);
+	--bs-focus-ring-width: var(--tacit-focus-width);
+}
+
+body {
+	background-color: var(--tacit-color-bg);
+	color: var(--tacit-color-fg);
+}
+
+a {
+	color: var(--tacit-color-link);
+	text-underline-offset: 0.2em;
+}
+
+a:hover {
+	color: var(--tacit-color-link-hover);
+}
+
+h1, h2, h3, h4 {
+	font-family: var(--tacit-font-display);
+	letter-spacing: var(--tacit-tracking-display);
+}
+
+:not(pre) > code {
+	background: var(--tacit-color-code-inline-bg);
+	border-radius: var(--tacit-radius-sm);
+	padding: 0.1em 0.35em;
+}
+
+:focus-visible {
+	outline: var(--tacit-focus-width) solid var(--tacit-color-focus);
+	outline-offset: var(--tacit-focus-offset);
+	box-shadow: none;
+}
+
+/* Nagłówek: granatowy pasek z pomarańczową krawędzią, ten sam co .t-header w serwisie.
+   Szablon daje mu klasę .bg-body z !important, stąd !important tutaj. */
+body > header {
+	color-scheme: dark;
+	background-color: var(--tacit-color-header-bg) !important;
+	border-bottom: var(--tacit-header-border) solid var(--tacit-color-header-accent) !important;
+	min-height: calc(var(--tacit-header-height) + var(--tacit-header-border));
+	--bs-body-color: var(--tacit-color-header-fg);
+	--bs-navbar-color: var(--tacit-color-header-muted);
+	--bs-navbar-hover-color: var(--tacit-color-header-fg);
+	--bs-navbar-active-color: var(--tacit-color-header-fg);
+	--bs-navbar-brand-color: var(--tacit-color-header-fg);
+	--bs-navbar-brand-hover-color: var(--tacit-color-header-fg);
+	--bs-nav-link-color: var(--tacit-color-header-muted);
+}
+
+body > header .navbar-brand,
+body > header .btn,
+body > header .bi {
+	color: var(--tacit-color-header-fg);
+	font-family: var(--tacit-font-display);
+}
+
+body > header .nav-link {
+	color: var(--tacit-color-header-muted);
+}
+
+/* Bieżąca sekcja: podkreślenie w kolorze akcentu, nie tylko inny kolor (WCAG 1.4.1). */
+body > header .nav-link.active {
+	color: var(--tacit-color-header-fg) !important;
+	box-shadow: inset 0 -3px 0 var(--tacit-color-header-accent);
+}
+
+.toc .nav-link.active,
+.affix a.active {
+	color: var(--tacit-color-link) !important;
+	font-weight: 600;
+}
+
+#logo {
+	width: 2rem;
+	height: 2rem;
+	margin-right: var(--tacit-space-2);
+}
+
+html {
+	scroll-padding-top: calc(var(--tacit-header-height) + var(--tacit-header-border) + var(--tacit-space-4));
+}

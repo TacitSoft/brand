@@ -1,0 +1,44 @@
+{
+  "name": "@tacitsoft/brand",
+  "version": "0.0.0-dev",
+  "description": "Marka Tacit: tokeny --tacit-*, fonty, style serwisu i adaptery Starlight/DocFX (ADR-C-0026).",
+  "license": "UNLICENSED",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TacitSoft/brand.git",
+    "directory": "web"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "files": [
+    "tacit-tokens.css",
+    "tacit-fonts.css",
+    "tacit-site.css",
+    "tacit-theme.js",
+    "tacit-theme-sync.js",
+    "adapters/",
+    "fonts/",
+    "README.md",
+    "DOSTEPNOSC.md"
+  ],
+  "exports": {
+    "./tacit-tokens.css": "./tacit-tokens.css",
+    "./tacit-fonts.css": "./tacit-fonts.css",
+    "./tacit-site.css": "./tacit-site.css",
+    "./tacit-theme.js": "./tacit-theme.js",
+    "./tacit-theme-sync.js": "./tacit-theme-sync.js",
+    "./adapters/*": "./adapters/*",
+    "./fonts/*": "./fonts/*",
+    "./package.json": "./package.json"
+  },
+  "sideEffects": [
+    "*.css",
+    "*.js"
+  ],
+  "scripts": {
+    "check": "node tools/check-contrast.mjs",
+    "prepublishOnly": "node tools/check-contrast.mjs"
+  }
+}

@@ -1,0 +1,278 @@
+<title>Tacit Style Web</title>
+<meta name="description" content="Podgląd stylów serwisu Tacit w motywie jasnym i ciemnym">
+<script src="tacit-theme.js"></script>
+<link rel="stylesheet" href="tacit-fonts.css">
+<link rel="stylesheet" href="tacit-tokens.css">
+<link rel="stylesheet" href="tacit-site.css">
+<style>
+/* Layout: strona podglądu = szkielet serwisu (nagłówek, treść, stopka) z sekcjami komponentów jedna pod drugą.
+   Wszystkie kolory i fonty pochodzą z tacit-tokens.css; tu tylko układ samej strony podglądu. */
+body { background: var(--tacit-color-bg); color: var(--tacit-color-fg); font: 400 1rem/1.6 var(--tacit-font-sans); }
+.pv-section { display: grid; gap: var(--tacit-space-5); padding-block: var(--tacit-space-10); border-top: 1px solid var(--tacit-color-line); }
+.pv-section > header { display: grid; gap: var(--tacit-space-1); }
+.pv-section > header p { color: var(--tacit-color-fg-muted); max-width: 70ch; }
+.pv-swatches { display: grid; gap: var(--tacit-space-3); grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr)); }
+.pv-swatch { display: grid; gap: var(--tacit-space-1); padding: var(--tacit-space-3); border: 1px solid var(--tacit-color-line); border-radius: var(--tacit-radius); background: var(--tacit-color-surface); min-width: 0; }
+.pv-swatch i { display: block; height: 3rem; border-radius: var(--tacit-radius-sm); border: 1px solid var(--tacit-color-line); }
+.pv-swatch code { font-size: var(--tacit-text-xs); background: none; padding: 0; }
+.pv-swatch span { font-size: var(--tacit-text-sm); }
+.pv-type { display: grid; gap: var(--tacit-space-4); }
+.pv-type > div { display: grid; gap: var(--tacit-space-1); padding-block: var(--tacit-space-3); border-bottom: 1px dashed var(--tacit-color-line); min-width: 0; }
+.pv-type small { color: var(--tacit-color-fg-muted); font: 400 var(--tacit-text-xs) var(--tacit-font-mono); }
+.pv-row { display: flex; flex-wrap: wrap; gap: var(--tacit-space-3); align-items: center; }
+.pv-form { display: grid; gap: var(--tacit-space-5); max-width: 32rem; }
+.pv-note { padding-block: var(--tacit-space-3); color: var(--tacit-color-fg-muted); font-size: var(--tacit-text-sm); border-bottom: 1px dashed var(--tacit-color-line); }
+</style>
+
+<div class="t-page">
+  <a class="t-skip-link" href="#main">Przejdź do treści</a>
+
+  <header class="t-header">
+    <div class="t-wrap t-header__inner">
+      <a class="t-brand" href="#main">
+        <svg viewBox="0 0 128 128" aria-hidden="true" focusable="false"><rect width="128" height="128" rx="24" fill="#1F3A5F" stroke="rgb(255 255 255 / .25)" stroke-width="4"/><rect x="26" y="30" width="76" height="16" rx="3" fill="#F2F4F7"/><rect x="56" y="46" width="16" height="56" rx="3" fill="#F2F4F7"/><g fill="#1F3A5F"><rect x="61" y="56" width="6" height="2"/><rect x="61" y="66" width="6" height="2"/><rect x="61" y="76" width="6" height="2"/><rect x="61" y="86" width="6" height="2"/></g><rect x="56" y="98" width="16" height="4" fill="#F5A623"/></svg>
+        Tacit <span class="t-brand__tag">katalog</span>
+      </a>
+      <nav class="t-nav" aria-label="Główna">
+        <ul>
+          <li><a href="#katalog" aria-current="page">Katalog</a></li>
+          <li><a href="#produkt">Dokumentacja</a></li>
+          <li><a href="#formularz">API</a></li>
+        </ul>
+      </nav>
+      <div class="t-header__end">
+        <div class="t-segmented t-theme-switch" role="group" aria-label="Motyw" data-tacit-theme-switch hidden>
+          <button type="button" data-tacit-theme="light" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg><span class="t-theme-switch__label">Jasny</span></button>
+          <button type="button" data-tacit-theme="dark" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg><span class="t-theme-switch__label">Ciemny</span></button>
+          <button type="button" data-tacit-theme="system" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg><span class="t-theme-switch__label">Systemowy</span></button>
+        </div>
+        <nav class="t-segmented" aria-label="Język">
+          <a href="#main" lang="pl" hreflang="pl" aria-current="page">PL</a>
+          <a href="#main" lang="en" hreflang="en">EN</a>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <main id="main" tabindex="-1" class="t-wrap">
+    <p class="pv-note">Podgląd stylów z <code>TacitSoft/brand/web</code>. Produkty prawdziwe, wersje i opisy przykładowe. Przełącznik motywu w nagłówku zapamiętuje wybór tak jak w serwisie.</p>
+
+    <section class="t-hero" id="katalog" aria-labelledby="hero-title">
+      <span class="t-eyebrow">Biblioteki .NET</span>
+      <h1 id="hero-title">Komponenty i biblioteki .NET do systemów, które mają działać latami</h1>
+      <p class="t-lead">Wzorce domenowe, obsługa błędów i obserwowalność jako paczki NuGet. Wybierz pojedynczą bibliotekę albo pakiet.</p>
+      <div class="pv-row">
+        <a class="t-btn t-btn--primary" href="#produkt">Przeglądaj katalog</a>
+        <a class="t-btn" href="#formularz">Zapytaj o ofertę</a>
+      </div>
+    </section>
+
+    <section class="t-stack" aria-label="Filtry" style="--tacit-stack-gap: var(--tacit-space-3); padding-bottom: var(--tacit-space-6)">
+      <label class="t-search">
+        <span class="t-visually-hidden">Szukaj po nazwie lub możliwości</span>
+        <svg viewBox="0 0 24 24" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+        <input class="t-input" id="q" type="search" placeholder="Szukaj po nazwie lub możliwości">
+      </label>
+      <div class="t-chips" role="group" aria-label="Rodzaj">
+        <button class="t-chip" type="button" aria-pressed="true">Wszystko <span class="t-chip__count">7</span></button>
+        <button class="t-chip" type="button" aria-pressed="false">Biblioteki <span class="t-chip__count">4</span></button>
+        <button class="t-chip" type="button" aria-pressed="false">Komponenty <span class="t-chip__count">1</span></button>
+        <button class="t-chip" type="button" aria-pressed="false">Pakiety <span class="t-chip__count">1</span></button>
+        <button class="t-chip" type="button" aria-pressed="false">Usługi <span class="t-chip__count">1</span></button>
+      </div>
+    </section>
+
+    <div class="t-grid" style="padding-bottom: var(--tacit-space-10)">
+      <article class="t-card">
+        <div class="t-card__head"><span class="t-kicker">Biblioteka</span><span class="t-badge t-badge--accent">Nowość</span></div>
+        <h2><a class="t-card__link" href="#produkt">Tacit.Results</a></h2>
+        <p>Obsługa błędów bez wyjątków: Result&lt;T&gt; z czytelnym modelem błędów.</p>
+        <ul class="t-tags"><li>Result pattern</li><li>Async pipeline</li></ul>
+        <div class="t-card__foot"><span>v1.0.2</span><span>net10.0 · net11.0</span><span>MIT</span></div>
+      </article>
+      <article class="t-card">
+        <div class="t-card__head"><span class="t-kicker">Biblioteka</span></div>
+        <h2><a class="t-card__link" href="#produkt">Tacit.Diagnostics</a></h2>
+        <p>Tracing i metryki dla .NET zgodne z OpenTelemetry, bez ręcznego klejenia.</p>
+        <ul class="t-tags"><li>Tracing</li><li>Metryki</li><li>Propagacja kontekstu</li></ul>
+        <div class="t-card__foot"><span>v1.2.0</span><span>net10.0 · net11.0</span><span>MIT</span></div>
+      </article>
+      <article class="t-card">
+        <div class="t-card__head"><span class="t-kicker">Biblioteka</span><span class="t-badge t-badge--danger">Wycofywany do 31.12.2026</span></div>
+        <h2><a class="t-card__link" href="#produkt">Tacit.Unicus</a></h2>
+        <p>Generator identyfikatorów ULID dla encji i zdarzeń.</p>
+        <ul class="t-tags"><li>Identyfikatory ULID</li></ul>
+        <div class="t-card__foot"><span>v0.1.0</span><span>net10.0 · net11.0</span><span>MIT</span></div>
+      </article>
+    </div>
+
+    <section class="pv-section" id="produkt" aria-labelledby="prod-title">
+      <nav class="t-breadcrumbs" aria-label="Okruszki"><ol><li><a href="#katalog">Katalog</a></li><li><a href="#katalog">Biblioteki</a></li><li aria-current="page">Tacit.Results</li></ol></nav>
+      <div class="t-split">
+        <article class="t-prose">
+          <span class="t-kicker">Biblioteka</span>
+          <h2 id="prod-title" style="font-size: var(--tacit-text-3xl); margin-top: var(--tacit-space-2)">Tacit.Results</h2>
+          <p class="t-lead">Obsługa błędów bez wyjątków: <code>Result&lt;T&gt;</code> z czytelnym modelem błędów.</p>
+          <p>Każda operacja zwraca sukces albo nazwany błąd (walidacja, brak zasobu, konflikt). Kod wywołujący widzi wszystkie ścieżki w sygnaturze i składa je w potoki zamiast łapać wyjątki. Szczegóły w <a href="#produkt">przewodniku po obsłudze błędów</a>.</p>
+
+          <h3>Instalacja</h3>
+          <div class="t-command"><code id="cmd">dotnet add package Tacit.Results</code><button class="t-btn t-btn--sm" type="button" id="copy">Kopiuj</button></div>
+          <p class="t-visually-hidden" aria-live="polite" id="copy-status"></p>
+
+          <pre tabindex="0" aria-label="Przykład użycia"><code>var result = await orders.FindAsync(id)
+    .Ensure(o =&gt; o.CanBeCancelled, Error.Conflict("order.locked"))
+    .Map(o =&gt; o.Cancel());
+
+return result.Match(Results.Ok, error =&gt; error.ToProblem());</code></pre>
+
+          <h3>Edycje</h3>
+          <div class="t-table" role="region" aria-label="Porównanie edycji" tabindex="0">
+            <table>
+              <thead><tr><td></td><th scope="col">Community</th><th scope="col">Team</th><th scope="col">Enterprise</th></tr></thead>
+              <tbody>
+                <tr><th scope="row">Liczba deweloperów</th><td>1–5</td><td>6–50</td><td>Bez limitu</td></tr>
+                <tr><th scope="row">Wsparcie</th><td>Społeczność</td><td>Dni robocze</td><td>Priorytet, 24/7</td></tr>
+                <tr><th scope="row">Czas reakcji</th><td>—</td><td>2 d</td><td>4 h</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>Komunikaty</h3>
+          <div class="t-stack" style="--tacit-stack-gap: var(--tacit-space-3)">
+            <div class="t-callout"><span class="t-callout__title">Uwaga</span><span>Wersja 1.x wymaga .NET 10 lub nowszego.</span></div>
+            <div class="t-callout t-callout--success"><span class="t-callout__title">Gotowe</span><span>Paczka zainstalowana. Możesz zwracać <code>Result</code> z pierwszego serwisu.</span></div>
+            <div class="t-callout t-callout--warning"><span class="t-callout__title">Ostrzeżenie</span><span>Tacit.Unicus 0.x zostanie zastąpiony przez 1.0 z nowym API.</span></div>
+            <div class="t-callout t-callout--danger"><span class="t-callout__title">Błąd</span><span>Nie udało się pobrać cennika. Odśwież stronę za chwilę.</span></div>
+          </div>
+        </article>
+
+        <aside class="t-stack" aria-label="Szczegóły produktu">
+          <div class="t-panel">
+            <h3>Cena</h3>
+            <div style="font: 700 var(--tacit-text-xl) var(--tacit-font-display)">Zapytaj o ofertę</div>
+            <p class="t-small t-muted">Cennik pojawi się w kolejnym etapie.</p>
+            <a class="t-btn t-btn--primary t-btn--block" href="#formularz">Zapytaj o ofertę</a>
+          </div>
+          <div class="t-panel">
+            <h3>Szczegóły</h3>
+            <dl class="t-facts"><dt>NuGet</dt><dd>Tacit.Results</dd><dt>Wersja</dt><dd>1.0.2</dd><dt>Platformy</dt><dd>net10.0, net11.0</dd><dt>Licencja</dt><dd>MIT</dd></dl>
+          </div>
+          <div class="t-panel">
+            <h3>Pasuje do</h3>
+            <ul class="t-links"><li><a href="#katalog"><span>Tacit.Diagnostics</span><small>Biblioteka</small></a></li><li><a href="#katalog"><span>Tacit Foundation</span><small>Pakiet</small></a></li></ul>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="pv-section" id="formularz" aria-labelledby="form-title">
+      <header><h2 id="form-title">Zapytaj o ofertę</h2><p>Formularz pokazuje pola, podpowiedzi i błędy. Wyślij go pusty, żeby zobaczyć walidację: podsumowanie dostaje fokus, a każde pole ma komunikat połączony przez <code>aria-describedby</code>.</p></header>
+      <form class="pv-form" id="quote" novalidate>
+        <div class="validation-errors" id="summary" tabindex="-1" hidden><strong>Popraw 2 pola:</strong><ul><li><a href="#email">Adres e-mail</a></li><li><a href="#team">Wielkość zespołu</a></li></ul></div>
+        <div class="t-field">
+          <label class="t-label" for="email" data-required>Adres e-mail</label>
+          <span class="t-hint" id="email-hint">Odpowiemy w ciągu jednego dnia roboczego.</span>
+          <input class="t-input" id="email" type="email" autocomplete="email" required aria-describedby="email-hint email-err">
+          <span class="t-error" id="email-err" hidden>Podaj adres e-mail, np. jan@firma.pl.</span>
+        </div>
+        <div class="t-field">
+          <label class="t-label" for="team" data-required>Wielkość zespołu</label>
+          <select class="t-select" id="team" required aria-describedby="team-err">
+            <option value="">Wybierz</option><option>1–5</option><option>6–50</option><option>Powyżej 50</option>
+          </select>
+          <span class="t-error" id="team-err" hidden>Wybierz wielkość zespołu.</span>
+        </div>
+        <div class="t-field">
+          <label class="t-label" for="msg">Wiadomość</label>
+          <textarea class="t-textarea" id="msg" placeholder="Np. potrzebujemy Results i Diagnostics dla 3 serwisów"></textarea>
+        </div>
+        <label class="t-check"><input type="checkbox" id="consent"> Chcę dostawać informacje o nowych wersjach (najwyżej raz w miesiącu).</label>
+        <div class="pv-row">
+          <button class="t-btn t-btn--primary" type="submit" id="send">Wyślij zapytanie</button>
+          <button class="t-btn t-btn--ghost" type="reset">Wyczyść</button>
+        </div>
+        <p aria-live="polite" id="form-status" class="t-small"></p>
+      </form>
+    </section>
+
+    <section class="pv-section" aria-labelledby="btn-title">
+      <header><h2 id="btn-title">Przyciski i odznaki</h2></header>
+      <div class="pv-row">
+        <button class="t-btn t-btn--primary" type="button">Główny</button>
+        <button class="t-btn" type="button">Drugorzędny</button>
+        <button class="t-btn t-btn--ghost" type="button">Tekstowy</button>
+        <button class="t-btn t-btn--danger" type="button">Usuń</button>
+        <button class="t-btn t-btn--primary" type="button" aria-busy="true">Zapisywanie</button>
+        <button class="t-btn" type="button" disabled>Niedostępny</button>
+      </div>
+      <div class="pv-row">
+        <span class="t-badge">Informacja</span><span class="t-badge t-badge--accent">Nowość</span><span class="t-badge t-badge--success">Stabilna</span><span class="t-badge t-badge--danger">Wycofywana</span>
+      </div>
+    </section>
+
+    <section class="pv-section" aria-labelledby="type-title">
+      <header><h2 id="type-title">Typografia</h2><p>Tacit Display do nagłówków, Tacit Sans do tekstu, Tacit Mono do kodu. Cyrylica przychodzi z Onest, bo dokumentacja jest też po rosyjsku.</p></header>
+      <div class="pv-type">
+        <div><small>--tacit-text-display · Tacit Display 700</small><span style="font: 700 var(--tacit-text-display)/1.05 var(--tacit-font-display); letter-spacing: -0.025em">Prosto i przewidywalnie</span></div>
+        <div><small>--tacit-text-2xl · Tacit Display, cyrylica</small><span lang="ru" style="font: 700 var(--tacit-text-2xl)/1.2 var(--tacit-font-display)">Обработка ошибок без исключений</span></div>
+        <div><small>--tacit-text-base · Tacit Sans 400</small><p style="max-width: var(--tacit-measure)">Zażółć gęślą jaźń. Każda operacja zwraca sukces albo nazwany błąd, a kod wywołujący widzi wszystkie ścieżki w sygnaturze.</p></div>
+        <div><small>--tacit-text-base · Tacit Sans, cyrylica</small><p lang="ru" style="max-width: var(--tacit-measure)">Каждая операция возвращает успех или именованную ошибку, и вызывающий код видит все пути в сигнатуре.</p></div>
+        <div><small>--tacit-text-sm · Tacit Mono</small><code style="background: none; padding: 0">Result&lt;Order&gt; Ensure(Func&lt;T, bool&gt;) → 0O1lI</code></div>
+      </div>
+    </section>
+
+    <section class="pv-section" aria-labelledby="color-title">
+      <header><h2 id="color-title">Kolory semantyczne</h2><p>Każdy token ma wartość jasną i ciemną. Przełącz motyw w nagłówku, żeby zobaczyć obie. Kontrast wszystkich par sprawdza <code>tools/check-contrast.mjs</code>.</p></header>
+      <div class="pv-swatches" id="swatches"></div>
+    </section>
+  </main>
+
+  <footer class="t-footer">
+    <div class="t-wrap t-footer__inner">
+      <span>© Tacit · przykładnica dla profesjonalnego oprogramowania</span>
+      <ul><li><a href="#main">Deklaracja dostępności</a></li><li><a href="#main">Prywatność</a></li><li><a href="#main">Dokumentacja</a></li></ul>
+    </div>
+  </footer>
+</div>
+
+<script>
+// Próbki kolorów generowane z tokenów, więc zawsze pokazują aktualne wartości.
+const names = ['bg', 'surface', 'surface-sunken', 'fg', 'fg-muted', 'line', 'line-strong', 'link', 'primary', 'on-primary', 'primary-soft', 'accent', 'accent-text', 'accent-soft', 'success', 'danger', 'focus', 'code-bg', 'header-bg'];
+document.getElementById('swatches').innerHTML = names.map(n =>
+  `<div class="pv-swatch"><i style="background: var(--tacit-color-${n})"></i><span>${n}</span><code>--tacit-color-${n}</code></div>`).join('');
+
+// Filtry: przełączanie aria-pressed (tylko wizualnie w podglądzie).
+document.querySelector('.t-chips').addEventListener('click', e => {
+  const b = e.target.closest('.t-chip'); if (!b) return;
+  document.querySelectorAll('.t-chips .t-chip').forEach(c => c.setAttribute('aria-pressed', String(c === b)));
+});
+
+// Kopiowanie polecenia z komunikatem dla czytnika ekranu.
+document.getElementById('copy').addEventListener('click', e => {
+  const btn = e.currentTarget, status = document.getElementById('copy-status');
+  const done = () => { btn.textContent = 'Skopiowano'; status.textContent = 'Polecenie skopiowane do schowka'; setTimeout(() => { btn.textContent = 'Kopiuj'; status.textContent = ''; }, 1600); };
+  const fallback = () => { const r = document.createRange(); r.selectNodeContents(document.getElementById('cmd')); getSelection().removeAllRanges(); getSelection().addRange(r); };
+  try { navigator.clipboard.writeText(document.getElementById('cmd').textContent).then(done, fallback); } catch { fallback(); }
+});
+
+// Walidacja formularza: błędy przy polach, podsumowanie z fokusem.
+const form = document.getElementById('quote');
+form.addEventListener('submit', e => {
+  e.preventDefault();
+  const checks = [['email', f => f.validity.valid && f.value], ['team', f => f.value]];
+  let bad = 0;
+  for (const [id, ok] of checks) {
+    const f = document.getElementById(id), err = document.getElementById(id + '-err'), valid = !!ok(f);
+    f.setAttribute('aria-invalid', String(!valid)); err.hidden = valid; if (!valid) bad++;
+  }
+  const summary = document.getElementById('summary'), status = document.getElementById('form-status');
+  if (bad) { summary.querySelector('strong').textContent = bad === 1 ? 'Popraw 1 pole:' : `Popraw ${bad} pola:`; summary.hidden = false; summary.focus(); status.textContent = ''; }
+  else { summary.hidden = true; status.textContent = 'To tylko podgląd, więc zapytanie nie zostało wysłane.'; }
+});
+form.addEventListener('reset', () => {
+  document.getElementById('summary').hidden = true;
+  form.querySelectorAll('[aria-invalid]').forEach(f => f.removeAttribute('aria-invalid'));
+  form.querySelectorAll('.t-error').forEach(x => x.hidden = true);
+  document.getElementById('form-status').textContent = '';
+});
+</script>

@@ -1,0 +1,202 @@
+/*
+ * Tokeny marki Tacit: jedyne źródło wartości wizualnych (ADR-C-0026, pkt 3).
+ * Używają ich serwis Blazor (tacit-site.css), Starlight (adapters/starlight.css)
+ * i szablon DocFX modern (adapters/docfx.css). Poza tym plikiem nie wpisujemy wartości hex.
+ *
+ * Motyw:
+ *   brak atrybutu na <html>       → motyw systemowy (prefers-color-scheme), działa bez JS
+ *   data-theme="light" | "dark"   → wybór użytkownika (Blazor i Starlight)
+ *   data-bs-theme="light" | "dark"→ to samo w DocFX (Bootstrap 5)
+ * Kolory semantyczne są zapisane przez light-dark(), więc każdy token ma obie wartości obok siebie
+ * i przełącza się razem z color-scheme. Dowolny fragment strony może wymusić motyw lokalnie przez
+ * `color-scheme: dark` (tak robi granatowy nagłówek, który jest ciemny w obu motywach).
+ * Wymaga przeglądarek z light-dark() (Baseline 2024: Chrome/Edge 123, Firefox 120, Safari 17.5).
+ *
+ * Kontrast: pary tekst/tło spełniają WCAG 2.2 AA (≥ 4,5:1), elementy interfejsu i fokus ≥ 3:1
+ * w obu motywach. Sprawdza to tools/check-contrast.mjs; uruchom go po każdej zmianie koloru.
+ */
+
+:root {
+	color-scheme: light dark;
+}
+
+:root[data-theme="light"],
+:root[data-bs-theme="light"] {
+	color-scheme: light;
+}
+
+:root[data-theme="dark"],
+:root[data-bs-theme="dark"] {
+	color-scheme: dark;
+}
+
+:root {
+	/* ── Marka (TacitSoft/brand, README → Kolory). Nie zmieniają się z motywem. ── */
+	--tacit-brand-navy: #1F3A5F;
+	--tacit-brand-mark: #F2F4F7;
+	--tacit-brand-accent: #F5A623;
+
+	/* ── Skale pomocnicze. Komponenty używają tokenów semantycznych poniżej, nie skal. ── */
+	--tacit-navy-950: #0B1522;
+	--tacit-navy-900: #0F1D30;
+	--tacit-navy-850: #111E30;
+	--tacit-navy-800: #162A45;
+	--tacit-navy-750: #1A2D47;
+	--tacit-navy-700: #24364F;
+	--tacit-navy-600: #24548F;
+	--tacit-navy-500: #5D7190;
+	--tacit-navy-400: #7A8AA1;
+	--tacit-navy-300: #8DB8EC;
+	--tacit-navy-250: #9DADC2;
+	--tacit-navy-200: #C5D0DF;
+	--tacit-navy-150: #D3DBE6;
+	--tacit-navy-100: #E3EAF3;
+	--tacit-navy-50: #EEF2F7;
+	--tacit-navy-25: #F5F7FA;
+	--tacit-ink: #14202F;
+	--tacit-ink-muted: #4F5F75;
+	--tacit-snow: #E6ECF3;
+
+	--tacit-amber-800: #33260F;
+	--tacit-amber-700: #8A5300;
+	--tacit-amber-500: var(--tacit-brand-accent);
+	--tacit-amber-400: #F5B544;
+	--tacit-amber-300: #F8C46B;
+	--tacit-amber-100: #FDE9C4;
+
+	/* ── Kolory semantyczne: light-dark(jasny, ciemny) ── */
+	--tacit-color-bg: light-dark(var(--tacit-navy-25), var(--tacit-navy-950));
+	--tacit-color-surface: light-dark(#FFFFFF, var(--tacit-navy-850));
+	--tacit-color-surface-sunken: light-dark(var(--tacit-navy-50), var(--tacit-navy-900));
+	--tacit-color-fg: light-dark(var(--tacit-ink), var(--tacit-snow));
+	--tacit-color-fg-muted: light-dark(var(--tacit-ink-muted), var(--tacit-navy-250));
+	/* Linie dekoracyjne (podziały, ramki kart). Nie niosą informacji, więc nie muszą mieć 3:1. */
+	--tacit-color-line: light-dark(var(--tacit-navy-150), var(--tacit-navy-700));
+	/* Ramki kontrolek (pola, przełączniki). WCAG 1.4.11 wymaga ≥ 3:1 względem tła. */
+	--tacit-color-line-strong: light-dark(var(--tacit-navy-400), var(--tacit-navy-500));
+
+	--tacit-color-link: light-dark(var(--tacit-navy-600), var(--tacit-navy-300));
+	--tacit-color-link-hover: light-dark(var(--tacit-brand-navy), var(--tacit-amber-300));
+
+	/* Główne wezwanie do działania: granat w jasnym motywie, akcent marki w ciemnym. */
+	--tacit-color-primary: light-dark(var(--tacit-brand-navy), var(--tacit-brand-accent));
+	--tacit-color-primary-hover: light-dark(var(--tacit-navy-800), var(--tacit-amber-300));
+	--tacit-color-on-primary: light-dark(var(--tacit-brand-mark), var(--tacit-navy-950));
+	--tacit-color-primary-soft: light-dark(var(--tacit-navy-100), var(--tacit-navy-750));
+	--tacit-color-on-primary-soft: light-dark(var(--tacit-brand-navy), var(--tacit-navy-300));
+
+	/* Akcent marki. Pomarańcz na bieli ma tylko 2:1, więc w jasnym motywie jako kolor tekstu
+	   służy ciemny wariant (accent-text); jasny pomarańcz jest tam wyłącznie ozdobą (paski, kropki). */
+	--tacit-color-accent: var(--tacit-brand-accent);
+	--tacit-color-accent-text: light-dark(var(--tacit-amber-700), var(--tacit-amber-400));
+	--tacit-color-accent-soft: light-dark(var(--tacit-amber-100), var(--tacit-amber-800));
+
+	--tacit-color-success: light-dark(#1B6B3A, #6FD49A);
+	--tacit-color-success-soft: light-dark(#E2F3E8, #10291B);
+	--tacit-color-danger: light-dark(#B3261E, #FF8A80);
+	--tacit-color-danger-soft: light-dark(#FBE7E5, #3A1512);
+	--tacit-color-warning: var(--tacit-color-accent-text);
+	--tacit-color-warning-soft: var(--tacit-color-accent-soft);
+	--tacit-color-info: var(--tacit-color-link);
+	--tacit-color-info-soft: var(--tacit-color-primary-soft);
+
+	/* Pierścień fokusu: ≥ 3:1 względem tła w obu motywach (WCAG 2.4.7, 2.4.13). */
+	--tacit-color-focus: light-dark(var(--tacit-navy-600), var(--tacit-brand-accent));
+
+	/* Kod: ciemny blok w obu motywach, jak w prototypie katalogu. */
+	--tacit-color-code-bg: light-dark(var(--tacit-ink), #070E18);
+	--tacit-color-code-fg: var(--tacit-snow);
+	--tacit-color-code-inline-bg: light-dark(var(--tacit-navy-50), var(--tacit-navy-750));
+
+	/* Nagłówek serwisu: granatowy pasek z pomarańczową krawędzią w obu motywach (Blazor, Starlight, DocFX). */
+	--tacit-color-header-bg: var(--tacit-brand-navy);
+	--tacit-color-header-fg: var(--tacit-brand-mark);
+	--tacit-color-header-muted: var(--tacit-navy-200);
+	--tacit-color-header-accent: var(--tacit-brand-accent);
+
+	--tacit-color-selection: light-dark(var(--tacit-amber-100), var(--tacit-navy-600));
+
+	/* ── Typografia ── */
+	--tacit-font-display: "Tacit Display", "Segoe UI", system-ui, -apple-system, sans-serif;
+	--tacit-font-sans: "Tacit Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+	--tacit-font-mono: "Tacit Mono", "Cascadia Code", ui-monospace, Consolas, monospace;
+
+	/* Skala w rem, żeby szanowała ustawienie rozmiaru tekstu w przeglądarce (WCAG 1.4.4). */
+	--tacit-text-xs: 0.75rem;     /* 12 px: etykiety wersalikami, liczniki */
+	--tacit-text-sm: 0.875rem;    /* 14 px: metadane, przypisy */
+	--tacit-text-base: 1rem;      /* 16 px: tekst */
+	--tacit-text-lg: 1.125rem;    /* 18 px: lead */
+	--tacit-text-xl: 1.375rem;    /* 22 px: h3 */
+	--tacit-text-2xl: clamp(1.5rem, 1.2rem + 1.2vw, 1.875rem);   /* h2 */
+	--tacit-text-3xl: clamp(1.875rem, 1.4rem + 2vw, 2.75rem);     /* h1 */
+	--tacit-text-display: clamp(2rem, 1.3rem + 3.4vw, 3.25rem);   /* hero */
+
+	--tacit-leading-tight: 1.1;
+	--tacit-leading-snug: 1.3;
+	--tacit-leading-body: 1.6;
+	--tacit-tracking-display: -0.02em;
+	--tacit-tracking-caps: 0.08em;
+	--tacit-measure: 68ch;
+
+	/* ── Odstępy (siatka 4 px) ── */
+	--tacit-space-1: 0.25rem;
+	--tacit-space-2: 0.5rem;
+	--tacit-space-3: 0.75rem;
+	--tacit-space-4: 1rem;
+	--tacit-space-5: 1.25rem;
+	--tacit-space-6: 1.5rem;
+	--tacit-space-8: 2rem;
+	--tacit-space-10: 2.5rem;
+	--tacit-space-12: 3rem;
+	--tacit-space-16: 4rem;
+
+	/* ── Kształt ── */
+	--tacit-radius-sm: 4px;
+	--tacit-radius: 8px;
+	--tacit-radius-lg: 12px;
+	--tacit-radius-pill: 999px;
+	--tacit-border-width: 1px;
+	--tacit-shadow-raised: 0 1px 2px rgb(11 21 34 / 0.06), 0 4px 12px rgb(11 21 34 / 0.06);
+
+	/* ── Układ ── */
+	--tacit-container: 72rem;          /* 1152 px */
+	--tacit-gutter: var(--tacit-space-4);
+	--tacit-gutter-wide: var(--tacit-space-8);
+	--tacit-header-height: 3.75rem;    /* 60 px, wspólna dla Blazora, Starlight i DocFX */
+	--tacit-header-border: 3px;
+
+	/* ── Dostępność ── */
+	--tacit-target-min: 2.75rem;       /* 44 px: cel dotykowy (WCAG 2.5.8 wymaga min. 24 px, dajemy zapas) */
+	--tacit-target-min-compact: 2.25rem; /* 36 px: gęste kontrolki, nadal ≥ 24 px */
+	--tacit-focus-width: 3px;
+	--tacit-focus-offset: 2px;
+
+	/* ── Ruch ── */
+	--tacit-duration: 150ms;
+	--tacit-easing: cubic-bezier(0.2, 0, 0, 1);
+}
+
+/* Użytkownik prosi o mniej ruchu: animacje i przejścia znikają (WCAG 2.3.3). */
+@media (prefers-reduced-motion: reduce) {
+	:root {
+		--tacit-duration: 0ms;
+	}
+}
+
+/* Użytkownik prosi o wyższy kontrast: ciemniejszy tekst pomocniczy i mocniejsze linie. */
+@media (prefers-contrast: more) {
+	:root {
+		--tacit-color-fg-muted: var(--tacit-color-fg);
+		--tacit-color-line: var(--tacit-color-line-strong);
+		--tacit-color-line-strong: light-dark(var(--tacit-ink), var(--tacit-snow));
+	}
+}
+
+/* Wydruk zawsze w jasnym motywie: przeglądarki zwykle pomijają tła, a jasny tekst z ciemnego motywu zniknąłby na papierze. */
+@media print {
+	:root,
+	:root[data-theme],
+	:root[data-bs-theme] {
+		color-scheme: light;
+	}
+}

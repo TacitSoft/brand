@@ -1,0 +1,76 @@
+name: Brand packages
+
+# Z jednego katalogu web/ powstają dwie paczki o tej samej wersji:
+#   npm   @tacitsoft/brand  (Starlight, DocFX)
+#   NuGet Tacit.Brand       (serwis Blazor, Razor Class Library z src/Tacit.Brand)
+# Obie trafiają do prywatnego GitHub Packages organizacji TacitSoft, wyłącznie po tagu vX.Y.Z (ADR-C-0008).
+# Wersja pochodzi z tagu (ADR-C-0003): MinVer dla NuGet, `npm version` dla npm.
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    # Jawny zapis do Packages, żeby publikacja nie zależała od ustawienia
+    # Settings -> Actions -> Workflow permissions.
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # Pełna historia, bez niej MinVer nie zobaczy tagów.
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          registry-url: https://npm.pkg.github.com
+          scope: '@tacitsoft'
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Check WCAG contrast of tokens
+        run: node web/tools/check-contrast.mjs
+
+      - name: Pack NuGet
+        run: dotnet pack src/Tacit.Brand --configuration Release --output ./artifacts
+
+      - name: Pack npm
+        working-directory: web
+        shell: bash
+        run: |
+          if [ "$GITHUB_REF_TYPE" = tag ]; then
+            npm version "${GITHUB_REF_NAME#v}" --no-git-tag-version
+          fi
+          npm pack --pack-destination ../artifacts
+
+      - uses: actions/upload-artifact@v6
+        with:
+          name: packages
+          path: |
+            ./artifacts/*.nupkg
+            ./artifacts/*.tgz
+
+      # GITHUB_TOKEN wystarcza: paczki są powiązane z tym repo i dziedziczą jego widoczność (prywatne).
+      - name: Publish NuGet to GitHub Packages
+        if: github.event_name == 'push' && github.ref_type == 'tag'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          dotnet nuget add source --username $GITHUB_ACTOR --password "$GITHUB_TOKEN" \
+            --store-password-in-clear-text --name github "https://nuget.pkg.github.com/TacitSoft/index.json"
+          dotnet nuget push ./artifacts/*.nupkg --source github --skip-duplicate
+
+      - name: Publish npm to GitHub Packages
+        if: github.event_name == 'push' && github.ref_type == 'tag'
+        working-directory: web
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm publish
