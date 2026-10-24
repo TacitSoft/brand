@@ -50,7 +50,7 @@ Bricolage Grotesque i Public Sans z prototypu nie mają cyrylicy, a przewodniki 
 
 ## Dystrybucja
 
-Z `web/` powstają dwie paczki o tej samej wersji, publikowane w **prywatnym GitHub Packages** organizacji TacitSoft:
+Z `web/` powstają dwie paczki o tej samej wersji, publikowane w **GitHub Packages** organizacji TacitSoft:
 
 | Paczka | Feed | Dla kogo | Zawartość |
 |---|---|---|---|
@@ -63,9 +63,9 @@ Pliki leżą tylko w `web/`. Projekt `src/Tacit.Brand` ich nie kopiuje, tylko po
 
 Semver: zmiana wartości tokenu to wersja patch albo minor. Usunięcie lub zmiana nazwy tokenu, klasy `.t-*` albo pliku to wersja major, bo psuje style odbiorców.
 
-### Dostęp do prywatnych paczek
+### Dostęp do paczek
 
-GitHub Packages wymaga uwierzytelnienia także przy pobieraniu.
+GitHub Packages wymaga uwierzytelnienia przy pobieraniu paczek npm i NuGet, także publicznych.
 
 - **Lokalnie**: klasyczny Personal Access Token z uprawnieniem `read:packages`. Tokeny fine-grained nie działają z feedami npm i NuGet. Token trzymaj w zmiennej środowiskowej, a nie w repo.
 - **W Actions innego repo**: w ustawieniach **każdej z paczek** (Package settings → Manage Actions access) dodaj to repo z rolą Read. Wtedy wystarczy `GITHUB_TOKEN` i `permissions: packages: read` w workflow.

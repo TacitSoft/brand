@@ -3,7 +3,7 @@ name: Brand packages
 # Z jednego katalogu web/ powstają dwie paczki o tej samej wersji:
 #   npm   @tacitsoft/brand  (Starlight, DocFX)
 #   NuGet Tacit.Brand       (serwis Blazor, Razor Class Library z src/Tacit.Brand)
-# Obie trafiają do prywatnego GitHub Packages organizacji TacitSoft, wyłącznie po tagu vX.Y.Z (ADR-C-0008).
+# Obie trafiają do GitHub Packages organizacji TacitSoft, wyłącznie po tagu vX.Y.Z (ADR-C-0008).
 # Wersja pochodzi z tagu (ADR-C-0003): MinVer dla NuGet, `npm version` dla npm.
 
 on:
@@ -58,7 +58,7 @@ jobs:
             ./artifacts/*.nupkg
             ./artifacts/*.tgz
 
-      # GITHUB_TOKEN wystarcza: paczki są powiązane z tym repo i dziedziczą jego widoczność (prywatne).
+      # GITHUB_TOKEN wystarcza: paczki są powiązane z tym repo i dziedziczą jego uprawnienia.
       - name: Publish NuGet to GitHub Packages
         if: github.event_name == 'push' && github.ref_type == 'tag'
         env:
