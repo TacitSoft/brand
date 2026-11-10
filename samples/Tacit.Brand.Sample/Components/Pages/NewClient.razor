@@ -1,0 +1,47 @@
+@page "/clients/new"
+@rendermode InteractiveServer
+
+<PageTitle>Nowy klient · Tacit</PageTitle>
+
+<TacitBreadcrumbs Items="@([new("Backoffice", ""), new("Klienci OAuth", "clients"), new("Nowy klient")])" />
+
+<h1>Nowy klient OAuth</h1>
+<p class="t-muted">Formularz interaktywny. Wyślij go pusty: podsumowanie błędów dostaje fokus, a jego linki prowadzą do pól.</p>
+
+<div role="status">
+    @if (saved is not null)
+    {
+        <TacitCallout Tone="TacitTone.Success">Zapisano klienta „@saved.Name”. <a href="clients">Wróć do listy</a>.</TacitCallout>
+    }
+</div>
+
+<EditForm Model="model" OnValidSubmit="Save" class="t-stack" style="max-width: 36rem; --tacit-stack-gap: var(--tacit-space-5)">
+    <DataAnnotationsValidator />
+    <TacitValidationSummary />
+    <ClientFields Model="model" />
+    <div class="t-cluster">
+        <TacitButton Type="submit" Variant="TacitButtonVariant.Primary" Busy="saving">Zapisz klienta</TacitButton>
+        <TacitButton Href="clients" Variant="TacitButtonVariant.Ghost">Anuluj</TacitButton>
+    </div>
+</EditForm>
+
+@code {
+    [Inject] private ClientStore Store { get; set; } = default!;
+
+    private ClientModel model = new();
+    private Client? saved;
+    private bool saving;
+
+    private async Task Save()
+    {
+        if (saving)
+        {
+            return;
+        }
+        saving = true;
+        await Task.Delay(800); // żeby było widać stan Busy
+        saved = Store.Add(model);
+        model = new();
+        saving = false;
+    }
+}

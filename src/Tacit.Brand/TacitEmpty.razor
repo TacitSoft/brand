@@ -1,0 +1,13 @@
+@*
+    Stan pusty .t-empty: lista bez wyników, brak danych. Treść powinna mówić, co zrobić dalej.
+
+    <TacitEmpty>Nie masz jeszcze klientów OAuth. <a href="clients/new">Dodaj pierwszego</a>.</TacitEmpty>
+*@
+
+<div @attributes="AdditionalAttributes" class="@Css.Join("t-empty", Css.From(AdditionalAttributes))">@ChildContent</div>
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    [Parameter(CaptureUnmatchedValues = true)] public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; set; }
+}

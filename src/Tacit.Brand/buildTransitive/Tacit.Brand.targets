@@ -1,0 +1,59 @@
+<Project>
+	<!-- Zasada z ADR-C-0026: kolor wpisany jako hex jest tylko w tacit-tokens.css. Projekt z referencją do Tacit.Brand
+	     (bezpośrednią albo przechodnią) dostaje ostrzeżenie TBRAND001 za hex w wartości deklaracji w *.razor.css
+	     i *.cshtml.css. Zamiast hexa użyj tokenu koloru z tacit-tokens.css.
+
+	     Wyłączenie:          <TacitBrandHexCheck>false</TacitBrandHexCheck>
+	     Błąd zamiast ostrzeżenia:  <WarningsAsErrors>$(WarningsAsErrors);TBRAND001</WarningsAsErrors>  -->
+
+	<PropertyGroup>
+		<TacitBrandHexCheck Condition="'$(TacitBrandHexCheck)' == ''">true</TacitBrandHexCheck>
+	</PropertyGroup>
+
+	<UsingTask TaskName="TacitBrandCheckHex" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+		<ParameterGroup>
+			<Files ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+		</ParameterGroup>
+		<Task>
+			<Using Namespace="System.IO" />
+			<Using Namespace="System.Text.RegularExpressions" />
+			<Code Type="Fragment" Language="cs"><![CDATA[
+				// Deklaracja = właściwość: wartość zakończona ; albo }. Selektor kończy się {, więc #id w selektorze
+				// (np. a:hover #abc {) nie pasuje. Komentarze, napisy w cudzysłowie i url(...) są pomijane, zanim tekst
+				// zostanie podzielony na deklaracje, więc ; w url("data:…;…") nie ucina wartości, a content: "#abc" nie jest kolorem.
+				var skipped = new Regex(@"/\*.*?\*/|url\(\s*(?:""(?:\\.|[^""\\])*""|'(?:\\.|[^'\\])*'|[^)]*)\s*\)|""(?:\\.|[^""\\])*""|'(?:\\.|[^'\\])*'",
+					RegexOptions.Singleline | RegexOptions.IgnoreCase);
+				var declaration = new Regex(@"(?<prop>-{0,2}[a-zA-Z][\w-]*)\s*:(?<value>[^;{}]*)(?=[;}])");
+				var hex = new Regex(@"#(?:[0-9a-fA-F]{8}|[0-9a-fA-F]{6}|[0-9a-fA-F]{3,4})(?![\w-])");
+				foreach (var item in Files)
+				{
+					var path = item.GetMetadata("FullPath");
+					if (!File.Exists(path)) continue;
+					var text = File.ReadAllText(path);
+					// Pomijany fragment zastępujemy spacjami tej samej długości (z zachowaniem nowych linii), żeby numery linii się zgadzały.
+					text = skipped.Replace(text, m => Regex.Replace(m.Value, @"[^\n]", " "));
+					foreach (Match d in declaration.Matches(text))
+					{
+						foreach (Match h in hex.Matches(d.Groups["value"].Value))
+						{
+							var index = d.Groups["value"].Index + h.Index;
+							var line = 1 + text.Take(index).Count(c => c == '\n');
+							var column = index - text.LastIndexOf('\n', Math.Max(0, index - 1));
+							Log.LogWarning(null, "TBRAND001", null, path, line, column, 0, 0,
+								"Kolor {0} wpisany jako hex w '{1}'. Użyj tokenu var(--tacit-color-…) z Tacit.Brand: hex jest tylko w tacit-tokens.css (ADR-C-0026).",
+								h.Value, d.Groups["prop"].Value);
+						}
+					}
+				}
+			]]></Code>
+		</Task>
+	</UsingTask>
+
+	<Target Name="TacitBrandCheckHex" BeforeTargets="BeforeBuild" Condition="'$(TacitBrandHexCheck)' == 'true'">
+		<ItemGroup>
+			<_TacitBrandScopedCss Include="$(MSBuildProjectDirectory)\**\*.razor.css;$(MSBuildProjectDirectory)\**\*.cshtml.css"
+			                      Exclude="$(MSBuildProjectDirectory)\bin\**;$(MSBuildProjectDirectory)\obj\**;$(MSBuildProjectDirectory)\node_modules\**" />
+		</ItemGroup>
+		<TacitBrandCheckHex Files="@(_TacitBrandScopedCss)" Condition="'@(_TacitBrandScopedCss)' != ''" />
+	</Target>
+</Project>

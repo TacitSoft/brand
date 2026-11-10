@@ -1,0 +1,28 @@
+@* Pola formularza klienta, wspólne dla wersji interaktywnej i statycznej. *@
+
+<TacitField For="() => Model.Name" Label="Nazwa" Hint="Widoczna dla użytkownika na ekranie zgody." Required Context="field">
+    <InputText @bind-Value="Model.Name" class="t-input" autocomplete="off" @attributes="field.Attributes" />
+</TacitField>
+
+<TacitField For="() => Model.ClientId" Label="Identyfikator klienta" Hint="Małe litery, cyfry i myślniki, np. portal-partner." Required Context="field">
+    <InputText @bind-Value="Model.ClientId" class="t-input t-mono" autocomplete="off" @attributes="field.Attributes" />
+</TacitField>
+
+<TacitField For="() => Model.Kind" Label="Rodzaj klienta" Context="field">
+    <InputSelect @bind-Value="Model.Kind" class="t-select" @attributes="field.Attributes">
+        <option value="@ClientKind.Confidential">Poufny (serwer, ma sekret)</option>
+        <option value="@ClientKind.Public">Publiczny (aplikacja mobilna lub SPA, PKCE)</option>
+    </InputSelect>
+</TacitField>
+
+<TacitField For="() => Model.RedirectUri" Label="Adres przekierowania" Required Context="field">
+    <InputText @bind-Value="Model.RedirectUri" class="t-input" type="url" @attributes="field.Attributes" />
+</TacitField>
+
+<TacitField For="() => Model.Notes" Label="Notatki" Hint="Opcjonalne, widoczne tylko w backoffice." Context="field">
+    <InputTextArea @bind-Value="Model.Notes" class="t-textarea" @attributes="field.Attributes" />
+</TacitField>
+
+@code {
+    [Parameter, EditorRequired] public ClientModel Model { get; set; } = default!;
+}

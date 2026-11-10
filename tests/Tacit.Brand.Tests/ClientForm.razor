@@ -1,0 +1,31 @@
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Components.Forms
+@using Tacit.Brand
+
+@* Formularz testowy: pole wymagane z podpowiedzią i pole opcjonalne. *@
+<EditForm Model="Model" OnValidSubmit="() => Submitted = true">
+    <DataAnnotationsValidator />
+    <TacitValidationSummary />
+    <TacitField For="() => Model.Name" Label="Nazwa" Hint="Widoczna na ekranie zgody." Required Context="field">
+        <InputText @bind-Value="Model.Name" class="t-input" @attributes="field.Attributes" />
+    </TacitField>
+    <TacitField For="() => Model.Uri" Label="Adres przekierowania" Context="field">
+        <InputText @bind-Value="Model.Uri" class="t-input" @attributes="field.Attributes" />
+    </TacitField>
+    <TacitButton Type="submit" Variant="TacitButtonVariant.Primary">Zapisz</TacitButton>
+</EditForm>
+
+@code {
+    public ClientModel Model { get; } = new();
+
+    public bool Submitted { get; private set; }
+
+    public sealed class ClientModel
+    {
+        [Required(ErrorMessage = "Podaj nazwę.")]
+        public string? Name { get; set; }
+
+        [Url(ErrorMessage = "Podaj pełny adres, np. https://app.example.com/callback.")]
+        public string? Uri { get; set; }
+    }
+}

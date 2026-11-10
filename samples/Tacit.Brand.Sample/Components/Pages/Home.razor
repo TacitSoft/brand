@@ -1,0 +1,61 @@
+@page "/"
+
+<PageTitle>Komponenty · Tacit</PageTitle>
+
+<TacitBreadcrumbs Items="@([new("Tacit"), new("Przegląd komponentów")])" />
+
+<h1>Komponenty Tacit.Brand</h1>
+<p class="t-lead">Strona statyczna (SSR). Klienci OAuth i formularz interaktywny działają w Interactive Server, formularz statyczny bez obwodu.</p>
+
+<section class="t-stack" aria-labelledby="buttons">
+    <h2 id="buttons">TacitButton</h2>
+    <div class="t-cluster">
+        <TacitButton Variant="TacitButtonVariant.Primary">Główny</TacitButton>
+        <TacitButton>Drugorzędny</TacitButton>
+        <TacitButton Variant="TacitButtonVariant.Ghost">Tekstowy</TacitButton>
+        <TacitButton Variant="TacitButtonVariant.Danger">Usuń</TacitButton>
+        <TacitButton Variant="TacitButtonVariant.Primary" Busy>Zapisywanie</TacitButton>
+        <TacitButton Disabled>Niedostępny</TacitButton>
+        <TacitButton Href="clients/new" Small>Link jako przycisk</TacitButton>
+    </div>
+</section>
+
+<section class="t-stack" aria-labelledby="callouts">
+    <h2 id="callouts">TacitCallout</h2>
+    <TacitCallout>Wersja 1.x wymaga .NET 10 lub nowszego.</TacitCallout>
+    <TacitCallout Tone="TacitTone.Success">Klient został zapisany.</TacitCallout>
+    <TacitCallout Tone="TacitTone.Warning" Title="Rotacja klucza">Klucz podpisu wygasa za 3 dni.</TacitCallout>
+    <TacitCallout Tone="TacitTone.Danger">Nie udało się pobrać listy klientów.</TacitCallout>
+</section>
+
+<section class="t-stack" aria-labelledby="table">
+    <h2 id="table">TacitTable</h2>
+    <TacitTable Items="clients" Label="Przykładowi klienci" Caption="Tabela w statycznym SSR" RowKey="c => c.Id">
+        <Header>
+            <th scope="col">Nazwa</th>
+            <th scope="col">Identyfikator</th>
+            <th scope="col">Rodzaj</th>
+        </Header>
+        <Row>
+            <th scope="row">@context.Name</th>
+            <td class="t-mono">@context.ClientId</td>
+            <td><KindBadge Kind="context.Kind" /></td>
+        </Row>
+    </TacitTable>
+</section>
+
+<section class="t-stack" aria-labelledby="empty">
+    <h2 id="empty">Stan pusty</h2>
+    <TacitTable Items="Array.Empty<Client>()" Label="Zgody">
+        <Row><td>@context.Name</td></Row>
+        <Empty>Nikt jeszcze nie udzielił zgody. Zgody pojawią się po pierwszym logowaniu przez klienta.</Empty>
+    </TacitTable>
+</section>
+
+@code {
+    [Inject] private ClientStore Store { get; set; } = default!;
+
+    private IReadOnlyList<Client> clients = [];
+
+    protected override void OnInitialized() => clients = Store.All();
+}

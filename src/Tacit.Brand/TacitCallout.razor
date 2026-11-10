@@ -1,0 +1,56 @@
+@*
+    Komunikat .t-callout. Rodzaj komunikatu niesie tytuł, nie tylko kolor (WCAG 1.4.1), dlatego bez Title
+    komponent pokazuje tytuł domyślny dla tonu („Informacja”, „Gotowe”, „Ostrzeżenie”, „Błąd”).
+
+    <TacitCallout Tone="TacitTone.Danger" Live="TacitLive.Assertive">Nie udało się zapisać klienta.</TacitCallout>
+
+    Live zamienia komunikat w region na żywo (role="status" albo role="alert"), żeby czytnik ekranu ogłosił
+    zmianę treści (WCAG 4.1.3). Region musi istnieć przed zmianą: renderuj komponent stale i zmieniaj jego treść.
+*@
+
+<div @attributes="AdditionalAttributes" class="@CssClass" role="@Role">
+    @if (TitleText.Length > 0)
+    {
+        <span class="t-callout__title">@TitleText</span>
+    }
+    <div>@ChildContent</div>
+</div>
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    [Parameter] public TacitTone Tone { get; set; }
+
+    /// <summary>Tytuł. Null daje tytuł domyślny dla tonu, pusty tekst ukrywa tytuł.</summary>
+    [Parameter] public string? Title { get; set; }
+
+    [Parameter] public TacitLive Live { get; set; }
+
+    [Parameter(CaptureUnmatchedValues = true)] public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private string TitleText => Title ?? Tone switch
+    {
+        TacitTone.Success => "Gotowe",
+        TacitTone.Warning => "Ostrzeżenie",
+        TacitTone.Danger => "Błąd",
+        _ => "Informacja",
+    };
+
+    private string? Role => Live switch
+    {
+        TacitLive.Polite => "status",
+        TacitLive.Assertive => "alert",
+        _ => null,
+    };
+
+    private string CssClass => Css.Join(
+        "t-callout",
+        Tone switch
+        {
+            TacitTone.Success => "t-callout--success",
+            TacitTone.Warning => "t-callout--warning",
+            TacitTone.Danger => "t-callout--danger",
+            _ => null,
+        },
+        Css.From(AdditionalAttributes));
+}

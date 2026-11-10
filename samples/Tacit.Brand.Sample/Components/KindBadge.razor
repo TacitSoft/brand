@@ -1,0 +1,12 @@
+@if (Kind == ClientKind.Public)
+{
+    <span class="t-badge t-badge--accent">publiczny</span>
+}
+else
+{
+    <span class="t-badge">poufny</span>
+}
+
+@code {
+    [Parameter] public ClientKind Kind { get; set; }
+}

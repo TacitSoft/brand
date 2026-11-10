@@ -1,0 +1,91 @@
+@typeparam TItem
+@*
+    Tabela danych w ramce .t-table: przewijana poziomo na wąskich ekranach, osiągalna klawiaturą (role="region",
+    aria-label, tabindex="0"), ze stanem pustym .t-empty zamiast pustej tabeli.
+
+    <TacitTable Items="clients" Label="Klienci OAuth" RowKey="c => c.Id">
+        <Header>
+            <th scope="col">Nazwa</th>
+            <th scope="col">Identyfikator</th>
+        </Header>
+        <Row>
+            <th scope="row">@context.Name</th>
+            <td class="t-mono">@context.ClientId</td>
+        </Row>
+        <Empty>Nie masz jeszcze klientów. <a href="clients/new">Dodaj pierwszego</a>.</Empty>
+    </TacitTable>
+
+    Komórki nagłówka to <th scope="col">, a pierwsza komórka wiersza, która go nazywa, to <th scope="row">.
+*@
+
+@if (IsEmpty)
+{
+    <TacitEmpty @attributes="AdditionalAttributes">
+        @if (Empty is not null)
+        {
+            @Empty
+        }
+        else
+        {
+            @EmptyText
+        }
+    </TacitEmpty>
+}
+else
+{
+    <div @attributes="AdditionalAttributes" class="@Css.Join("t-table", Css.From(AdditionalAttributes))" role="region" aria-label="@Label" tabindex="0">
+        <table>
+            @if (Caption is not null)
+            {
+                <caption>@Caption</caption>
+            }
+            @if (Header is not null)
+            {
+                <thead><tr>@Header</tr></thead>
+            }
+            <tbody>
+                @foreach (var item in Items!)
+                {
+                    <tr @key="KeyOf(item)">@Row(item)</tr>
+                }
+            </tbody>
+            @if (Footer is not null)
+            {
+                <tfoot><tr>@Footer</tr></tfoot>
+            }
+        </table>
+    </div>
+}
+
+@code {
+    [Parameter, EditorRequired] public IEnumerable<TItem>? Items { get; set; }
+
+    /// <summary>Nazwa tabeli dla czytnika ekranu (aria-label regionu przewijania).</summary>
+    [Parameter, EditorRequired] public string Label { get; set; } = "";
+
+    /// <summary>Widoczny podpis tabeli (&lt;caption&gt;).</summary>
+    [Parameter] public string? Caption { get; set; }
+
+    /// <summary>Komórki wiersza nagłówka: &lt;th scope="col"&gt;.</summary>
+    [Parameter] public RenderFragment? Header { get; set; }
+
+    /// <summary>Komórki wiersza dla elementu.</summary>
+    [Parameter, EditorRequired] public RenderFragment<TItem> Row { get; set; } = _ => _ => { };
+
+    /// <summary>Komórki stopki, np. suma.</summary>
+    [Parameter] public RenderFragment? Footer { get; set; }
+
+    /// <summary>Treść stanu pustego. Ma pierwszeństwo przed <see cref="EmptyText"/>.</summary>
+    [Parameter] public RenderFragment? Empty { get; set; }
+
+    [Parameter] public string EmptyText { get; set; } = "Brak danych.";
+
+    /// <summary>Klucz wiersza (@key), żeby Blazor nie mylił wierszy po sortowaniu lub usunięciu.</summary>
+    [Parameter] public Func<TItem, object>? RowKey { get; set; }
+
+    [Parameter(CaptureUnmatchedValues = true)] public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private bool IsEmpty => Items is null || !Items.Any();
+
+    private object? KeyOf(TItem item) => RowKey is null ? null : RowKey(item);
+}

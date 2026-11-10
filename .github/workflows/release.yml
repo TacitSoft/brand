@@ -39,6 +39,12 @@ jobs:
       - name: Check WCAG contrast of tokens
         run: node web/tools/check-contrast.mjs
 
+      - name: Test Razor components
+        run: dotnet test tests/Tacit.Brand.Tests --configuration Release
+
+      - name: Build sample
+        run: dotnet build samples/Tacit.Brand.Sample --configuration Release
+
       - name: Pack NuGet
         run: dotnet pack src/Tacit.Brand --configuration Release --output ./artifacts
 

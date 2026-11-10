@@ -16,7 +16,9 @@ Podgląd wszystkich komponentów w obu motywach: `preview.html`, opublikowany po
 | `adapters/starlight.css` | `--tacit-*` → `--sl-*`, granatowy nagłówek, fonty nagłówków | Starlight |
 | `adapters/docfx.css` | `--tacit-*` → zmienne Bootstrap 5, granatowy nagłówek | DocFX modern |
 | `package.json` | Definicja paczki npm `@tacitsoft/brand` | Starlight, DocFX |
-| `../src/Tacit.Brand/` | Paczka NuGet `Tacit.Brand` (Razor Class Library): pliki z `web/` jako zasoby statyczne, komponent `ThemeSwitch.razor`, wzór `App.razor.example` z `App.razor` i `MainLayout.razor` | Blazor |
+| `../src/Tacit.Brand/` | Paczka NuGet `Tacit.Brand` (Razor Class Library): pliki z `web/` jako zasoby statyczne, `ThemeSwitch.razor`, wspólne komponenty stron modułów (`TacitTable`, `TacitField`, `TacitValidationSummary`, `TacitButton`, `TacitCallout`, `TacitBreadcrumbs`, `TacitNav`, `TacitEmpty`), ostrzeżenie TBRAND001 o hexie w `*.razor.css`, wzór `App.razor.example` z `App.razor`, `MainLayout.razor` i układem obszaru | Blazor |
+| `../samples/Tacit.Brand.Sample/` | Aplikacja Blazor do oglądania komponentów: obszar z menu, tabela, formularz interaktywny i statyczny (SSR). `dotnet run --project samples/Tacit.Brand.Sample`, potem http://localhost:5273 | rozwój |
+| `../tests/Tacit.Brand.Tests/` | Testy znacznika komponentów (bUnit): powiązania etykiet, `aria-*`, stan pusty, menu | CI |
 | `tools/check-contrast.mjs` | Sprawdza kontrast WCAG wszystkich par tokenów w obu motywach | CI |
 | `DOSTEPNOSC.md` | Wymagania dostępności: przepisy, co dają style, co musi zrobić znacznik, jak testować | wszyscy |
 
@@ -55,13 +57,13 @@ Z `web/` powstają dwie paczki o tej samej wersji, publikowane w **GitHub Packag
 | Paczka | Feed | Dla kogo | Zawartość |
 |---|---|---|---|
 | npm `@tacitsoft/brand` | `https://npm.pkg.github.com` | Starlight, DocFX | Wszystkie pliki CSS i JS, adaptery, fonty |
-| NuGet `Tacit.Brand` | `https://nuget.pkg.github.com/TacitSoft/index.json` | Serwis Blazor | Tokeny, fonty, `tacit-site.css`, `tacit-theme.js`, ikony, komponent `<ThemeSwitch />` |
+| NuGet `Tacit.Brand` | `https://nuget.pkg.github.com/TacitSoft/index.json` | Serwis Blazor, biblioteki z UI modułów | Tokeny, fonty, `tacit-site.css`, `tacit-theme.js`, ikony, `<ThemeSwitch />`, komponenty stron modułów, reguła TBRAND001 |
 
 Pliki leżą tylko w `web/`. Projekt `src/Tacit.Brand` ich nie kopiuje, tylko podlinkowuje jako static web assets.
 
-**Wydanie nowej wersji**: `git tag v0.2.0 && git push origin v0.2.0`. Workflow `.github/workflows/release.yml` sprawdza kontrast, buduje obie paczki i publikuje je. Wersja pochodzi z tagu (ADR-C-0003), a publikacja jest tylko po tagu (ADR-C-0008). Każdy push i PR też buduje paczki i zostawia je jako artefakt workflow, ale ich nie publikuje.
+**Wydanie nowej wersji**: `git tag v0.2.0 && git push origin v0.2.0`. Workflow `.github/workflows/release.yml` sprawdza kontrast, uruchamia testy komponentów, buduje obie paczki i publikuje je. Wersja pochodzi z tagu (ADR-C-0003), a publikacja jest tylko po tagu (ADR-C-0008). Każdy push i PR też buduje paczki i zostawia je jako artefakt workflow, ale ich nie publikuje.
 
-Semver: zmiana wartości tokenu to wersja patch albo minor. Usunięcie lub zmiana nazwy tokenu, klasy `.t-*` albo pliku to wersja major, bo psuje style odbiorców.
+Semver: zmiana wartości tokenu to wersja patch albo minor. Usunięcie lub zmiana nazwy tokenu, klasy `.t-*`, pliku, komponentu albo jego parametru to wersja major, bo psuje style lub kod odbiorców.
 
 ### Dostęp do paczek
 
@@ -99,10 +101,10 @@ Hasło do źródła dodaj poza repo: `dotnet nuget update source tacitsoft --use
 ### Blazor
 
 ```xml
-<PackageReference Include="Tacit.Brand" Version="0.1.*" />
+<PackageReference Include="Tacit.Brand" Version="0.2.*" />
 ```
 
-W `_Imports.razor` dodaj `@using Tacit.Brand`. Pliki są pod `_content/Tacit.Brand/…`, a ikony pod `_content/Tacit.Brand/icons/`. `MapStaticAssets` i `@Assets[...]` dają im kompresję i fingerprinting, więc bundler nie jest potrzebny. Wzór `App.razor` i layoutu jest w `src/Tacit.Brand/App.razor.example`.
+W `_Imports.razor` dodaj `@using Tacit.Brand`. Komponenty stron modułów i ich użycie opisuje [README paczki](../src/Tacit.Brand/README.md). Pliki są pod `_content/Tacit.Brand/…`, a ikony pod `_content/Tacit.Brand/icons/`. `MapStaticAssets` i `@Assets[...]` dają im kompresję i fingerprinting, więc bundler nie jest potrzebny. Wzór `App.razor` i layoutu jest w `src/Tacit.Brand/App.razor.example`.
 
 Usuń Bootstrapa z szablonu Blazora. Klasy `.t-*` z nim nie kolidują, ale dwa systemy stylów to dwa źródła prawdy.
 
@@ -163,6 +165,8 @@ import './tacit-theme-sync.js';
 | Klasa | Zastosowanie |
 |---|---|
 | `.t-page`, `.t-wrap`, `.t-main` | Szkielet strony, kontener szerokości, główny obszar |
+| `.t-area`, `.t-area__nav` | Układ obszaru modułów: menu obszaru obok treści (od 960 px), na wąskim ekranie nad treścią |
+| `.t-sidenav`, `.t-sidenav__title` | Menu obszaru z grupami (`<TacitNav>`, także z pozycjami z `<ModuleNavigation>`). Bieżąca strona: `aria-current="page"` albo `.active` |
 | `.t-skip-link` | „Przejdź do treści” |
 | `.t-header`, `.t-header__inner`, `.t-header__end`, `.t-brand`, `.t-nav` | Granatowy nagłówek z nawigacją (`aria-current="page"` albo `.active` z `NavLink`) |
 | `.t-segmented` | Przełącznik segmentowy: motyw (`aria-pressed`) i język (`aria-current`) |
@@ -175,7 +179,7 @@ import './tacit-theme-sync.js';
 | `.t-chips`, `.t-chip`, `.t-chip__count` | Filtry z `aria-pressed` |
 | `.t-field`, `.t-label`, `.t-hint`, `.t-error`, `.t-input`, `.t-select`, `.t-textarea`, `.t-check`, `.t-search` | Formularze. Obsługują też klasy z `EditForm` (`.invalid`, `.validation-message`, `.validation-errors`) |
 | `.t-callout` + `--success`, `--warning`, `--danger` | Komunikaty |
-| `.t-table` | Tabela w ramce, przewijana na wąskich ekranach |
+| `.t-table` | Tabela w ramce, przewijana na wąskich ekranach (`<TacitTable>`) |
 | `.t-command` | Polecenie do skopiowania (`dotnet add package …`) |
 | `.t-breadcrumbs`, `.t-empty`, `.t-footer` | Okruszki, stan pusty, stopka |
 | `.t-visually-hidden`, `.t-muted`, `.t-mono`, `.t-small`, `.t-nowrap` | Narzędzia |

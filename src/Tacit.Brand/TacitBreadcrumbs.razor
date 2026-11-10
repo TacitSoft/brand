@@ -1,0 +1,38 @@
+@*
+    Okruszki .t-breadcrumbs. Ostatnia pozycja to bieżąca strona: bez linku, z aria-current="page".
+
+    <TacitBreadcrumbs Items="@([new("Klienci OAuth", "clients"), new("Portal partnera")])" />
+*@
+
+@if (Items.Count > 0)
+{
+    <nav @attributes="AdditionalAttributes" class="@Css.Join("t-breadcrumbs", Css.From(AdditionalAttributes))" aria-label="@Label">
+        <ol>
+            @for (var i = 0; i < Items.Count; i++)
+            {
+                var item = Items[i];
+                if (i == Items.Count - 1)
+                {
+                    <li aria-current="page">@item.Text</li>
+                }
+                else if (item.Href is null)
+                {
+                    <li>@item.Text</li>
+                }
+                else
+                {
+                    <li><a href="@item.Href">@item.Text</a></li>
+                }
+            }
+        </ol>
+    </nav>
+}
+
+@code {
+    [Parameter, EditorRequired] public IReadOnlyList<TacitBreadcrumb> Items { get; set; } = [];
+
+    /// <summary>Etykieta landmarku nawigacji.</summary>
+    [Parameter] public string Label { get; set; } = "Okruszki";
+
+    [Parameter(CaptureUnmatchedValues = true)] public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; set; }
+}

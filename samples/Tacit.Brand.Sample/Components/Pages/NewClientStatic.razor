@@ -1,0 +1,39 @@
+@page "/clients/new-static"
+
+<PageTitle>Nowy klient (SSR) · Tacit</PageTitle>
+
+<TacitBreadcrumbs Items="@([new("Backoffice", ""), new("Klienci OAuth", "clients"), new("Nowy klient (SSR)")])" />
+
+<h1>Nowy klient OAuth (statyczny SSR)</h1>
+<p class="t-muted">Ten sam formularz bez obwodu, jak strony obszaru <code>interaction</code>. Walidacja odbywa się na serwerze po wysłaniu, a błędy przychodzą w odpowiedzi.</p>
+
+@if (saved is not null)
+{
+    <TacitCallout Tone="TacitTone.Success">Zapisano klienta „@saved.Name”. <a href="clients">Wróć do listy</a>.</TacitCallout>
+}
+
+<EditForm Model="Model!" FormName="new-client" OnValidSubmit="Save" Enhance class="t-stack" style="max-width: 36rem; --tacit-stack-gap: var(--tacit-space-5)">
+    <DataAnnotationsValidator />
+    <TacitValidationSummary />
+    <ClientFields Model="Model!" />
+    <div class="t-cluster">
+        <TacitButton Type="submit" Variant="TacitButtonVariant.Primary">Zapisz klienta</TacitButton>
+        <TacitButton Href="clients" Variant="TacitButtonVariant.Ghost">Anuluj</TacitButton>
+    </div>
+</EditForm>
+
+@code {
+    [Inject] private ClientStore Store { get; set; } = default!;
+
+    [SupplyParameterFromForm(FormName = "new-client")] private ClientModel? Model { get; set; }
+
+    private Client? saved;
+
+    protected override void OnInitialized() => Model ??= new();
+
+    private void Save()
+    {
+        saved = Store.Add(Model!);
+        Model = new();
+    }
+}
