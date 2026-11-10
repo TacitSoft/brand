@@ -1,0 +1,9 @@
+{
+  "name": "tacit-brand",
+  "description": "How to use Tacit.Brand correctly in a Blazor host or a library with module pages: loading the brand assets, the --tacit-* tokens and .t-* classes, the area layout (.t-area) with TacitNav fed by Tacit.Modulus.Blazor ModuleNavigation, the module page components (TacitTable, TacitField, TacitValidationSummary, TacitButton, TacitCallout, TacitBreadcrumbs, TacitEmpty), the TBRAND001 hex-colour check, WCAG 2.2 AA duties of the markup, and a review checklist.",
+  "author": {
+    "name": "TacitSoft"
+  },
+  "icon": "icon-rounded-512.png",
+  "skills": "./.claude/skills/"
+}

@@ -146,7 +146,7 @@ Pozycje menu modułów daje `<ModuleNavigation>` z Tacit.Modulus.Blazor (ADR-C-0
 
 ## Hex tylko w tokenach
 
-Paczka dokłada do builda odbiorcy (także przechodnio, przez paczkę modułu UI) sprawdzenie zasady z ADR-C-0026: kolor wpisany jako hex jest tylko w `tacit-tokens.css`. Hex w wartości deklaracji w `*.razor.css` albo `*.cshtml.css` daje ostrzeżenie **TBRAND001** z plikiem i linią. Komentarze, selektory `#id` i `url(#…)` są pomijane.
+Paczka dokłada do builda odbiorcy (także przechodnio, przez paczkę modułu UI) sprawdzenie zasady z ADR-C-0026: kolor wpisany jako hex jest tylko w `tacit-tokens.css`. Hex w wartości deklaracji w `*.razor.css` albo `*.cshtml.css` daje ostrzeżenie **TBRAND001** z plikiem i linią. Komentarze, napisy w cudzysłowie, selektory `#id` i całe `url(…)` są pomijane.
 
 ```xml
 <!-- błąd zamiast ostrzeżenia, np. w Directory.Build.props biblioteki z UI -->

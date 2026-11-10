@@ -44,3 +44,14 @@ SVG jest źródłem, a PNG i ICO się z niego generuje. Po zmianie SVG wygeneruj
 Katalog `web/` zawiera wspólne style serwisu Blazor i dokumentacji (Starlight, DocFX) zgodnie z ADR-C-0026. Są tam tokeny `--tacit-*` (kolory z tabeli wyżej, motyw jasny i ciemny), lokalnie hostowane fonty, komponenty `.t-*`, przełącznik motywu i adaptery dla obu narzędzi dokumentacji. Opis i sposób podłączenia: [`web/README.md`](web/README.md), wymagania dostępności (WCAG 2.2 AA): [`web/DOSTEPNOSC.md`](web/DOSTEPNOSC.md).
 
 Style są dystrybuowane jako dwie paczki w GitHub Packages, wydawane tagiem `vX.Y.Z`: npm `@tacitsoft/brand` (Starlight, DocFX) i NuGet `Tacit.Brand` (Blazor, z `src/Tacit.Brand`). Paczka NuGet ma też wspólne komponenty Razor stron modułów (tabela, pole formularza, przycisk, komunikat, okruszki, menu obszaru) zgodnie z ADR-C-0031 pkt 9, opisane w [`src/Tacit.Brand/README.md`](src/Tacit.Brand/README.md). Szczegóły i konfiguracja dostępu: [`web/README.md`](web/README.md#dystrybucja).
+
+## Skill dla agentów kodujących
+
+Dla agentów kodujących jest skill [`tacit-brand`](.claude/skills/tacit-brand/SKILL.md). Trafia do repozytoriów konsumentów jako plugin z marketplace'u [`TacitSoft/claude-plugins`](https://github.com/TacitSoft/claude-plugins) (ADR-C-0023):
+
+```
+/plugin marketplace add TacitSoft/claude-plugins
+/plugin install tacit-brand@tacitsoft
+```
+
+W repozytorium konsumenta lepiej włączyć marketplace i plugin w `.claude/settings.json` (`extraKnownMarketplaces`, `enabledPlugins`), żeby cały zespół dostał go bez ręcznej instalacji. Wzór jest w README `TacitSoft/claude-plugins`.
