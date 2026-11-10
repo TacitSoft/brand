@@ -19,22 +19,22 @@
 			<Using Namespace="System.Text.RegularExpressions" />
 			<Code Type="Fragment" Language="cs"><![CDATA[
 				// Deklaracja = właściwość: wartość zakończona ; albo }. Selektor kończy się {, więc #id w selektorze
-				// (np. a:hover #abc {) nie pasuje. Komentarze i url(...) są pomijane.
-				var comment = new Regex(@"/\*.*?\*/", RegexOptions.Singleline);
+				// (np. a:hover #abc {) nie pasuje. Komentarze, napisy w cudzysłowie i url(...) są pomijane, zanim tekst
+				// zostanie podzielony na deklaracje, więc ; w url("data:…;…") nie ucina wartości, a content: "#abc" nie jest kolorem.
+				var skipped = new Regex(@"/\*.*?\*/|url\(\s*(?:""(?:\\.|[^""\\])*""|'(?:\\.|[^'\\])*'|[^)]*)\s*\)|""(?:\\.|[^""\\])*""|'(?:\\.|[^'\\])*'",
+					RegexOptions.Singleline | RegexOptions.IgnoreCase);
 				var declaration = new Regex(@"(?<prop>-{0,2}[a-zA-Z][\w-]*)\s*:(?<value>[^;{}]*)(?=[;}])");
-				var url = new Regex(@"url\([^)]*\)", RegexOptions.IgnoreCase);
 				var hex = new Regex(@"#(?:[0-9a-fA-F]{8}|[0-9a-fA-F]{6}|[0-9a-fA-F]{3,4})(?![\w-])");
 				foreach (var item in Files)
 				{
 					var path = item.GetMetadata("FullPath");
 					if (!File.Exists(path)) continue;
 					var text = File.ReadAllText(path);
-					// Komentarz zastępujemy spacjami tej samej długości (z zachowaniem nowych linii), żeby numery linii się zgadzały.
-					text = comment.Replace(text, m => Regex.Replace(m.Value, @"[^\n]", " "));
+					// Pomijany fragment zastępujemy spacjami tej samej długości (z zachowaniem nowych linii), żeby numery linii się zgadzały.
+					text = skipped.Replace(text, m => Regex.Replace(m.Value, @"[^\n]", " "));
 					foreach (Match d in declaration.Matches(text))
 					{
-						var value = url.Replace(d.Groups["value"].Value, m => new string(' ', m.Length));
-						foreach (Match h in hex.Matches(value))
+						foreach (Match h in hex.Matches(d.Groups["value"].Value))
 						{
 							var index = d.Groups["value"].Index + h.Index;
 							var line = 1 + text.Take(index).Count(c => c == '\n');

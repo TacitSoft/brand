@@ -20,7 +20,7 @@
 
 @if (IsEmpty)
 {
-    <TacitEmpty>
+    <TacitEmpty @attributes="AdditionalAttributes">
         @if (Empty is not null)
         {
             @Empty

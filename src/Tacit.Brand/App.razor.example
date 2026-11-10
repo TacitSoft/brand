@@ -34,10 +34,12 @@
 
 @* ───────────────────────── MainLayout.razor ───────────────────────── *@
 @inherits LayoutComponentBase
+@inject NavigationManager Navigation
 
 <div class="t-page">
-    @* Pierwszy element strony, widoczny po Tab (WCAG 2.4.1) *@
-    <a class="t-skip-link" href="#main">Przejdź do treści</a>
+    @* Pierwszy element strony, widoczny po Tab (WCAG 2.4.1). Sam „#main” przy <base href="/"> prowadziłby
+       do strony głównej, dlatego link ma ścieżkę bieżącej strony. *@
+    <a class="t-skip-link" href="@(new Uri(Navigation.Uri).GetComponents(UriComponents.PathAndQuery, UriFormat.UriEscaped))#main">Przejdź do treści</a>
 
     <header class="t-header">
         <div class="t-wrap t-header__inner">

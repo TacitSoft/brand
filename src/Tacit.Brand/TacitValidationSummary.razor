@@ -106,21 +106,26 @@
     private static List<(string, string?)> Collect(EditContext context)
     {
         var result = new List<(string, string?)>();
-        var linked = new HashSet<string>();
+        // Liczba wystąpień komunikatu już pokazanych przy polach. GetValidationMessages() zwraca komunikaty wszystkich
+        // pól, więc odejmujemy tylko te wystąpienia, a inne błędy o tej samej treści zostają na liście.
+        var linked = new Dictionary<string, int>();
         foreach (var (field, id) in TacitFieldRegistry.Find(context)?.Fields ?? [])
         {
             foreach (var message in context.GetValidationMessages(field))
             {
                 result.Add((message, id));
-                linked.Add(message);
+                linked[message] = linked.GetValueOrDefault(message) + 1;
             }
         }
         foreach (var message in context.GetValidationMessages())
         {
-            if (!linked.Contains(message))
+            if (linked.TryGetValue(message, out var count) && count > 0)
+            {
+                linked[message] = count - 1;
+            }
+            else
             {
                 result.Add((message, null));
-                linked.Add(message);
             }
         }
         return result;

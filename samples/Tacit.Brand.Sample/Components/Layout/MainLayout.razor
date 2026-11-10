@@ -1,7 +1,8 @@
 @inherits LayoutComponentBase
+@inject NavigationManager Navigation
 
 <div class="t-page">
-    <a class="t-skip-link" href="#main">Przejdź do treści</a>
+    <a class="t-skip-link" href="@MainHref">Przejdź do treści</a>
 
     <header class="t-header">
         <div class="t-wrap t-header__inner">
@@ -34,5 +35,10 @@
 
 <div id="blazor-error-ui" role="alert">
     Wystąpił błąd. <a href="" class="reload">Odśwież stronę</a>
-    <span class="dismiss" aria-label="Zamknij">✕</span>
+    <button type="button" class="dismiss" aria-label="Zamknij">✕</button>
 </div>
+
+@code {
+    // Sam „#main” przy <base href="/"> prowadziłby do strony głównej, dlatego link ma ścieżkę bieżącej strony.
+    private string MainHref => new Uri(Navigation.Uri).GetComponents(UriComponents.PathAndQuery, UriFormat.UriEscaped) + "#main";
+}

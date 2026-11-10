@@ -1,5 +1,6 @@
 using Bunit;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
@@ -108,6 +109,21 @@ public sealed class TableTests : BunitContext
 		Assert.Empty(cut.FindAll("table"));
 		Assert.Equal("Nie masz jeszcze klientów.", cut.Find(".t-empty").TextContent.Trim());
 	}
+
+	[Fact]
+	public void Empty_state_keeps_additional_attributes()
+	{
+		var cut = Render<TacitTable<Client>>(p => p
+			.Add(t => t.Items, [])
+			.Add(t => t.Label, "Klienci OAuth")
+			.Add(t => t.Row, c => c.Name)
+			.AddUnmatched("id", "clients")
+			.AddUnmatched("class", "wide"));
+
+		var empty = cut.Find(".t-empty");
+		Assert.Equal("clients", empty.Id);
+		Assert.Equal("t-empty wide", empty.ClassName);
+	}
 }
 
 public sealed class BreadcrumbsTests : BunitContext
@@ -203,6 +219,28 @@ public sealed class FieldTests : BunitContext
 		var links = summary.QuerySelectorAll("a").Select(a => a.GetAttribute("href")).ToList();
 		Assert.Equal(["/#clientmodel-name", "/#clientmodel-uri"], links);
 		Assert.False(cut.Instance.Submitted);
+	}
+
+	[Fact]
+	public void Summary_keeps_other_errors_with_the_same_message()
+	{
+		var cut = Render<ClientForm>();
+		var context = cut.FindComponent<EditForm>().Instance.EditContext!;
+		var store = new ValidationMessageStore(context);
+
+		cut.InvokeAsync(() =>
+		{
+			store.Add(context.Field(nameof(ClientForm.ClientModel.Name)), "Błąd.");
+			store.Add(context.Field("Unregistered"), "Błąd.");
+			store.Add(new FieldIdentifier(context.Model, ""), "Błąd.");
+			context.NotifyValidationStateChanged();
+		});
+
+		var items = cut.FindAll(".validation-errors li");
+		Assert.Equal(3, items.Count);
+		Assert.Equal("/#clientmodel-name", items[0].QuerySelector("a")!.GetAttribute("href"));
+		Assert.All(items.Skip(1), li => Assert.Null(li.QuerySelector("a")));
+		Assert.Equal("Popraw 3 pola:", cut.Find(".validation-errors strong").TextContent);
 	}
 
 	[Fact]

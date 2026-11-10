@@ -325,14 +325,17 @@
 		}
 	}
 
-	/* Obszar modułów: menu obszaru (.t-area__nav) obok treści. Na wąskim ekranie menu jest nad treścią. */
+	/* Obszar modułów: menu obszaru (.t-area__nav) obok treści. Na wąskim ekranie menu jest nad treścią.
+	   minmax(0, 1fr): szeroka tabela przewija się w .t-table zamiast rozpychać stronę. Bez menu (TacitNav bez
+	   pozycji nic nie renderuje) treść zostaje w jednej, pełnej kolumnie. */
 	.t-area {
 		display: grid;
+		grid-template-columns: minmax(0, 1fr);
 		gap: var(--tacit-space-6);
 	}
 
 	@media (min-width: 60em) {
-		.t-area {
+		.t-area:has(> .t-area__nav) {
 			grid-template-columns: 15rem minmax(0, 1fr);
 			gap: var(--tacit-space-10);
 			align-items: start;
