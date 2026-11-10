@@ -50,5 +50,8 @@ Style są dystrybuowane jako dwie paczki w GitHub Packages, wydawane tagiem `vX.
 Dla agentów kodujących jest skill [`tacit-brand`](.claude/skills/tacit-brand/SKILL.md). Trafia do repozytoriów konsumentów jako plugin z marketplace'u [`TacitSoft/claude-plugins`](https://github.com/TacitSoft/claude-plugins) (ADR-C-0023):
 
 ```
-/plugin install tacit-brand --marketplace TacitSoft/claude-plugins
+/plugin marketplace add TacitSoft/claude-plugins
+/plugin install tacit-brand@tacitsoft
 ```
+
+W repozytorium konsumenta lepiej włączyć marketplace i plugin w `.claude/settings.json` (`extraKnownMarketplaces`, `enabledPlugins`), żeby cały zespół dostał go bez ręcznej instalacji. Wzór jest w README `TacitSoft/claude-plugins`.
