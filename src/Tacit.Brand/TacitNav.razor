@@ -1,0 +1,62 @@
+@*
+    Menu obszaru .t-sidenav: pionowa lista stron obszaru modułów, z grupami. Bieżącą stronę oznacza NavLink
+    (aria-current="page" i klasa active), także w statycznym SSR.
+
+    <nav> w układzie obszaru (np. BackofficeLayout):
+        <div class="t-wrap t-main t-area">
+            <TacitNav class="t-area__nav" Label="Backoffice" Items="items" />
+            <div>@Body</div>
+        </div>
+
+    Kolejność pozycji i grup jest taka jak w Items. Pozycje bez grupy idą na górę. Menu modułów: pozycje widoczne
+    dla użytkownika daje <ModuleNavigation Context="groups"> z Tacit.Modulus.Blazor, a TacitNav w jego treści
+    renderuje je tym znacznikiem (wzór w README), więc menu modułów i menu pisane ręcznie wyglądają tak samo.
+*@
+
+@if (items.Count > 0)
+{
+    <nav @attributes="AdditionalAttributes" class="@Css.Join("t-sidenav", Css.From(AdditionalAttributes))" aria-label="@Label">
+        @{
+            var groupIndex = 0;
+        }
+        @foreach (var group in items.GroupBy(i => i.Group).OrderBy(g => g.Key is null ? 0 : 1))
+        {
+            if (group.Key is null)
+            {
+                <ul>@Links(group)</ul>
+            }
+            else
+            {
+                var titleId = $"{IdPrefix}-g{++groupIndex}";
+                <div>
+                    <p class="t-sidenav__title" id="@titleId">@group.Key</p>
+                    <ul aria-labelledby="@titleId">@Links(group)</ul>
+                </div>
+            }
+        }
+    </nav>
+}
+
+@code {
+    [Parameter, EditorRequired] public IEnumerable<TacitNavItem>? Items { get; set; }
+
+    /// <summary>Etykieta landmarku, inna niż nawigacji głównej w nagłówku (np. nazwa obszaru).</summary>
+    [Parameter, EditorRequired] public string Label { get; set; } = "";
+
+    /// <summary>Przedrostek identyfikatorów tytułów grup. Podaj go, gdy na stronie są dwa menu obszaru.</summary>
+    [Parameter] public string IdPrefix { get; set; } = "t-sidenav";
+
+    [Parameter(CaptureUnmatchedValues = true)] public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private List<TacitNavItem> items = [];
+
+    protected override void OnParametersSet() => items = Items?.ToList() ?? [];
+
+    private static RenderFragment Links(IEnumerable<TacitNavItem> group) => __builder =>
+    {
+        foreach (var item in group)
+        {
+            <li @key="item.Href"><NavLink href="@item.Href" Match="item.Match">@item.Title</NavLink></li>
+        }
+    };
+}

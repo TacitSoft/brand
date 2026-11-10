@@ -1,0 +1,57 @@
+@page "/clients"
+@rendermode InteractiveServer
+
+<PageTitle>Klienci OAuth · Tacit</PageTitle>
+
+<TacitBreadcrumbs Items="@([new("Backoffice", ""), new("Klienci OAuth")])" />
+
+<div class="t-cluster" style="justify-content: space-between">
+    <h1>Klienci OAuth</h1>
+    <TacitButton Href="clients/new" Variant="TacitButtonVariant.Primary">Nowy klient</TacitButton>
+</div>
+
+@* Region na żywo istnieje stale, a komunikat pojawia się w nim po usunięciu, więc czytnik ekranu go ogłosi. *@
+<div role="status">
+    @if (status is not null)
+    {
+        <TacitCallout Tone="TacitTone.Success">@status</TacitCallout>
+    }
+</div>
+
+<TacitTable Items="clients" Label="Klienci OAuth" RowKey="c => c.Id">
+    <Header>
+        <th scope="col">Nazwa</th>
+        <th scope="col">Identyfikator</th>
+        <th scope="col">Rodzaj</th>
+        <th scope="col">Przekierowanie</th>
+        <th scope="col"><span class="t-visually-hidden">Akcje</span></th>
+    </Header>
+    <Row>
+        <th scope="row">@context.Name</th>
+        <td class="t-mono">@context.ClientId</td>
+        <td><KindBadge Kind="context.Kind" /></td>
+        <td class="t-mono t-small">@context.RedirectUri</td>
+        <td>
+            <TacitButton Variant="TacitButtonVariant.Ghost" Small @onclick="() => Remove(context)">
+                Usuń<span class="t-visually-hidden"> @context.Name</span>
+            </TacitButton>
+        </td>
+    </Row>
+    <Empty>Nie masz klientów. <a href="clients/new">Dodaj pierwszego</a>.</Empty>
+</TacitTable>
+
+@code {
+    [Inject] private ClientStore Store { get; set; } = default!;
+
+    private IReadOnlyList<Client> clients = [];
+    private string? status;
+
+    protected override void OnInitialized() => clients = Store.All();
+
+    private void Remove(Client client)
+    {
+        Store.Remove(client.Id);
+        clients = Store.All();
+        status = $"Usunięto klienta „{client.Name}”.";
+    }
+}

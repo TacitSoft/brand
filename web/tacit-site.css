@@ -325,6 +325,25 @@
 		}
 	}
 
+	/* Obszar modułów: menu obszaru (.t-area__nav) obok treści. Na wąskim ekranie menu jest nad treścią. */
+	.t-area {
+		display: grid;
+		gap: var(--tacit-space-6);
+	}
+
+	@media (min-width: 60em) {
+		.t-area {
+			grid-template-columns: 15rem minmax(0, 1fr);
+			gap: var(--tacit-space-10);
+			align-items: start;
+		}
+
+		.t-area__nav {
+			position: sticky;
+			top: calc(var(--tacit-header-height) + var(--tacit-header-border) + var(--tacit-space-5));
+		}
+	}
+
 	.t-section + .t-section {
 		margin-top: var(--tacit-space-10);
 	}
@@ -1157,6 +1176,56 @@
 		font-family: var(--tacit-font-mono);
 	}
 
+	/* ── Nawigacja obszaru (menu boczne modułów: <TacitNav>, także z pozycjami z <ModuleNavigation>).
+	   Znacznik: <nav class="t-sidenav" aria-label="…"><ul>…</ul>
+	             <p class="t-sidenav__title" id="g1">Grupa</p><ul aria-labelledby="g1">…</ul></nav> ── */
+	.t-sidenav {
+		display: grid;
+		gap: var(--tacit-space-4);
+		align-content: start;
+	}
+
+	.t-sidenav ul {
+		display: grid;
+		gap: 2px;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.t-sidenav__title {
+		margin: 0 0 var(--tacit-space-1);
+		padding-inline: var(--tacit-space-3);
+		color: var(--tacit-color-fg-muted);
+		font: 600 var(--tacit-text-xs)/1.4 var(--tacit-font-mono);
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+	}
+
+	.t-sidenav a {
+		display: flex;
+		align-items: center;
+		min-height: var(--tacit-target-min);
+		padding: var(--tacit-space-2) var(--tacit-space-3);
+		border-radius: var(--tacit-radius);
+		color: var(--tacit-color-fg);
+		text-decoration: none;
+	}
+
+	.t-sidenav a:hover {
+		background: var(--tacit-color-surface-sunken);
+		color: var(--tacit-color-fg);
+	}
+
+	/* Bieżąca strona: tło, pogrubienie i pasek z lewej, więc nie tylko kolor (WCAG 1.4.1). */
+	.t-sidenav a[aria-current="page"],
+	.t-sidenav a.active {
+		background: var(--tacit-color-primary-soft);
+		color: var(--tacit-color-on-primary-soft);
+		font-weight: 600;
+		box-shadow: inset 3px 0 0 var(--tacit-color-primary);
+	}
+
 	/* ── Stan pusty ── */
 	.t-empty {
 		grid-column: 1 / -1;
@@ -1272,7 +1341,9 @@
 		}
 
 		.t-nav a[aria-current="page"],
-		.t-nav a.active {
+		.t-nav a.active,
+		.t-sidenav a[aria-current="page"],
+		.t-sidenav a.active {
 			text-decoration: underline;
 			text-decoration-thickness: 3px;
 		}

@@ -1,0 +1,38 @@
+@inherits LayoutComponentBase
+
+<div class="t-page">
+    <a class="t-skip-link" href="#main">Przejdź do treści</a>
+
+    <header class="t-header">
+        <div class="t-wrap t-header__inner">
+            <a class="t-brand" href="">
+                <img src="_content/Tacit.Brand/icons/icon-rounded.svg" alt="" width="32" height="32" />
+                Tacit <span class="t-brand__tag">sample</span>
+            </a>
+            <nav class="t-nav" aria-label="Główna">
+                <ul>
+                    <li><NavLink href="" Match="NavLinkMatch.All">Komponenty</NavLink></li>
+                    <li><NavLink href="clients">Backoffice</NavLink></li>
+                </ul>
+            </nav>
+            <div class="t-header__end">
+                <ThemeSwitch />
+            </div>
+        </div>
+    </header>
+
+    <main id="main" tabindex="-1" class="t-wrap t-main">
+        @Body
+    </main>
+
+    <footer class="t-footer">
+        <div class="t-wrap t-footer__inner">
+            <span>Tacit.Brand.Sample: podgląd komponentów Razor</span>
+        </div>
+    </footer>
+</div>
+
+<div id="blazor-error-ui" role="alert">
+    Wystąpił błąd. <a href="" class="reload">Odśwież stronę</a>
+    <span class="dismiss" aria-label="Zamknij">✕</span>
+</div>

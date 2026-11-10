@@ -1,0 +1,150 @@
+@implements IDisposable
+@*
+    Podsumowanie błędów nad formularzem (.validation-errors), zamiennik <ValidationSummary />. Błąd pola w
+    <TacitField For="…"> jest linkiem do kontrolki, a po nieudanym wysłaniu w trybie interaktywnym podsumowanie
+    dostaje fokus, więc czytnik ekranu od razu je czyta (WCAG 3.3.1).
+
+    <EditForm Model="model" OnValidSubmit="Save">
+        <DataAnnotationsValidator />
+        <TacitValidationSummary />
+        …
+    </EditForm>
+
+    W formularzu statycznym (SSR) fokus nie przechodzi sam, bo nie ma obwodu. Podsumowanie i tak stoi na górze
+    formularza, a każde pole ma komunikat połączony przez aria-describedby.
+*@
+
+@if (errors.Count > 0)
+{
+    <div @attributes="AdditionalAttributes" class="@Css.Join("validation-errors", Css.From(AdditionalAttributes))" tabindex="-1" @ref="element">
+        <strong>@Title(errors.Count)</strong>
+        <ul>
+            @foreach (var (message, id) in errors)
+            {
+                @if (id is null)
+                {
+                    <li>@message</li>
+                }
+                else
+                {
+                    <li><a href="@($"{currentPath}#{id}")">@message</a></li>
+                }
+            }
+        </ul>
+    </div>
+}
+
+@code {
+    [CascadingParameter] private EditContext? EditContext { get; set; }
+
+    [Inject] private NavigationManager Navigation { get; set; } = default!;
+
+    /// <summary>Nagłówek z liczbą błędów. Domyślnie po polsku z odmianą: „Popraw 1 pole”, „2 pola”, „5 pól”.</summary>
+    [Parameter] public Func<int, string> Title { get; set; } = DefaultTitle;
+
+    [Parameter(CaptureUnmatchedValues = true)] public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private EditContext? subscribedContext;
+    private TacitFieldRegistry? registry;
+    private ElementReference element;
+    private bool focusPending;
+    private string currentPath = "";
+    private List<(string Message, string? Id)> errors = [];
+
+    protected override void OnParametersSet()
+    {
+        if (EditContext is null)
+        {
+            throw new InvalidOperationException($"{nameof(TacitValidationSummary)} musi być wewnątrz EditForm.");
+        }
+
+        // Sam „#id” w aplikacji z <base href> prowadziłby do strony głównej, dlatego link ma ścieżkę bieżącej strony.
+        currentPath = new Uri(Navigation.Uri).GetComponents(UriComponents.PathAndQuery, UriFormat.UriEscaped);
+
+        if (!ReferenceEquals(EditContext, subscribedContext))
+        {
+            Unsubscribe();
+            subscribedContext = EditContext;
+            subscribedContext.OnValidationStateChanged += OnValidationStateChanged;
+            subscribedContext.OnValidationRequested += OnValidationRequested;
+            registry = TacitFieldRegistry.For(subscribedContext);
+            registry.Changed += OnFieldsChanged;
+        }
+
+        errors = Collect(EditContext);
+    }
+
+    private void OnValidationRequested(object? sender, ValidationRequestedEventArgs e) => focusPending = true;
+
+    private void OnValidationStateChanged(object? sender, ValidationStateChangedEventArgs e)
+    {
+        errors = Collect(subscribedContext!);
+        StateHasChanged();
+    }
+
+    private void OnFieldsChanged()
+    {
+        var updated = Collect(subscribedContext!);
+        if (!updated.SequenceEqual(errors))
+        {
+            errors = updated;
+            StateHasChanged();
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (focusPending && errors.Count > 0)
+        {
+            focusPending = false;
+            await element.FocusAsync();
+        }
+        focusPending = false;
+    }
+
+    // Najpierw błędy pól w kolejności formularza (z linkiem), potem pozostałe, np. błędy całego modelu (bez linku).
+    private static List<(string, string?)> Collect(EditContext context)
+    {
+        var result = new List<(string, string?)>();
+        var linked = new HashSet<string>();
+        foreach (var (field, id) in TacitFieldRegistry.Find(context)?.Fields ?? [])
+        {
+            foreach (var message in context.GetValidationMessages(field))
+            {
+                result.Add((message, id));
+                linked.Add(message);
+            }
+        }
+        foreach (var message in context.GetValidationMessages())
+        {
+            if (!linked.Contains(message))
+            {
+                result.Add((message, null));
+                linked.Add(message);
+            }
+        }
+        return result;
+    }
+
+    internal static string DefaultTitle(int count) => "Popraw " + count + " " + (count, count % 10, count % 100) switch
+    {
+        (1, _, _) => "pole:",
+        (_, >= 2 and <= 4, not (>= 12 and <= 14)) => "pola:",
+        _ => "pól:",
+    };
+
+    private void Unsubscribe()
+    {
+        if (subscribedContext is not null)
+        {
+            subscribedContext.OnValidationStateChanged -= OnValidationStateChanged;
+            subscribedContext.OnValidationRequested -= OnValidationRequested;
+        }
+        if (registry is not null)
+        {
+            registry.Changed -= OnFieldsChanged;
+        }
+    }
+
+    public void Dispose() => Unsubscribe();
+}

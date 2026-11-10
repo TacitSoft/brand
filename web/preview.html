@@ -195,6 +195,36 @@ return result.Match(Results.Ok, error =&gt; error.ToProblem());</code></pre>
       </form>
     </section>
 
+    <section class="pv-section" id="obszar" aria-labelledby="area-title">
+      <header><h2 id="area-title">Strona modułu w obszarze</h2><p>Układ obszaru <code>.t-area</code> z menu <code>.t-sidenav</code> (<code>&lt;TacitNav&gt;</code>, także z pozycjami z <code>&lt;ModuleNavigation&gt;</code>), okruszkami, tabelą, stanem pustym i komunikatem. Tak wyglądają strony modułów z kilku bibliotek w jednej aplikacji. Znacznik generują komponenty Razor z paczki <code>Tacit.Brand</code>.</p></header>
+      <div class="t-area">
+        <nav class="t-sidenav t-area__nav" aria-label="Backoffice">
+          <ul><li><a href="#obszar">Pulpit</a></li></ul>
+          <div><p class="t-sidenav__title" id="nav-g1">Tożsamość</p><ul aria-labelledby="nav-g1"><li><a href="#obszar" aria-current="page">Klienci OAuth</a></li><li><a href="#obszar">Zgody</a></li></ul></div>
+          <div><p class="t-sidenav__title" id="nav-g2">Kryptografia</p><ul aria-labelledby="nav-g2"><li><a href="#obszar">Klucze</a></li><li><a href="#obszar">Rotacja</a></li></ul></div>
+        </nav>
+        <div class="t-stack" style="--tacit-stack-gap: var(--tacit-space-5)">
+          <nav class="t-breadcrumbs" aria-label="Okruszki"><ol><li><a href="#obszar">Backoffice</a></li><li aria-current="page">Klienci OAuth</li></ol></nav>
+          <div class="t-cluster" style="justify-content: space-between">
+            <h3 style="font-size: var(--tacit-text-2xl)">Klienci OAuth</h3>
+            <a class="t-btn t-btn--primary" href="#obszar">Nowy klient</a>
+          </div>
+          <div class="t-callout t-callout--success" role="status"><span class="t-callout__title">Gotowe</span><div>Klient „Portal partnera” został zapisany.</div></div>
+          <div class="t-table" role="region" aria-label="Klienci OAuth" tabindex="0">
+            <table>
+              <thead><tr><th scope="col">Nazwa</th><th scope="col">Identyfikator</th><th scope="col">Rodzaj</th><th scope="col"><span class="t-visually-hidden">Akcje</span></th></tr></thead>
+              <tbody>
+                <tr><th scope="row">Portal partnera</th><td class="t-mono">portal-partner</td><td><span class="t-badge">poufny</span></td><td><a class="t-btn t-btn--ghost t-btn--sm" href="#obszar">Edytuj<span class="t-visually-hidden"> Portal partnera</span></a></td></tr>
+                <tr><th scope="row">Aplikacja mobilna</th><td class="t-mono">mobile-app</td><td><span class="t-badge t-badge--accent">publiczny</span></td><td><a class="t-btn t-btn--ghost t-btn--sm" href="#obszar">Edytuj<span class="t-visually-hidden"> Aplikacja mobilna</span></a></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <h3>Zgody</h3>
+          <div class="t-empty">Nikt jeszcze nie udzielił zgody. Zgody pojawią się po pierwszym logowaniu przez klienta.</div>
+        </div>
+      </div>
+    </section>
+
     <section class="pv-section" aria-labelledby="btn-title">
       <header><h2 id="btn-title">Przyciski i odznaki</h2></header>
       <div class="pv-row">

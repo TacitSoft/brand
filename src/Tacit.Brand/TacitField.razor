@@ -1,0 +1,157 @@
+@implements IDisposable
+@*
+    Pole formularza .t-field: etykieta, podpowiedź i błąd połączone z kontrolką (WCAG 1.3.1, 3.3.1, 3.3.2).
+    Kontrolkę podaje się w treści i rozkłada na niej field.Attributes: id, aria-describedby, aria-required
+    i aria-invalid. Działa z EditForm (błędy z EditContext) i bez niego (parametr Error).
+    Context="field" jest potrzebny wewnątrz EditForm, bo EditForm zajmuje już nazwę context.
+
+    <EditForm Model="model" OnValidSubmit="Save">
+        <DataAnnotationsValidator />
+        <TacitValidationSummary />
+        <TacitField For="() => model.Name" Label="Nazwa" Hint="Widoczna na ekranie zgody." Required Context="field">
+            <InputText @bind-Value="model.Name" class="t-input" @attributes="field.Attributes" />
+        </TacitField>
+    </EditForm>
+
+    Bez EditForm:  <TacitField Id="q" Label="Szukaj" Error="@error"><input class="t-input" @attributes="context.Attributes" /></TacitField>
+*@
+
+<div @attributes="AdditionalAttributes" class="@Css.Join("t-field", Css.From(AdditionalAttributes))">
+    <label class="t-label" for="@FieldId" data-required="@Required">@Label</label>
+    @if (!string.IsNullOrEmpty(Hint))
+    {
+        <span class="t-hint" id="@HintId">@Hint</span>
+    }
+    @ChildContent?.Invoke(BuildContext())
+    @if (messages.Count > 0)
+    {
+        <span class="t-error" id="@ErrorId">@string.Join(" ", messages)</span>
+    }
+</div>
+
+@code {
+    [CascadingParameter] private EditContext? EditContext { get; set; }
+
+    /// <summary>Pole modelu, z którego biorą się błędy walidacji i domyślny identyfikator.</summary>
+    [Parameter] public Expression<Func<object?>>? For { get; set; }
+
+    [Parameter, EditorRequired] public string Label { get; set; } = "";
+
+    /// <summary>Podpowiedź pod etykietą: format, przykład, skutki. Nie zastępuje etykiety.</summary>
+    [Parameter] public string? Hint { get; set; }
+
+    /// <summary>Błąd podany ręcznie, np. bez EditForm albo z odpowiedzi serwera. Dokleja się do błędów walidacji.</summary>
+    [Parameter] public string? Error { get; set; }
+
+    /// <summary>Pole wymagane: gwiazdka przy etykiecie i aria-required na kontrolce.</summary>
+    [Parameter] public bool Required { get; set; }
+
+    /// <summary>
+    /// Identyfikator kontrolki. Domyślnie z typu modelu i nazwy pola z <see cref="For"/> (np. „clientform-name”).
+    /// Podaj go, gdy ten sam model jest na stronie dwa razy.
+    /// </summary>
+    [Parameter] public string? Id { get; set; }
+
+    [Parameter, EditorRequired] public RenderFragment<TacitFieldContext>? ChildContent { get; set; }
+
+    [Parameter(CaptureUnmatchedValues = true)] public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private EditContext? subscribedContext;
+    private FieldIdentifier? fieldId;
+    private List<string> messages = [];
+
+    private string FieldId => Id ?? DefaultId(fieldId!.Value);
+    private string HintId => FieldId + "-hint";
+    private string ErrorId => FieldId + "-error";
+
+    internal static string DefaultId(FieldIdentifier identifier) =>
+        $"{identifier.Model.GetType().Name}-{identifier.FieldName}".ToLowerInvariant();
+
+    protected override void OnParametersSet()
+    {
+        if (For is null && Id is null)
+        {
+            throw new InvalidOperationException(
+                $"{nameof(TacitField)} wymaga parametru {nameof(For)} albo {nameof(Id)}, bo etykieta musi wskazać kontrolkę.");
+        }
+
+        var previous = fieldId;
+        fieldId = For is null ? null : FieldIdentifier.Create(For);
+
+        if (!ReferenceEquals(EditContext, subscribedContext))
+        {
+            Detach(previous);
+            subscribedContext = EditContext;
+            if (subscribedContext is not null)
+            {
+                subscribedContext.OnValidationStateChanged += OnValidationStateChanged;
+            }
+        }
+        else if (previous is { } p && subscribedContext is not null && !p.Equals(fieldId))
+        {
+            TacitFieldRegistry.Find(subscribedContext)?.Remove(p);
+        }
+
+        if (subscribedContext is not null && fieldId is { } f)
+        {
+            TacitFieldRegistry.For(subscribedContext).Set(f, FieldId);
+        }
+
+        messages = CollectMessages();
+    }
+
+    private TacitFieldContext BuildContext()
+    {
+        var describedBy = Css.Join(string.IsNullOrEmpty(Hint) ? null : HintId, messages.Count > 0 ? ErrorId : null);
+        var attributes = new Dictionary<string, object> { ["id"] = FieldId };
+        if (describedBy.Length > 0)
+        {
+            attributes["aria-describedby"] = describedBy;
+        }
+        if (Required)
+        {
+            // aria-required, nie required: atrybut required włącza walidację przeglądarki, która dubluje EditForm.
+            attributes["aria-required"] = "true";
+        }
+        if (messages.Count > 0)
+        {
+            attributes["aria-invalid"] = "true";
+        }
+        return new TacitFieldContext(FieldId, describedBy.Length > 0 ? describedBy : null, messages.Count > 0, attributes);
+    }
+
+    private void OnValidationStateChanged(object? sender, ValidationStateChangedEventArgs e)
+    {
+        messages = CollectMessages();
+        StateHasChanged();
+    }
+
+    private List<string> CollectMessages()
+    {
+        var result = new List<string>();
+        if (EditContext is not null && fieldId is { } f)
+        {
+            result.AddRange(EditContext.GetValidationMessages(f));
+        }
+        if (!string.IsNullOrWhiteSpace(Error))
+        {
+            result.Add(Error);
+        }
+        return result;
+    }
+
+    private void Detach(FieldIdentifier? registered)
+    {
+        if (subscribedContext is null)
+        {
+            return;
+        }
+        subscribedContext.OnValidationStateChanged -= OnValidationStateChanged;
+        if (registered is { } r)
+        {
+            TacitFieldRegistry.Find(subscribedContext)?.Remove(r);
+        }
+    }
+
+    public void Dispose() => Detach(fieldId);
+}

@@ -32,6 +32,8 @@ W stopce serwisu umieszczamy link **„Deklaracja dostępności”**. Nas formal
 
 ## Co musi zapewnić znacznik (Razor, Markdown). Tego CSS nie załatwi.
 
+W Blazorze dużą część tych wymagań spełniają komponenty z paczki `Tacit.Brand`: `TacitField` łączy etykietę, podpowiedź i błąd z kontrolką (`for`, `aria-describedby`, `aria-invalid`, `aria-required`), `TacitValidationSummary` linkuje błędy do pól i przejmuje fokus po nieudanym wysłaniu, `TacitTable` daje region przewijania z etykietą i `tabindex`, `TacitCallout` region na żywo, a `TacitBreadcrumbs` i `TacitNav` landmarki z etykietą i `aria-current`. Reszta listy (nagłówki, `scope` komórek, teksty linków, język) zostaje po stronie autora strony.
+
 - **Język**: `<html lang="…">` zgodny z językiem strony (3.1.1). Fragmenty w innym języku dostają `lang`, np. nazwy języków w przełączniku (`<a lang="ru">Русский</a>`) (3.1.2). Starlight robi to sam.
 - **Struktura**: na stronie jest jeden `<h1>` i nagłówki bez przeskoków poziomu. Do tego landmarki `<header>`, `<nav aria-label>`, `<main id="main" tabindex="-1">` i `<footer>`. Jeśli jest kilka `<nav>`, każdy ma inną etykietę.
 - **Tytuł strony**: przez `<PageTitle>`, unikalny, w formacie „Nazwa strony · Tacit” (2.4.2).

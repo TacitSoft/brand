@@ -8,10 +8,11 @@
 		     też aplikacje na net11.0. -->
 		<TargetFramework>net10.0</TargetFramework>
 		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
 		<LangVersion>latest</LangVersion>
 		<RootNamespace>Tacit.Brand</RootNamespace>
 		<PackageId>Tacit.Brand</PackageId>
-		<Description>Marka Tacit dla Blazora: tokeny --tacit-*, fonty, style .t-*, przełącznik motywu.</Description>
+		<Description>Marka Tacit dla Blazora: tokeny --tacit-*, fonty, style .t-*, przełącznik motywu i wspólne komponenty stron modułów (tabela, pole formularza, przycisk, komunikat, okruszki, menu obszaru).</Description>
 		<RepositoryUrl>https://github.com/TacitSoft/brand</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 		<Company>TacitSoft</Company>
@@ -37,16 +38,24 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<!-- To, czego używa serwis. Adaptery Starlight/DocFX, podgląd i narzędzia zostają tylko w npm i repo. -->
+		<!-- To, czego używa serwis. Adaptery Starlight/DocFX, podgląd i narzędzia zostają tylko w npm i repo.
+		     ContentRoot = katalog pliku źródłowego: bez tego aplikacja z referencją do projektu (sample) szukałaby
+		     plików w nieistniejącym src/Tacit.Brand/wwwroot. Paczka i tak dostaje kopie plików. -->
 		<Content Include="$(BrandWebDir)tacit-tokens.css;$(BrandWebDir)tacit-fonts.css;$(BrandWebDir)tacit-site.css;$(BrandWebDir)tacit-theme.js"
-		         Link="wwwroot/%(Filename)%(Extension)" />
+		         Link="wwwroot/%(Filename)%(Extension)"
+		         ContentRoot="%(RootDir)%(Directory)" />
 		<Content Include="$(BrandWebDir)fonts/*.woff2;$(BrandWebDir)fonts/OFL-*.txt"
-		         Link="wwwroot/fonts/%(Filename)%(Extension)" />
+		         Link="wwwroot/fonts/%(Filename)%(Extension)"
+		         ContentRoot="%(RootDir)%(Directory)" />
 		<Content Include="$(MSBuildThisFileDirectory)../../favicon.ico;$(MSBuildThisFileDirectory)../../icon-rounded.svg;$(MSBuildThisFileDirectory)../../icon-rounded-180.png;$(MSBuildThisFileDirectory)../../icon-rounded-192.png;$(MSBuildThisFileDirectory)../../icon-rounded-512.png"
-		         Link="wwwroot/icons/%(Filename)%(Extension)" />
+		         Link="wwwroot/icons/%(Filename)%(Extension)"
+		         ContentRoot="%(RootDir)%(Directory)" />
 
 		<None Include="$(MSBuildThisFileDirectory)../../icon-rounded-128.png" Pack="true" PackagePath="icon.png" Visible="false" />
 		<None Include="README.md" Pack="true" PackagePath="\" />
+		<!-- Ostrzeżenie TBRAND001 o hexie w *.razor.css u odbiorców paczki (także przechodnich). -->
+		<None Include="buildTransitive/Tacit.Brand.targets" Pack="true" PackagePath="buildTransitive/" />
 		<None Include="App.razor.example" />
+		<InternalsVisibleTo Include="Tacit.Brand.Tests" />
 	</ItemGroup>
 </Project>

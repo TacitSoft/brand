@@ -1,0 +1,56 @@
+@*
+    Przycisk .t-btn. Z Href renderuje link <a> (nawigacja), bez Href przycisk <button> (akcja), bo <div @onclick> jest zakazany.
+    Pozostałe atrybuty (np. @onclick, aria-label) przechodzą na element.
+
+    <TacitButton Variant="TacitButtonVariant.Primary" Type="submit" Busy="saving">Zapisz</TacitButton>
+    <TacitButton Href="clients/new">Nowy klient</TacitButton>
+
+    Busy ustawia aria-busy="true" (kółko ładowania), ale nie blokuje kliknięć: zignoruj je w obsłudze zdarzenia.
+    Przycisk z samą ikoną musi dostać aria-label.
+*@
+
+@if (Href is not null)
+{
+    <a @attributes="AdditionalAttributes" class="@CssClass" href="@Href" aria-busy="@(Busy ? "true" : null)">@ChildContent</a>
+}
+else
+{
+    <button @attributes="AdditionalAttributes" class="@CssClass" type="@Type" disabled="@Disabled" aria-busy="@(Busy ? "true" : null)">@ChildContent</button>
+}
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    [Parameter] public TacitButtonVariant Variant { get; set; }
+
+    /// <summary>Adres. Gdy jest ustawiony, komponent renderuje link zamiast przycisku.</summary>
+    [Parameter] public string? Href { get; set; }
+
+    /// <summary>Typ przycisku: button (domyślnie), submit albo reset. Pomijany przy linku.</summary>
+    [Parameter] public string Type { get; set; } = "button";
+
+    [Parameter] public bool Small { get; set; }
+
+    /// <summary>Przycisk na całą szerokość kontenera.</summary>
+    [Parameter] public bool Block { get; set; }
+
+    /// <summary>Stan ładowania (aria-busy).</summary>
+    [Parameter] public bool Busy { get; set; }
+
+    [Parameter] public bool Disabled { get; set; }
+
+    [Parameter(CaptureUnmatchedValues = true)] public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private string CssClass => Css.Join(
+        "t-btn",
+        Variant switch
+        {
+            TacitButtonVariant.Primary => "t-btn--primary",
+            TacitButtonVariant.Ghost => "t-btn--ghost",
+            TacitButtonVariant.Danger => "t-btn--danger",
+            _ => null,
+        },
+        Small ? "t-btn--sm" : null,
+        Block ? "t-btn--block" : null,
+        Css.From(AdditionalAttributes));
+}

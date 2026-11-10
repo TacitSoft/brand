@@ -1,0 +1,23 @@
+@inherits LayoutComponentBase
+@layout MainLayout
+@*
+    Układ obszaru, taki jak host podaje w AddModuleBlazor(...). W aplikacji z Tacit.Modulus.Blazor pozycje daje
+    <ModuleNavigation Area="backoffice" Context="groups">, a <TacitNav> w jego treści renderuje je znacznikiem
+    .t-sidenav (wzór w src/Tacit.Brand/README.md, „Menu obszaru”).
+*@
+
+<div class="t-area">
+    <TacitNav class="t-area__nav" Label="Obszar" Items="items" />
+    <div class="t-stack" style="--tacit-stack-gap: var(--tacit-space-6)">@Body</div>
+</div>
+
+@code {
+    private readonly TacitNavItem[] items =
+    [
+        new("Przegląd komponentów", "", Match: NavLinkMatch.All),
+        new("Klienci OAuth", "clients", Group: "Tożsamość", Match: NavLinkMatch.All),
+        new("Nowy klient (interaktywny)", "clients/new", Group: "Tożsamość", Match: NavLinkMatch.All),
+        new("Nowy klient (statyczny SSR)", "clients/new-static", Group: "Tożsamość"),
+        new("Klucze", "keys", Group: "Kryptografia"),
+    ];
+}

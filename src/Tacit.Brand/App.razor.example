@@ -81,3 +81,25 @@
 
 @* FocusOnNavigate w Routes.razor przenosi fokus na <h1> po nawigacji (czytnik ogłasza nową stronę):
    <FocusOnNavigate RouteData="routeData" Selector="h1" /> *@
+
+@* ───────────────────────── BackofficeLayout.razor ─────────────────────────
+   Układ obszaru modułów (ADR-C-0031 pkt 3): host podaje go w AddModuleBlazor(areas => areas.Interactive("backoffice",
+   typeof(BackofficeLayout))). Menu obszaru obok treści. W aplikacji z modułami pozycje daje <ModuleNavigation>
+   z Tacit.Modulus.Blazor, a renderuje je <TacitNav> (wzór w README, „Menu obszaru”). Sam <ModuleNavigation>
+   bez treści ma własny, prostszy znacznik bez klas .t-sidenav. *@
+@inherits LayoutComponentBase
+@layout MainLayout
+
+<div class="t-area">
+    <TacitNav class="t-area__nav" Label="Backoffice" Items="items" />
+    <div class="t-stack">@Body</div>
+</div>
+
+@code {
+    private readonly TacitNavItem[] items =
+    [
+        new("Pulpit", "backoffice", Match: NavLinkMatch.All),
+        new("Klienci OAuth", "backoffice/clients", Group: "Tożsamość"),
+        new("Klucze", "backoffice/keys", Group: "Kryptografia"),
+    ];
+}
