@@ -100,4 +100,23 @@
 
 	if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', afterLoad, { once: true });
 	else afterLoad();
+
+	// Tryby interaktywne Blazora (Server, WebAssembly) przy starcie renderują znacznik od nowa, zamiast przejąć
+	// ten z prerenderingu: przełącznik wraca z atrybutem hidden i aria-pressed="false", a nie pada ani
+	// DOMContentLoaded, ani enhancedload. To samo przy przełączniku dorenderowanym później w obwodzie.
+	// Obserwator odsłania i synchronizuje każdy przełącznik, który pojawi się w DOM albo dostanie hidden z powrotem.
+	const SWITCH = '[data-tacit-theme-switch]';
+	new MutationObserver((mutations) => {
+		for (const m of mutations) {
+			if (m.type === 'attributes') {
+				if (m.target.hidden && m.target.matches(SWITCH)) return syncSwitches();
+				continue;
+			}
+			for (const node of m.addedNodes) {
+				if (node.nodeType === Node.ELEMENT_NODE && (node.matches(SWITCH) || node.querySelector(SWITCH))) {
+					return syncSwitches();
+				}
+			}
+		}
+	}).observe(root, { childList: true, subtree: true, attributes: true, attributeFilter: ['hidden'] });
 })();
