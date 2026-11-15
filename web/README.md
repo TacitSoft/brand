@@ -42,13 +42,15 @@ Kolejność dołączania jest wszędzie ta sama: **fonty → tokeny → style lu
 
 ## Fonty
 
-| Rodzina | Łacina | Cyrylica |
+| Rodzina | Krój | Cyrylica |
 |---|---|---|
-| Tacit Display (nagłówki) | Bricolage Grotesque | Onest |
-| Tacit Sans (tekst) | Public Sans | Onest |
-| Tacit Mono (kod) | JetBrains Mono | JetBrains Mono |
+| Tacit Display (nagłówki, 700) | Public Sans | nie |
+| Tacit Sans (tekst) | Public Sans | nie |
+| Tacit Mono (kod) | JetBrains Mono | tak |
 
-Bricolage Grotesque i Public Sans z prototypu nie mają cyrylicy, a przewodniki są także po rosyjsku. Cyrylicę dostarcza więc Onest przez `unicode-range`, a przeglądarka pobiera tylko potrzebne pliki. Wszystkie fonty są na licencji SIL OFL 1.1 (`fonts/OFL-*.txt`) i są hostowane lokalnie, bez Google Fonts: nie przekazujemy adresów IP odwiedzających podmiotowi trzeciemu i nie zależymy od zewnętrznego CDN.
+Nagłówki i tekst mają ten sam krój, więc przeglądarka pobiera pliki Public Sans raz. „Tacit Display” zostaje osobną rodziną, żeby krój nagłówków dało się zmienić w jednym miejscu. Odstęp liter zależy od rozmiaru: `--tacit-tracking-display` (−0,02em) dla hero i h1, `--tacit-tracking-heading` (−0,01em) dla h2 i h3, h4 i mniejsze bez zmiany.
+
+Rosyjska wersja stron jest wstrzymana, więc fonty nie mają cyrylicy (poza kodem). Gdy wróci, cyrylicę dołożymy w `tacit-fonts.css` osobnymi blokami `@font-face` z `unicode-range`, bez ruszania łacińskich. Wszystkie fonty są na licencji SIL OFL 1.1 (`fonts/OFL-*.txt`) i są hostowane lokalnie, bez Google Fonts: nie przekazujemy adresów IP odwiedzających podmiotowi trzeciemu i nie zależymy od zewnętrznego CDN.
 
 ## Dystrybucja
 
