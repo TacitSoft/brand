@@ -87,6 +87,14 @@ h1#_top,
 	letter-spacing: var(--tacit-tracking-display);
 }
 
+.sl-markdown-content :is(h2, h3) {
+	letter-spacing: var(--tacit-tracking-heading);
+}
+
+.sl-markdown-content h4 {
+	letter-spacing: 0;
+}
+
 /* Fokus jak w serwisie (3 px, kontrast ≥ 3:1) */
 :focus-visible {
 	outline: var(--tacit-focus-width) solid var(--tacit-color-focus);

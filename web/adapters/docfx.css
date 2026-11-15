@@ -60,6 +60,14 @@ h1, h2, h3, h4 {
 	letter-spacing: var(--tacit-tracking-display);
 }
 
+h2, h3 {
+	letter-spacing: var(--tacit-tracking-heading);
+}
+
+h4 {
+	letter-spacing: 0;
+}
+
 :not(pre) > code {
 	background: var(--tacit-color-code-inline-bg);
 	border-radius: var(--tacit-radius-sm);

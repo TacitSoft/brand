@@ -241,12 +241,10 @@ return result.Match(Results.Ok, error =&gt; error.ToProblem());</code></pre>
     </section>
 
     <section class="pv-section" aria-labelledby="type-title">
-      <header><h2 id="type-title">Typografia</h2><p>Tacit Display do nagłówków, Tacit Sans do tekstu, Tacit Mono do kodu. Cyrylica przychodzi z Onest, bo dokumentacja jest też po rosyjsku.</p></header>
+      <header><h2 id="type-title">Typografia</h2><p>Tacit Display do nagłówków, Tacit Sans do tekstu (obie to Public Sans), Tacit Mono do kodu.</p></header>
       <div class="pv-type">
-        <div><small>--tacit-text-display · Tacit Display 700</small><span style="font: 700 var(--tacit-text-display)/1.05 var(--tacit-font-display); letter-spacing: -0.025em">Prosto i przewidywalnie</span></div>
-        <div><small>--tacit-text-2xl · Tacit Display, cyrylica</small><span lang="ru" style="font: 700 var(--tacit-text-2xl)/1.2 var(--tacit-font-display)">Обработка ошибок без исключений</span></div>
+        <div><small>--tacit-text-display · Tacit Display 700</small><span style="font: 700 var(--tacit-text-display)/1.05 var(--tacit-font-display); letter-spacing: var(--tacit-tracking-display)">Prosto i przewidywalnie</span></div>
         <div><small>--tacit-text-base · Tacit Sans 400</small><p style="max-width: var(--tacit-measure)">Zażółć gęślą jaźń. Każda operacja zwraca sukces albo nazwany błąd, a kod wywołujący widzi wszystkie ścieżki w sygnaturze.</p></div>
-        <div><small>--tacit-text-base · Tacit Sans, cyrylica</small><p lang="ru" style="max-width: var(--tacit-measure)">Каждая операция возвращает успех или именованную ошибку, и вызывающий код видит все пути в сигнатуре.</p></div>
         <div><small>--tacit-text-sm · Tacit Mono</small><code style="background: none; padding: 0">Result&lt;Order&gt; Ensure(Func&lt;T, bool&gt;) → 0O1lI</code></div>
       </div>
     </section>

@@ -134,7 +134,8 @@
 	--tacit-leading-tight: 1.1;
 	--tacit-leading-snug: 1.3;
 	--tacit-leading-body: 1.6;
-	--tacit-tracking-display: -0.02em;
+	--tacit-tracking-display: -0.02em;   /* hero i h1: duże litery optycznie się rozchodzą */
+	--tacit-tracking-heading: -0.01em;   /* h2 i h3; h4 i mniejsze bez zmiany odstępu */
 	--tacit-tracking-caps: 0.08em;
 	--tacit-measure: 68ch;
 
