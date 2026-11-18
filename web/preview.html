@@ -225,6 +225,37 @@ return result.Match(Results.Ok, error =&gt; error.ToProblem());</code></pre>
       </div>
     </section>
 
+    <section class="pv-section" id="quickgrid" aria-labelledby="qg-title">
+      <header><h2 id="qg-title">QuickGrid</h2><p>Znacznik, który renderuje <code>&lt;QuickGrid Theme="tacit"&gt;</code> z <code>&lt;Paginator&gt;</code> w .NET 11: sortowanie i strony to linki z parametrami w adresie, więc działają też w statycznym SSR. Tacit.Brand daje tylko style w ramce <code>.t-datagrid</code>.</p></header>
+      <div class="t-datagrid">
+        <div class="t-table" role="region" aria-label="Dziennik zdarzeń" tabindex="0">
+          <table theme="tacit" class="quickgrid">
+            <thead><tr>
+              <th class="col-justify-start col-sort-desc" aria-sort="descending" scope="col"><div class="col-header-content"><a class="col-title" href="#quickgrid"><div class="col-title-text">Czas</div><div class="sort-indicator" aria-hidden="true"></div></a></div></th>
+              <th class="col-justify-start" aria-sort="none" scope="col"><div class="col-header-content"><a class="col-title" href="#quickgrid"><div class="col-title-text">Kto</div><div class="sort-indicator" aria-hidden="true"></div></a></div></th>
+              <th class="col-justify-start" aria-sort="none" scope="col"><div class="col-header-content"><div class="col-title"><div class="col-title-text">Zdarzenie</div></div></div></th>
+              <th class="col-justify-end" aria-sort="none" scope="col"><div class="col-header-content"><a class="col-title" href="#quickgrid"><div class="col-title-text">Czas trwania [ms]</div><div class="sort-indicator" aria-hidden="true"></div></a></div></th>
+            </tr></thead>
+            <tbody>
+              <tr class="row-clickable"><td class="col-justify-start">2026-11-18 16:00</td><td class="col-justify-start">anna.kowalska</td><td class="col-justify-start">Logowanie</td><td class="col-justify-end">20</td></tr>
+              <tr class="row-clickable"><td class="col-justify-start">2026-11-18 15:23</td><td class="col-justify-start">jan.nowak</td><td class="col-justify-start">Odświeżenie tokenu</td><td class="col-justify-end">73</td></tr>
+              <tr class="row-clickable"><td class="col-justify-start">2026-11-18 14:46</td><td class="col-justify-start">system</td><td class="col-justify-start">Rotacja klucza</td><td class="col-justify-end">126</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="paginator">
+          <div class="summary">Zdarzeń: <strong>47</strong></div>
+          <nav role="navigation">
+            <a class="go-first" href="#quickgrid" aria-label="Go to first page" aria-disabled="true" tabindex="-1">«</a>
+            <a class="go-previous" href="#quickgrid" aria-label="Go to previous page" aria-disabled="true" tabindex="-1">‹</a>
+            <div class="pagination-text">Page <strong>1</strong> of <strong>5</strong></div>
+            <a class="go-next" href="#quickgrid" aria-label="Go to next page">›</a>
+            <a class="go-last" href="#quickgrid" aria-label="Go to last page">»</a>
+          </nav>
+        </div>
+      </div>
+    </section>
+
     <section class="pv-section" aria-labelledby="btn-title">
       <header><h2 id="btn-title">Przyciski i odznaki</h2></header>
       <div class="pv-row">

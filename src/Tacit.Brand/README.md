@@ -45,11 +45,11 @@ Komponenty renderują sam znacznik z klasami `.t-*` i nie mają własnych styló
     <DataAnnotationsValidator />
     <TacitValidationSummary />
 
-    <TacitField For="() => model.Name" Label="Nazwa" Hint="Widoczna na ekranie zgody." Required Context="field">
+    <TacitField For="() => model.Name" Hint="Widoczna na ekranie zgody." Required Context="field">
         <InputText @bind-Value="model.Name" class="t-input" @attributes="field.Attributes" />
     </TacitField>
 
-    <TacitField For="() => model.Type" Label="Rodzaj klienta" Context="field">
+    <TacitField For="() => model.Type" Context="field">
         <InputSelect @bind-Value="model.Type" class="t-select" @attributes="field.Attributes">…</InputSelect>
     </TacitField>
 
@@ -57,11 +57,12 @@ Komponenty renderują sam znacznik z klasami `.t-*` i nie mają własnych styló
 </EditForm>
 ```
 
+- Etykieta pochodzi z atrybutu pola modelu: najpierw `[Display(Name = "Nazwa")]` (także z `ResourceType` do lokalizacji), potem `[DisplayName]`. Tę samą kolejność ma komponent `DisplayName` z .NET 11. Parametr `Label` ją nadpisuje. Bez `Label` i bez atrybutu komponent rzuca wyjątek z nazwą pola.
 - `field.Attributes` daje kontrolce `id`, `aria-describedby` (podpowiedź i błąd), `aria-required` i `aria-invalid`. Kontrolkę wybierasz sam: `InputText`, `InputSelect`, `InputTextArea`, `InputCheckbox` albo zwykły `<input>`.
 - `Context="field"` jest potrzebny, bo `EditForm` zajmuje już nazwę `context`.
 - `Required` daje gwiazdkę i `aria-required`, ale nie atrybut `required`, bo ten włącza walidację przeglądarki obok `EditForm`. Samą regułę daje `[Required]` na modelu.
 - Identyfikator kontrolki powstaje z typu modelu i nazwy pola (`clientmodel-name`). Gdy ten sam model jest na stronie dwa razy, podaj `Id`.
-- Bez `EditForm` podaj `Id` zamiast `For`, a błąd w parametrze `Error`. Ten parametr przyjmuje też błąd z odpowiedzi serwera przy `EditForm`.
+- Bez `EditForm` podaj `Id` zamiast `For`, `Label` i błąd w parametrze `Error`. Ten parametr przyjmuje też błąd z odpowiedzi serwera przy `EditForm`.
 - `<TacitValidationSummary />` linkuje błędy pól z `<TacitField For>` do kontrolek. W trybie interaktywnym po nieudanym wysłaniu dostaje fokus (WCAG 3.3.1). W statycznym SSR fokus nie przechodzi sam, ale podsumowanie stoi na górze formularza.
 
 ### Tabela
@@ -83,6 +84,31 @@ Komponenty renderują sam znacznik z klasami `.t-*` i nie mają własnych styló
 ```
 
 `Label` nazywa region przewijania dla czytnika ekranu. `Caption` dodaje widoczny podpis. Bez elementów (także przy `Items="null"`) komponent pokazuje `.t-empty` zamiast pustej tabeli. Nagłówki kolumn to `<th scope="col">`, a komórka nazywająca wiersz to `<th scope="row">`. Linki „Edytuj” w wierszach dostają ukryte uzupełnienie, żeby na liście linków czytnika różniły się od siebie (WCAG 2.4.4).
+
+### QuickGrid (sortowanie, stronicowanie)
+
+Gdy tabela ma sortowanie, stronicowanie albo wirtualizację, użyj `QuickGrid` z pakietu `Microsoft.AspNetCore.Components.QuickGrid` z motywem `tacit`. W .NET 11 nagłówki sortowania i paginator to linki z parametrami w adresie, więc działają w statycznym SSR, a adres strony można udostępnić. Tacit.Brand daje tylko style (`tacit-site.css`) i nie zależy od pakietu QuickGrid.
+
+```razor
+<div class="t-datagrid">
+    <div class="t-table" role="region" aria-label="Dziennik zdarzeń" tabindex="0">
+        <QuickGrid Items="events" Theme="tacit" Pagination="pagination">
+            <PropertyColumn Property="e => e.At" Title="Czas" Format="yyyy-MM-dd HH:mm" Sortable="true" IsDefaultSortColumn="true" />
+            <PropertyColumn Property="e => e.Actor" Title="Kto" Sortable="true" />
+            <PropertyColumn Property="e => e.DurationMs" Title="Czas trwania [ms]" Align="Align.End" Sortable="true" />
+        </QuickGrid>
+    </div>
+    <Paginator State="pagination">
+        <SummaryTemplate>Zdarzeń: <strong>@pagination.TotalItemCount</strong></SummaryTemplate>
+    </Paginator>
+</div>
+```
+
+- `Theme="tacit"` wyłącza domyślny motyw QuickGrid. Style izolowane pakietu (bez `@layer`) nadpisuje sekcja „QuickGrid” w `tacit-site.css`, więc kolejność `<link>` w `App.razor` nie ma znaczenia.
+- `Paginator` stoi poza ramką `.t-table`, żeby nie przewijał się razem z szeroką tabelą.
+- Wiersz z `OnRowClick` nie dostaje fokusu. Tę samą akcję daj też jako link lub przycisk w komórce (WCAG 2.1.1).
+- Gdy nie ma czego sortować ani stronicować, wybierz `TacitTable`: QuickGrid nie renderuje `<th scope="row">` ani stanu pustego.
+- Tekst „Page 2 of 5” i etykiety linków paginatora („Go to next page”) są w .NET 11 po angielsku i nie da się ich zmienić. Polski może być tylko `SummaryTemplate`.
 
 ### Przycisk, komunikat, okruszki
 

@@ -1,0 +1,49 @@
+@page "/events"
+
+<PageTitle>Dziennik zdarzeń · Tacit</PageTitle>
+
+<TacitBreadcrumbs Items="@([new("Backoffice", ""), new("Dziennik zdarzeń")])" />
+
+<h1>Dziennik zdarzeń</h1>
+
+@*
+    QuickGrid z Theme="tacit" w ramce .t-table. Strona jest statyczna (SSR): od .NET 11 sortowanie i stronicowanie
+    to linki z parametrami w adresie, więc działają bez obwodu, a adres strony można udostępnić.
+    Paginator stoi poza ramką przewijania, w .t-datagrid.
+*@
+<div class="t-datagrid">
+    <div class="t-table" role="region" aria-label="Dziennik zdarzeń" tabindex="0">
+        <QuickGrid Items="events" Theme="tacit" Pagination="pagination">
+            <PropertyColumn Property="e => e.At" Title="Czas" Format="yyyy-MM-dd HH:mm" Sortable="true"
+                            IsDefaultSortColumn="true" InitialSortDirection="SortDirection.Descending" Class="t-nowrap" />
+            <PropertyColumn Property="e => e.Actor" Title="Kto" Sortable="true" />
+            <PropertyColumn Property="e => e.Action" Title="Zdarzenie" Sortable="true" />
+            <PropertyColumn Property="e => e.ClientId" Title="Klient" Sortable="true" />
+            <PropertyColumn Property="e => e.DurationMs" Title="Czas trwania [ms]" Align="Align.End" Sortable="true" />
+        </QuickGrid>
+    </div>
+    <Paginator State="pagination">
+        <SummaryTemplate>Zdarzeń: <strong>@pagination.TotalItemCount</strong></SummaryTemplate>
+    </Paginator>
+</div>
+
+@code {
+    private readonly PaginationState pagination = new() { ItemsPerPage = 10 };
+
+    private static readonly string[] Actors = ["anna.kowalska", "jan.nowak", "system"];
+    private static readonly string[] Actions = ["Logowanie", "Wydanie tokenu", "Odświeżenie tokenu", "Zmiana klienta", "Rotacja klucza"];
+    private static readonly string[] Clients = ["portal-partner", "mobile-app", "reports"];
+
+    // Dane przykładowe, stałe między żądaniami, żeby linki sortowania i stron dawały powtarzalny wynik.
+    private static readonly IQueryable<AuditEvent> events = Enumerable.Range(0, 47)
+        .Select(i => new AuditEvent(
+            new DateTime(2026, 11, 18, 16, 0, 0).AddMinutes(-i * 37),
+            Actors[i % Actors.Length],
+            Actions[i * 7 % Actions.Length],
+            Clients[i * 5 % Clients.Length],
+            20 + i * 53 % 900))
+        .ToArray()
+        .AsQueryable();
+
+    private sealed record AuditEvent(DateTime At, string Actor, string Action, string ClientId, int DurationMs);
+}
