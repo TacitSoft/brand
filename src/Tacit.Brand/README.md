@@ -98,17 +98,15 @@ Gdy tabela ma sortowanie, stronicowanie albo wirtualizację, użyj `QuickGrid` z
             <PropertyColumn Property="e => e.DurationMs" Title="Czas trwania [ms]" Align="Align.End" Sortable="true" />
         </QuickGrid>
     </div>
-    <Paginator State="pagination">
-        <SummaryTemplate>Zdarzeń: <strong>@pagination.TotalItemCount</strong></SummaryTemplate>
-    </Paginator>
+    <TacitPaginator State="pagination" />
 </div>
 ```
 
 - `Theme="tacit"` wyłącza domyślny motyw QuickGrid. Style izolowane pakietu (bez `@layer`) nadpisuje sekcja „QuickGrid” w `tacit-site.css`, więc kolejność `<link>` w `App.razor` nie ma znaczenia.
-- `Paginator` stoi poza ramką `.t-table`, żeby nie przewijał się razem z szeroką tabelą.
+- Paginator stoi poza ramką `.t-table`, żeby nie przewijał się razem z szeroką tabelą.
 - Wiersz z `OnRowClick` nie dostaje fokusu. Tę samą akcję daj też jako link lub przycisk w komórce (WCAG 2.1.1).
 - Gdy nie ma czego sortować ani stronicować, wybierz `TacitTable`: QuickGrid nie renderuje `<th scope="row">` ani stanu pustego.
-- Tekst „Page 2 of 5” i etykiety linków paginatora („Go to next page”) są w .NET 11 po angielsku i nie da się ich zmienić. Polski może być tylko `SummaryTemplate`.
+- `TacitPaginator` jest w paczce `Tacit.Brand.QuickGrid` ([README](../Tacit.Brand.QuickGrid/README.md)). Używaj go zamiast `<Paginator />` z QuickGrid, który ma teksty wpisane po angielsku („Page 2 of 5”, „Go to next page”). Teksty `TacitPaginator` są domyślnie po polsku i każdy można podać z `IStringLocalizer`. Style działają z oboma, bo znacznik jest ten sam.
 
 ### Przycisk, komunikat, okruszki
 

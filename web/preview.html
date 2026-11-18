@@ -226,7 +226,7 @@ return result.Match(Results.Ok, error =&gt; error.ToProblem());</code></pre>
     </section>
 
     <section class="pv-section" id="quickgrid" aria-labelledby="qg-title">
-      <header><h2 id="qg-title">QuickGrid</h2><p>Znacznik, który renderuje <code>&lt;QuickGrid Theme="tacit"&gt;</code> z <code>&lt;Paginator&gt;</code> w .NET 11: sortowanie i strony to linki z parametrami w adresie, więc działają też w statycznym SSR. Tacit.Brand daje tylko style w ramce <code>.t-datagrid</code>.</p></header>
+      <header><h2 id="qg-title">QuickGrid</h2><p>Znacznik, który renderuje <code>&lt;QuickGrid Theme="tacit"&gt;</code> z <code>&lt;TacitPaginator&gt;</code> (paczka <code>Tacit.Brand.QuickGrid</code>) w .NET 11: sortowanie i strony to linki z parametrami w adresie, więc działają też w statycznym SSR. Tacit.Brand daje tylko style w ramce <code>.t-datagrid</code>.</p></header>
       <div class="t-datagrid">
         <div class="t-table" role="region" aria-label="Dziennik zdarzeń" tabindex="0">
           <table theme="tacit" class="quickgrid">
@@ -244,13 +244,13 @@ return result.Match(Results.Ok, error =&gt; error.ToProblem());</code></pre>
           </table>
         </div>
         <div class="paginator">
-          <div class="summary">Zdarzeń: <strong>47</strong></div>
-          <nav role="navigation">
-            <a class="go-first" href="#quickgrid" aria-label="Go to first page" aria-disabled="true" tabindex="-1">«</a>
-            <a class="go-previous" href="#quickgrid" aria-label="Go to previous page" aria-disabled="true" tabindex="-1">‹</a>
-            <div class="pagination-text">Page <strong>1</strong> of <strong>5</strong></div>
-            <a class="go-next" href="#quickgrid" aria-label="Go to next page">›</a>
-            <a class="go-last" href="#quickgrid" aria-label="Go to last page">»</a>
+          <div class="summary">47 pozycji</div>
+          <nav aria-label="Strony">
+            <a class="go-first" title="Pierwsza strona" aria-label="Pierwsza strona" aria-disabled="true">«</a>
+            <a class="go-previous" title="Poprzednia strona" aria-label="Poprzednia strona" aria-disabled="true">‹</a>
+            <div class="pagination-text" aria-live="polite" aria-atomic="true">Strona 1 z 5</div>
+            <a class="go-next" href="#quickgrid" title="Następna strona" aria-label="Następna strona">›</a>
+            <a class="go-last" href="#quickgrid" title="Ostatnia strona" aria-label="Ostatnia strona">»</a>
           </nav>
         </div>
       </div>

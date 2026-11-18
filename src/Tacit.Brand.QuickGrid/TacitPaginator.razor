@@ -1,0 +1,136 @@
+@using System.Web
+@implements IDisposable
+@*
+    Paginator dla QuickGrid z tekstami do przetłumaczenia, zamiennik <Paginator /> z .NET 11, który ma teksty wpisane
+    po angielsku. Znacznik i zachowanie jak w Paginator: linki z numerem strony w adresie (działają w statycznym SSR
+    i w Interactive Server), klasy .paginator/.go-*, które stylizuje .t-datagrid z tacit-site.css.
+
+    <div class="t-datagrid">
+        <div class="t-table" role="region" aria-label="Dziennik zdarzeń" tabindex="0">
+            <QuickGrid Items="events" Theme="tacit" Pagination="pagination">…</QuickGrid>
+        </div>
+        <TacitPaginator State="pagination" />
+    </div>
+
+    Domyślne teksty są po polsku. W aplikacji wielojęzycznej przekaż je z IStringLocalizer, a teksty z liczbą
+    (Summary, PageText) jako funkcje, bo odmiana zależy od języka:
+
+    <TacitPaginator State="pagination" Label="@L["Pages"]" NextPageLabel="@L["Next page"]" …
+                    Summary="@(count => L["{0} items", count])" PageText="@((page, pages) => L["Page {0} of {1}", page, pages])" />
+
+    Gdy QuickGrid ma QueryParameterNameOptions, przekaż ten sam obiekt, bo nazwa parametru strony musi się zgadzać.
+*@
+
+<div @attributes="AdditionalAttributes" class="@Css.Join("paginator", Css.From(AdditionalAttributes))">
+    @if (State.TotalItemCount is { } total)
+    {
+        <div class="summary">@Summary(total)</div>
+        <nav aria-label="@Label">
+            @PageLink("go-first", 0, CanGoBack, FirstPageLabel, "«")
+            @PageLink("go-previous", State.CurrentPageIndex - 1, CanGoBack, PreviousPageLabel, "‹")
+            <div class="pagination-text" aria-live="polite" aria-atomic="true">@PageText(State.CurrentPageIndex + 1, PageCount)</div>
+            @PageLink("go-next", State.CurrentPageIndex + 1, CanGoForwards, NextPageLabel, "›")
+            @PageLink("go-last", PageCount - 1, CanGoForwards, LastPageLabel, "»")
+        </nav>
+    }
+</div>
+
+@code {
+    [Inject] private NavigationManager Navigation { get; set; } = default!;
+
+    /// <summary>Stan stronicowania, ten sam co w parametrze Pagination siatki.</summary>
+    [Parameter, EditorRequired] public PaginationState State { get; set; } = default!;
+
+    /// <summary>
+    /// Nazwy parametrów adresu siatki. Podaj ten sam obiekt co w QuickGrid, gdy go zmieniasz (np. dwie siatki na stronie).
+    /// </summary>
+    [Parameter] public QueryParameterNameOptions? QueryParameterNameOptions { get; set; }
+
+    /// <summary>Nazwa nawigacji dla czytnika ekranu (aria-label &lt;nav&gt;).</summary>
+    [Parameter] public string Label { get; set; } = "Strony";
+
+    [Parameter] public string FirstPageLabel { get; set; } = "Pierwsza strona";
+
+    [Parameter] public string PreviousPageLabel { get; set; } = "Poprzednia strona";
+
+    [Parameter] public string NextPageLabel { get; set; } = "Następna strona";
+
+    [Parameter] public string LastPageLabel { get; set; } = "Ostatnia strona";
+
+    /// <summary>Podsumowanie z liczbą wszystkich pozycji, np. „47 pozycji”.</summary>
+    [Parameter] public Func<int, string> Summary { get; set; } = DefaultSummary;
+
+    /// <summary>Bieżąca strona i liczba stron, np. „Strona 2 z 5”. Ogłaszane przez czytnik po zmianie strony.</summary>
+    [Parameter] public Func<int, int, string> PageText { get; set; } = DefaultPageText;
+
+    [Parameter(CaptureUnmatchedValues = true)] public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private PaginationState? subscribedState;
+
+    private string QueryName => (QueryParameterNameOptions ?? DefaultQueryNames).Page;
+    private int PageCount => (State.LastPageIndex ?? 0) + 1;
+    private bool CanGoBack => State.CurrentPageIndex > 0;
+    private bool CanGoForwards => State.CurrentPageIndex < State.LastPageIndex;
+
+    private static readonly QueryParameterNameOptions DefaultQueryNames = new();
+
+    internal static string DefaultSummary(int count) => count + " " + (count, count % 10, count % 100) switch
+    {
+        (1, _, _) => "pozycja",
+        (_, >= 2 and <= 4, < 12 or > 14) => "pozycje",
+        _ => "pozycji",
+    };
+
+    internal static string DefaultPageText(int page, int pageCount) => $"Strona {page} z {pageCount}";
+
+    // Nieaktywny link nie ma href, więc nie trafia na listę linków czytnika ani do kolejności Tab.
+    private RenderFragment PageLink(string css, int pageIndex, bool enabled, string label, string glyph) => @<a class="@css" href="@(enabled ? PageUrl(pageIndex) : null)" title="@label" aria-label="@label" aria-disabled="@(enabled ? null : "true")">@glyph</a>;
+
+    // Pierwsza strona bez parametru w adresie, jak w Paginator z QuickGrid.
+    private string PageUrl(int pageIndex) => Navigation.GetUriWithQueryParameter(QueryName, pageIndex == 0 ? null : pageIndex + 1);
+
+    protected override void OnInitialized() => Navigation.LocationChanged += OnLocationChanged;
+
+    protected override Task OnParametersSetAsync()
+    {
+        if (!ReferenceEquals(State, subscribedState))
+        {
+            if (subscribedState is not null)
+            {
+                subscribedState.TotalItemCountChanged -= OnTotalItemCountChanged;
+            }
+            subscribedState = State;
+            State.TotalItemCountChanged += OnTotalItemCountChanged;
+        }
+        return SyncPageFromQueryAsync();
+    }
+
+    private Task SyncPageFromQueryAsync()
+    {
+        var pageIndex = PageIndexFromQuery(Navigation.Uri, QueryName);
+        return pageIndex == State.CurrentPageIndex ? Task.CompletedTask : State.SetCurrentPageIndexAsync(pageIndex);
+    }
+
+    internal static int PageIndexFromQuery(string uri, string queryName)
+    {
+        var query = new Uri(uri).Query;
+        return int.TryParse(HttpUtility.ParseQueryString(query)[queryName], out var page) && page > 0 ? page - 1 : 0;
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e) => _ = InvokeAsync(async () =>
+    {
+        await SyncPageFromQueryAsync();
+        StateHasChanged();
+    });
+
+    private void OnTotalItemCountChanged(object? sender, int? total) => _ = InvokeAsync(StateHasChanged);
+
+    public void Dispose()
+    {
+        Navigation.LocationChanged -= OnLocationChanged;
+        if (subscribedState is not null)
+        {
+            subscribedState.TotalItemCountChanged -= OnTotalItemCountChanged;
+        }
+    }
+}

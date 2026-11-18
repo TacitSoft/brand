@@ -182,7 +182,7 @@ import './tacit-theme-sync.js';
 | `.t-field`, `.t-label`, `.t-hint`, `.t-error`, `.t-input`, `.t-select`, `.t-textarea`, `.t-check`, `.t-search` | Formularze. Obsługują też klasy z `EditForm` (`.invalid`, `.validation-message`, `.validation-errors`) |
 | `.t-callout` + `--success`, `--warning`, `--danger` | Komunikaty |
 | `.t-table` | Tabela w ramce, przewijana na wąskich ekranach (`<TacitTable>`) |
-| `.t-datagrid` | Ramka QuickGrid z `Theme="tacit"`: `.t-table` z siatką i `Paginator` pod nią (`src/Tacit.Brand/README.md`, „QuickGrid”) |
+| `.t-datagrid` | Ramka QuickGrid z `Theme="tacit"`: `.t-table` z siatką i `<TacitPaginator>` (paczka `Tacit.Brand.QuickGrid`) pod nią (`src/Tacit.Brand/README.md`, „QuickGrid”) |
 | `.t-command` | Polecenie do skopiowania (`dotnet add package …`) |
 | `.t-breadcrumbs`, `.t-empty`, `.t-footer` | Okruszki, stan pusty, stopka |
 | `.t-visually-hidden`, `.t-muted`, `.t-mono`, `.t-small`, `.t-nowrap` | Narzędzia |

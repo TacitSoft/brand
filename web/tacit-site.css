@@ -1300,7 +1300,7 @@
        <div class="t-table" role="region" aria-label="…" tabindex="0">
          <QuickGrid Theme="tacit" …>…</QuickGrid>
        </div>
-       <Paginator State="…" />
+       <TacitPaginator State="…" />   (Tacit.Brand.QuickGrid; ten sam znacznik co Paginator)
      </div>
    Wyjątek od zasady „wszystko w @layer”: QuickGrid ma własny CSS izolowany (bez warstwy), który wygrywa z każdą
    warstwą. Ta sekcja jest więc bez warstwy, a selektory są o klasę mocniejsze od selektorów pakietu
