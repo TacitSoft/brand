@@ -1322,6 +1322,10 @@
 	text-decoration: none;
 }
 
+.quickgrid[theme=tacit] .col-justify-center .col-title {
+	justify-content: center;
+}
+
 .quickgrid[theme=tacit] .col-justify-end .col-title {
 	flex-direction: row-reverse;
 }
