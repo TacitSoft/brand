@@ -87,7 +87,19 @@ Komponenty renderują sam znacznik z klasami `.t-*` i nie mają własnych styló
 
 ### QuickGrid (sortowanie, stronicowanie)
 
-Gdy tabela ma sortowanie, stronicowanie albo wirtualizację, użyj `QuickGrid` z pakietu `Microsoft.AspNetCore.Components.QuickGrid` z motywem `tacit`. W .NET 11 nagłówki sortowania i paginator to linki z parametrami w adresie, więc działają w statycznym SSR, a adres strony można udostępnić. Tacit.Brand daje tylko style (`tacit-site.css`) i nie zależy od pakietu QuickGrid.
+Gdy tabela ma sortowanie, stronicowanie albo wirtualizację, użyj `QuickGrid` z pakietu `Microsoft.AspNetCore.Components.QuickGrid` z motywem `tacit`, a do stronicowania `TacitPaginator` z paczki `Tacit.Brand.QuickGrid` (net11.0; ciągnie za sobą `Tacit.Brand` i QuickGrid):
+
+```xml
+<PackageReference Include="Tacit.Brand.QuickGrid" Version="0.4.*" />
+```
+
+```razor
+@* _Imports.razor *@
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using Tacit.Brand.QuickGrid
+```
+
+ W .NET 11 nagłówki sortowania i paginator to linki z parametrami w adresie, więc działają w statycznym SSR, a adres strony można udostępnić. Tacit.Brand daje tylko style (`tacit-site.css`) i nie zależy od pakietu QuickGrid.
 
 ```razor
 <div class="t-datagrid">
