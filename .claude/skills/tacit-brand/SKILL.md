@@ -60,6 +60,36 @@ This skill covers **consuming** `Tacit.Brand`: hosts and libraries that render T
 | No data | `<TacitEmpty>` | Say what to do next, with a link. |
 | Anything else (cards, badges, chips, panels, facts) | Plain markup with the `.t-*` classes from `web/README.md` | Do not invent a parallel class or component. |
 
+## A sortable, paged grid (QuickGrid)
+
+The host references `Microsoft.AspNetCore.Components.QuickGrid` (11.x for sorting and paging in static SSR); Tacit.Brand only styles it.
+
+```razor
+<div class="t-datagrid">
+    <div class="t-table" role="region" aria-label="Dziennik zdarzeń" tabindex="0">
+        <QuickGrid Items="events" Theme="tacit" Pagination="pagination">
+            <PropertyColumn Property="e => e.At" Title="Czas" Format="yyyy-MM-dd HH:mm" Sortable="true" IsDefaultSortColumn="true" />
+            <PropertyColumn Property="e => e.Actor" Title="Kto" Sortable="true" />
+            <PropertyColumn Property="e => e.DurationMs" Title="Czas trwania [ms]" Align="Align.End" Sortable="true" />
+            <TemplateColumn Title="Akcje">
+                <TacitButton Href="@($"events/{context.Id}")" Variant="TacitButtonVariant.Ghost" Small>Szczegóły<span class="t-visually-hidden"> @context.At</span></TacitButton>
+            </TemplateColumn>
+        </QuickGrid>
+    </div>
+    <Paginator State="pagination">
+        <SummaryTemplate>Zdarzeń: <strong>@pagination.TotalItemCount</strong></SummaryTemplate>
+    </Paginator>
+</div>
+
+@code {
+    private readonly PaginationState pagination = new() { ItemsPerPage = 20 };
+}
+```
+
+- `Paginator` goes after the `.t-table` div, not inside it, so it does not scroll sideways with a wide grid.
+- `Class` on a column lands on both `<th>` and `<td>`; `t-mono` there turns the header monospace too.
+- No items means an empty `<tbody>`, not `.t-empty`: render `<TacitEmpty>` instead of the grid when the source is known to be empty.
+
 ## Area layout and the module menu
 
 A host's area layout (the one passed to `AddModuleBlazor(...)` in Tacit.Modulus.Blazor) puts the menu next to the content:
