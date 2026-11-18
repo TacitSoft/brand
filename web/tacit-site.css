@@ -1294,6 +1294,209 @@
 }
 
 /* ════════════════════════════════════════════════════════════════════════════
+   QuickGrid (Microsoft.AspNetCore.Components.QuickGrid) z Theme="tacit".
+   Znacznik:
+     <div class="t-datagrid">
+       <div class="t-table" role="region" aria-label="…" tabindex="0">
+         <QuickGrid Theme="tacit" …>…</QuickGrid>
+       </div>
+       <Paginator State="…" />
+     </div>
+   Wyjątek od zasady „wszystko w @layer”: QuickGrid ma własny CSS izolowany (bez warstwy), który wygrywa z każdą
+   warstwą. Ta sekcja jest więc bez warstwy, a selektory są o klasę mocniejsze od selektorów pakietu
+   (np. „.paginator[b-…]” to 0,2,0, a „.t-datagrid div.paginator” 0,2,1).
+   ════════════════════════════════════════════════════════════════════════════ */
+/* Układ powtórzony za pakietem, żeby styl nie zależał od jego CSS (np. w preview.html). */
+.quickgrid[theme=tacit] .col-header-content {
+	display: flex;
+	align-items: center;
+	gap: var(--tacit-space-2);
+}
+
+.quickgrid[theme=tacit] .col-title {
+	display: flex;
+	flex-grow: 1;
+	min-width: 0;
+	gap: var(--tacit-space-2);
+	color: inherit;
+	text-decoration: none;
+}
+
+.quickgrid[theme=tacit] .col-justify-center .col-title {
+	justify-content: center;
+}
+
+.quickgrid[theme=tacit] .col-justify-end .col-title {
+	flex-direction: row-reverse;
+}
+
+.quickgrid[theme=tacit] a.col-title:hover {
+	text-decoration: underline;
+	text-decoration-thickness: 2px;
+	text-underline-offset: 0.2em;
+}
+
+/* Kierunek sortowania jako znak, nie obraz tła: dziedziczy kolor, więc działa w trybie ciemnym i w wymuszonych
+   kolorach. Nazwę kierunku czytnik dostaje z aria-sort na <th>, a wskaźnik ma aria-hidden. */
+.quickgrid[theme=tacit] .sort-indicator,
+.quickgrid[theme=tacit] .col-sort-asc .sort-indicator,
+.quickgrid[theme=tacit] .col-sort-desc .sort-indicator {
+	flex: none;
+	align-self: center;
+	width: 1em;
+	text-align: center;
+	background-image: none;
+	transform: none;
+	color: var(--tacit-color-fg-muted);
+	line-height: 1;
+}
+
+.quickgrid[theme=tacit] .col-sort-asc .sort-indicator::before { content: "↑"; }
+.quickgrid[theme=tacit] .col-sort-desc .sort-indicator::before { content: "↓"; }
+
+.quickgrid[theme=tacit] th .col-options-button {
+	flex: none;
+	width: var(--tacit-target-min-compact);
+	min-height: var(--tacit-target-min-compact);
+	border-radius: var(--tacit-radius-sm);
+	background: currentColor;
+	color: var(--tacit-color-fg-muted);
+	mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>') center / 1rem no-repeat;
+	cursor: pointer;
+}
+
+.quickgrid[theme=tacit] th .col-options-button:hover {
+	color: var(--tacit-color-fg);
+}
+
+.quickgrid[theme=tacit] .col-options {
+	min-width: 14rem;
+	padding: var(--tacit-space-4);
+	border: var(--tacit-border-width) solid var(--tacit-color-line);
+	border-radius: var(--tacit-radius);
+	background: var(--tacit-color-surface);
+	box-shadow: var(--tacit-shadow-raised);
+	font-family: var(--tacit-font-sans);
+	font-weight: 400;
+}
+
+.quickgrid[theme=tacit] > thead .col-width-draghandle {
+	width: var(--tacit-space-2);
+}
+
+.quickgrid[theme=tacit] > thead .col-width-draghandle::after {
+	border-color: var(--tacit-color-line-strong);
+}
+
+/* Wyrównanie logiczne zamiast left/right pakietu, więc działa też w dir="rtl". */
+.quickgrid[theme=tacit] td.col-justify-start { text-align: start; }
+.quickgrid[theme=tacit] td.col-justify-center { text-align: center; }
+.quickgrid[theme=tacit] td.col-justify-end { text-align: end; }
+
+/* Klikalny wiersz (OnRowClick). Wiersz nie dostaje fokusu, więc ta sama akcja musi być też linkiem lub przyciskiem
+   w komórce (WCAG 2.1.1). */
+.quickgrid[theme=tacit] > tbody > tr.row-clickable:hover > td {
+	background: var(--tacit-color-surface-sunken);
+}
+
+.quickgrid[theme=tacit].loading > tbody {
+	opacity: 0.4;
+	transition: opacity var(--tacit-duration) var(--tacit-easing);
+	transition-delay: 25ms;
+}
+
+.quickgrid[theme=tacit] > tbody > tr > td.grid-cell-placeholder::after {
+	content: "…";
+	color: var(--tacit-color-fg-muted);
+}
+
+.t-datagrid {
+	display: grid;
+	gap: var(--tacit-space-3);
+}
+
+.t-datagrid div.paginator {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: var(--tacit-space-2) var(--tacit-space-4);
+	margin: 0;
+	padding: 0;
+	border: 0;
+	color: var(--tacit-color-fg-muted);
+	font-size: var(--tacit-text-sm);
+}
+
+.t-datagrid .paginator nav {
+	display: flex;
+	align-items: center;
+	gap: var(--tacit-space-2);
+	margin-inline-start: auto;
+}
+
+.t-datagrid .paginator .pagination-text {
+	margin: 0;
+}
+
+.t-datagrid .paginator strong {
+	color: var(--tacit-color-fg);
+	font-variant-numeric: tabular-nums;
+}
+
+/* Strzałki «‹›» są tekstem linków, a pakiet chowa je (font-size: 0) pod obrazkami tła i odwraca je transformacją. */
+.t-datagrid .paginator nav a,
+.t-datagrid .paginator nav button {
+	display: inline-grid;
+	place-items: center;
+	width: auto;
+	min-width: var(--tacit-target-min);
+	height: var(--tacit-target-min);
+	border: var(--tacit-border-width) solid var(--tacit-color-line);
+	border-radius: var(--tacit-radius);
+	background: var(--tacit-color-surface);
+	color: var(--tacit-color-fg);
+	font-size: var(--tacit-text-lg);
+	line-height: 1;
+	text-decoration: none;
+	transform: none;
+}
+
+.t-datagrid .paginator nav a:not([aria-disabled="true"]):hover,
+.t-datagrid .paginator nav button:not(:disabled):hover {
+	background: var(--tacit-color-surface-sunken);
+	border-color: var(--tacit-color-line-strong);
+}
+
+.t-datagrid .paginator nav a:not([aria-disabled="true"]):active,
+.t-datagrid .paginator nav button:not(:disabled):active {
+	background: var(--tacit-color-primary-soft);
+}
+
+.t-datagrid .paginator nav a[aria-disabled="true"],
+.t-datagrid .paginator nav button:disabled {
+	opacity: 1;
+	color: var(--tacit-color-fg-muted);
+	background: transparent;
+}
+
+@media (forced-colors: active) {
+	.t-datagrid .paginator nav a,
+	.t-datagrid .paginator nav button {
+		border-color: ButtonText;
+	}
+
+	.t-datagrid .paginator nav a[aria-disabled="true"],
+	.t-datagrid .paginator nav button:disabled {
+		border-color: GrayText;
+		color: GrayText;
+	}
+
+	.quickgrid[theme=tacit] th .col-options-button {
+		background: ButtonText;
+	}
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
    Narzędzia
    ════════════════════════════════════════════════════════════════════════════ */
 @layer tacit.utilities {

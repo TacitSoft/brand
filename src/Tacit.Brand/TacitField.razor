@@ -1,3 +1,6 @@
+@using System.ComponentModel
+@using System.ComponentModel.DataAnnotations
+@using System.Reflection
 @implements IDisposable
 @*
     Pole formularza .t-field: etykieta, podpowiedź i błąd połączone z kontrolką (WCAG 1.3.1, 3.3.1, 3.3.2).
@@ -14,10 +17,13 @@
     </EditForm>
 
     Bez EditForm:  <TacitField Id="q" Label="Szukaj" Error="@error"><input class="t-input" @attributes="context.Attributes" /></TacitField>
+
+    Bez Label etykieta pochodzi z atrybutu pola modelu: najpierw [Display(Name = …)] (także z ResourceType), potem
+    [DisplayName]. Tę samą kolejność ma komponent DisplayName z .NET 11, więc nazwa pola jest w jednym miejscu.
 *@
 
 <div @attributes="AdditionalAttributes" class="@Css.Join("t-field", Css.From(AdditionalAttributes))">
-    <label class="t-label" for="@FieldId" data-required="@Required">@Label</label>
+    <label class="t-label" for="@FieldId" data-required="@Required">@labelText</label>
     @if (!string.IsNullOrEmpty(Hint))
     {
         <span class="t-hint" id="@HintId">@Hint</span>
@@ -35,7 +41,10 @@
     /// <summary>Pole modelu, z którego biorą się błędy walidacji i domyślny identyfikator.</summary>
     [Parameter] public Expression<Func<object?>>? For { get; set; }
 
-    [Parameter, EditorRequired] public string Label { get; set; } = "";
+    /// <summary>
+    /// Etykieta pola. Domyślnie z <see cref="DisplayAttribute"/>, a potem z <see cref="DisplayNameAttribute"/> pola z <see cref="For"/>.
+    /// </summary>
+    [Parameter] public string? Label { get; set; }
 
     /// <summary>Podpowiedź pod etykietą: format, przykład, skutki. Nie zastępuje etykiety.</summary>
     [Parameter] public string? Hint { get; set; }
@@ -59,6 +68,7 @@
     private EditContext? subscribedContext;
     private FieldIdentifier? fieldId;
     private List<string> messages = [];
+    private string labelText = "";
 
     private string FieldId => Id ?? DefaultId(fieldId!.Value);
     private string HintId => FieldId + "-hint";
@@ -97,7 +107,39 @@
             TacitFieldRegistry.For(subscribedContext).Set(f, FieldId);
         }
 
+        labelText = ResolveLabel();
         messages = CollectMessages();
+    }
+
+    private string ResolveLabel()
+    {
+        if (!string.IsNullOrWhiteSpace(Label))
+        {
+            return Label;
+        }
+        if (fieldId is { } f && DisplayNameOf(f) is { } name)
+        {
+            return name;
+        }
+        throw new InvalidOperationException(For is null
+            ? $"{nameof(TacitField)} z parametrem {nameof(Id)} wymaga parametru {nameof(Label)}."
+            : $"{nameof(TacitField)} dla pola '{fieldId!.Value.FieldName}' wymaga parametru {nameof(Label)} albo atrybutu [Display(Name = …)] lub [DisplayName] na polu modelu.");
+    }
+
+    internal static string? DisplayNameOf(FieldIdentifier identifier)
+    {
+        var member = (MemberInfo?)identifier.Model.GetType().GetProperty(identifier.FieldName)
+            ?? identifier.Model.GetType().GetField(identifier.FieldName);
+        if (member is null)
+        {
+            return null;
+        }
+        var name = member.GetCustomAttribute<DisplayAttribute>()?.GetName();
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            name = member.GetCustomAttribute<DisplayNameAttribute>()?.DisplayName;
+        }
+        return string.IsNullOrWhiteSpace(name) ? null : name;
     }
 
     private TacitFieldContext BuildContext()

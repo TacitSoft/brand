@@ -1,3 +1,6 @@
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.Linq.Expressions;
 using Bunit;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
@@ -268,6 +271,63 @@ public sealed class FieldTests : BunitContext
 	public void Requires_for_or_id()
 	{
 		Assert.Throws<InvalidOperationException>(() => Render<TacitField>(p => p.Add(f => f.Label, "Nazwa")));
+	}
+
+	[Fact]
+	public void Label_comes_from_display_attribute_before_display_name()
+	{
+		var model = new LabelledModel();
+
+		Assert.Equal("Nazwa klienta", LabelOf(() => model.Name));
+		Assert.Equal("Adres strony", LabelOf(() => model.Website));
+		Assert.Equal("Opis", LabelOf(() => model.Description));
+		Assert.Equal("Kontakt", LabelOf(() => model.Contact));
+	}
+
+	[Fact]
+	public void Label_parameter_wins_over_attribute()
+	{
+		var model = new LabelledModel();
+
+		Assert.Equal("Nazwa", LabelOf(() => model.Name, "Nazwa"));
+	}
+
+	[Fact]
+	public void Requires_label_without_display_attribute()
+	{
+		var model = new LabelledModel();
+
+		var error = Assert.Throws<InvalidOperationException>(() => LabelOf(() => model.Plain));
+		Assert.Contains("'Plain'", error.Message);
+	}
+
+	private string LabelOf(Expression<Func<object?>> field, string? label = null) =>
+		Render<TacitField>(p => p
+			.Add(f => f.For, field)
+			.Add(f => f.Label, label)
+			.Add(f => f.ChildContent, ctx => b => b.AddMarkupContent(0, "<input>")))
+			.Find("label").TextContent;
+
+	private sealed class LabelledModel
+	{
+		[Display(Name = "Nazwa klienta")]
+		public string? Name { get; set; }
+
+		[Display(Name = "Adres strony"), DisplayName("Strona")]
+		public string? Website { get; set; }
+
+		[DisplayName("Opis")]
+		public string? Description { get; set; }
+
+		[Display(Name = nameof(LabelResources.Contact), ResourceType = typeof(LabelResources))]
+		public string? Contact { get; set; }
+
+		public string? Plain { get; set; }
+	}
+
+	public static class LabelResources
+	{
+		public static string Contact => "Kontakt";
 	}
 
 	[Theory]

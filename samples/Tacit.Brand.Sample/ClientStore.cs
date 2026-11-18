@@ -44,19 +44,24 @@ public enum ClientKind
 
 public sealed class ClientModel
 {
+	[Display(Name = "Nazwa")]
 	[Required(ErrorMessage = "Podaj nazwę klienta.")]
 	[StringLength(60, ErrorMessage = "Nazwa może mieć najwyżej 60 znaków.")]
 	public string? Name { get; set; }
 
+	[Display(Name = "Identyfikator klienta")]
 	[Required(ErrorMessage = "Podaj identyfikator klienta.")]
 	[RegularExpression("^[a-z0-9-]+$", ErrorMessage = "Identyfikator może mieć tylko małe litery, cyfry i myślniki.")]
 	public string? ClientId { get; set; }
 
+	[Display(Name = "Rodzaj klienta")]
 	public ClientKind Kind { get; set; }
 
+	[Display(Name = "Adres przekierowania")]
 	[Required(ErrorMessage = "Podaj adres przekierowania.")]
 	[Url(ErrorMessage = "Podaj pełny adres, np. https://app.example.com/callback.")]
 	public string? RedirectUri { get; set; }
 
+	[Display(Name = "Notatki")]
 	public string? Notes { get; set; }
 }

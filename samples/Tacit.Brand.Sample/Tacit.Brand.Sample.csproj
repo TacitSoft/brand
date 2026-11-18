@@ -1,13 +1,18 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 	<!-- Aplikacja do oglądania komponentów Tacit.Brand: dotnet run, projekt samples/Tacit.Brand.Sample
-	     Referencja do projektu, nie do paczki, więc zmiany w web/ i src/Tacit.Brand widać od razu. -->
+	     Referencja do projektu, nie do paczki, więc zmiany w web/ i src/Tacit.Brand widać od razu.
+	     net11.0, bo strona /events pokazuje QuickGrid z .NET 11 (sortowanie i stronicowanie w statycznym SSR).
+	     Sama paczka Tacit.Brand zostaje na net10.0. -->
 	<PropertyGroup>
-		<TargetFramework>net10.0</TargetFramework>
+		<TargetFramework>net11.0</TargetFramework>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<IsPackable>false</IsPackable>
 	</PropertyGroup>
 	<ItemGroup>
 		<ProjectReference Include="../../src/Tacit.Brand/Tacit.Brand.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.Components.QuickGrid" Version="11.0.0" />
 	</ItemGroup>
 </Project>
