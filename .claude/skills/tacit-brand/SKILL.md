@@ -62,7 +62,17 @@ This skill covers **consuming** `Tacit.Brand`: hosts and libraries that render T
 
 ## A sortable, paged grid (QuickGrid)
 
-The host references `Microsoft.AspNetCore.Components.QuickGrid` (11.x for sorting and paging in static SSR); Tacit.Brand only styles it.
+The host references `Tacit.Brand.QuickGrid` (net11.0), which brings `Tacit.Brand` and `Microsoft.AspNetCore.Components.QuickGrid` 11.x (sorting and paging in static SSR). The grid's styles come from `tacit-site.css` in Tacit.Brand; the package adds `TacitPaginator`.
+
+```xml
+<PackageReference Include="Tacit.Brand.QuickGrid" Version="0.4.*" />
+```
+
+```razor
+@* _Imports.razor *@
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using Tacit.Brand.QuickGrid
+```
 
 ```razor
 <div class="t-datagrid">
