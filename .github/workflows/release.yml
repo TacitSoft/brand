@@ -1,9 +1,10 @@
 name: Brand packages
 
-# Z jednego katalogu web/ powstają dwie paczki o tej samej wersji:
-#   npm   @tacitsoft/brand  (Starlight, DocFX)
-#   NuGet Tacit.Brand       (serwis Blazor, Razor Class Library z src/Tacit.Brand)
-# Obie trafiają do GitHub Packages organizacji TacitSoft, wyłącznie po tagu vX.Y.Z (ADR-C-0008).
+# Z jednego repo powstają trzy paczki o tej samej wersji:
+#   npm   @tacitsoft/brand       (Starlight, DocFX)
+#   NuGet Tacit.Brand            (serwis Blazor, Razor Class Library z src/Tacit.Brand)
+#   NuGet Tacit.Brand.QuickGrid  (TacitPaginator dla QuickGrid, net11.0, z src/Tacit.Brand.QuickGrid)
+# Wszystkie trafiają do GitHub Packages organizacji TacitSoft, wyłącznie po tagu vX.Y.Z (ADR-C-0008).
 # Wersja pochodzi z tagu (ADR-C-0003): MinVer dla NuGet, `npm version` dla npm.
 
 on:
@@ -34,7 +35,7 @@ jobs:
 
       - uses: actions/setup-dotnet@v6
         with:
-          # 11.0.x dla samples/Tacit.Brand.Sample (QuickGrid z .NET 11); paczka i testy są na net10.0.
+          # 11.0.x dla Tacit.Brand.QuickGrid i sample (QuickGrid z .NET 11); Tacit.Brand jest na net10.0.
           dotnet-version: |
             10.0.x
             11.0.x
@@ -43,13 +44,17 @@ jobs:
         run: node web/tools/check-contrast.mjs
 
       - name: Test Razor components
-        run: dotnet test tests/Tacit.Brand.Tests --configuration Release
+        run: |
+          dotnet test tests/Tacit.Brand.Tests --configuration Release
+          dotnet test tests/Tacit.Brand.QuickGrid.Tests --configuration Release
 
       - name: Build sample
         run: dotnet build samples/Tacit.Brand.Sample --configuration Release
 
       - name: Pack NuGet
-        run: dotnet pack src/Tacit.Brand --configuration Release --output ./artifacts
+        run: |
+          dotnet pack src/Tacit.Brand --configuration Release --output ./artifacts
+          dotnet pack src/Tacit.Brand.QuickGrid --configuration Release --output ./artifacts
 
       - name: Pack npm
         working-directory: web

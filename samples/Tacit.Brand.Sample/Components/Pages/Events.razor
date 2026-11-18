@@ -9,7 +9,8 @@
 @*
     QuickGrid z Theme="tacit" w ramce .t-table. Strona jest statyczna (SSR): od .NET 11 sortowanie i stronicowanie
     to linki z parametrami w adresie, więc działają bez obwodu, a adres strony można udostępnić.
-    Paginator stoi poza ramką przewijania, w .t-datagrid.
+    TacitPaginator (z Tacit.Brand.QuickGrid) zamiast Paginator, bo ten ma teksty po angielsku. Stoi poza ramką
+    przewijania, w .t-datagrid.
 *@
 <div class="t-datagrid">
     <div class="t-table" role="region" aria-label="Dziennik zdarzeń" tabindex="0">
@@ -22,9 +23,7 @@
             <PropertyColumn Property="e => e.DurationMs" Title="Czas trwania [ms]" Align="Align.End" Sortable="true" />
         </QuickGrid>
     </div>
-    <Paginator State="pagination">
-        <SummaryTemplate>Zdarzeń: <strong>@pagination.TotalItemCount</strong></SummaryTemplate>
-    </Paginator>
+    <TacitPaginator State="pagination" />
 </div>
 
 @code {

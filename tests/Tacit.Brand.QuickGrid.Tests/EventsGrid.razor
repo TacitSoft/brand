@@ -1,0 +1,17 @@
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using Tacit.Brand.QuickGrid
+
+@* Siatka testowa: 47 wierszy po 10 na stronę, czyli 5 stron. *@
+<QuickGrid Items="items" Theme="tacit" Pagination="pagination" QueryParameterNameOptions="QueryNames">
+    <PropertyColumn Property="r => r" Title="Numer" />
+</QuickGrid>
+<TacitPaginator State="pagination" QueryParameterNameOptions="QueryNames" @attributes="PaginatorAttributes" />
+
+@code {
+    [Parameter] public QueryParameterNameOptions QueryNames { get; set; } = new();
+
+    [Parameter] public Dictionary<string, object>? PaginatorAttributes { get; set; }
+
+    private readonly IQueryable<int> items = Enumerable.Range(1, 47).AsQueryable();
+    private readonly PaginationState pagination = new() { ItemsPerPage = 10 };
+}

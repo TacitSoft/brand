@@ -1,0 +1,46 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+	<!-- Komponenty marki Tacit dla QuickGrid (Microsoft.AspNetCore.Components.QuickGrid). Osobna paczka, żeby
+	     Tacit.Brand nie zależał od QuickGrid i został na net10.0. Style są w tacit-site.css z Tacit.Brand. -->
+
+	<PropertyGroup>
+		<!-- net11.0, bo dopiero QuickGrid z .NET 11 sortuje i stronicuje przez adres (także w statycznym SSR). -->
+		<TargetFramework>net11.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<LangVersion>latest</LangVersion>
+		<RootNamespace>Tacit.Brand.QuickGrid</RootNamespace>
+		<PackageId>Tacit.Brand.QuickGrid</PackageId>
+		<Description>Marka Tacit dla QuickGrid w Blazorze: TacitPaginator z tekstami do przetłumaczenia (domyślnie po polsku) zamiast Paginator z angielskimi tekstami.</Description>
+		<RepositoryUrl>https://github.com/TacitSoft/brand</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<Company>TacitSoft</Company>
+		<Authors>Andrzej Świstowski</Authors>
+		<Copyright>Copyright © 2026 TacitSoft</Copyright>
+		<PackageIcon>icon.png</PackageIcon>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+
+		<!-- Ta sama wersja co Tacit.Brand, z tego samego tagu vX.Y.Z (ADR-C-0003). -->
+		<MinVerTagPrefix>v</MinVerTagPrefix>
+		<MinVerVerbosity>minimal</MinVerVerbosity>
+		<MinVerMinimumMajorMinor>0.1</MinVerMinimumMajorMinor>
+		<MinVerDefaultPreReleaseIdentifiers Condition="'$(GITHUB_REF_TYPE)' != 'tag'">preview</MinVerDefaultPreReleaseIdentifiers>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="MinVer" Version="7.0.0" PrivateAssets="all" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.QuickGrid" Version="11.0.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- W paczce: zależność od Tacit.Brand w tej samej wersji (style .t-datagrid). PrivateAssets="none", bo domyślnie
+		     paczka wyklucza zasoby build, a z nimi buildTransitive/Tacit.Brand.targets (ostrzeżenie TBRAND001). -->
+		<ProjectReference Include="../Tacit.Brand/Tacit.Brand.csproj" PrivateAssets="none" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="$(MSBuildThisFileDirectory)../../icon-rounded-128.png" Pack="true" PackagePath="icon.png" Visible="false" />
+		<None Include="README.md" Pack="true" PackagePath="\" />
+		<InternalsVisibleTo Include="Tacit.Brand.QuickGrid.Tests" />
+	</ItemGroup>
+</Project>

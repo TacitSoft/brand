@@ -1,6 +1,6 @@
 ---
 name: tacit-brand
-description: How to build and review Blazor layouts, module pages and forms with Tacit.Brand — loading the brand assets in App.razor, the --tacit-* tokens and .t-* classes, the area layout (.t-area) with TacitNav fed by Tacit.Modulus.Blazor ModuleNavigation, the components TacitTable, TacitField, TacitValidationSummary, TacitButton, TacitCallout, TacitBreadcrumbs and TacitEmpty, QuickGrid with Theme="tacit", field labels from [Display], the hex-only-in-tokens rule and the TBRAND001 warning, and the WCAG 2.2 AA duties of the markup. Use it when a page needs a table or a sortable/paged QuickGrid, form field, validation summary, button, notice, breadcrumbs, empty state or area menu, when styling a component, when Bootstrap or a hard-coded colour appears, and when someone asks why TBRAND001 fires, why the module menu looks different, or why the skip link jumps to the home page.
+description: How to build and review Blazor layouts, module pages and forms with Tacit.Brand — loading the brand assets in App.razor, the --tacit-* tokens and .t-* classes, the area layout (.t-area) with TacitNav fed by Tacit.Modulus.Blazor ModuleNavigation, the components TacitTable, TacitField, TacitValidationSummary, TacitButton, TacitCallout, TacitBreadcrumbs and TacitEmpty, QuickGrid with Theme="tacit" and the translatable TacitPaginator from Tacit.Brand.QuickGrid, field labels from [Display], the hex-only-in-tokens rule and the TBRAND001 warning, and the WCAG 2.2 AA duties of the markup. Use it when a page needs a table or a sortable/paged QuickGrid, form field, validation summary, button, notice, breadcrumbs, empty state or area menu, when styling a component, when Bootstrap or a hard-coded colour appears, and when someone asks why TBRAND001 fires, why the module menu looks different, or why the skip link jumps to the home page.
 ---
 # Using Tacit.Brand
 
@@ -48,7 +48,7 @@ This skill covers **consuming** `Tacit.Brand`: hosts and libraries that render T
 | Need | Use | Notes |
 |---|---|---|
 | A data table | `<TacitTable Items Label RowKey>` with `Header`, `Row`, `Empty` | `Label` names the scroll region. Column headers `<th scope="col">`, the naming cell `<th scope="row">`. Shows `.t-empty` when there are no items, also for `Items="null"`. |
-| A data grid with sorting, paging or virtualization | `<QuickGrid Theme="tacit">` inside `<div class="t-datagrid">` → `<div class="t-table" role="region" aria-label tabindex="0">`, with `<Paginator>` after the `.t-table` div | .NET 11 QuickGrid sorts and pages in static SSR through URL links. Tacit.Brand styles it with CSS only and does not reference the QuickGrid package. Pass `SummaryTemplate` to `Paginator` for Polish text. Use `TacitTable` when there is nothing to sort or page: QuickGrid cannot render `<th scope="row">` or an empty state. |
+| A data grid with sorting, paging or virtualization | `<QuickGrid Theme="tacit">` inside `<div class="t-datagrid">` → `<div class="t-table" role="region" aria-label tabindex="0">`, with `<TacitPaginator State>` (package `Tacit.Brand.QuickGrid`) after the `.t-table` div | .NET 11 QuickGrid sorts and pages in static SSR through URL links. Tacit.Brand styles it with CSS only and does not reference the QuickGrid package; `Tacit.Brand.QuickGrid` (net11.0) adds `TacitPaginator`. Use `TacitTable` when there is nothing to sort or page: QuickGrid cannot render `<th scope="row">` or an empty state. |
 | A form field | `<TacitField For Hint Required Context="field">` around any input with `@attributes="field.Attributes"` | Gives the control `id`, `aria-describedby`, `aria-required`, `aria-invalid`. The label comes from `[Display(Name)]` (also with `ResourceType`), then `[DisplayName]` on the model property, the same order as .NET 11's `DisplayName` component; `Label` overrides it. `Context="field"` because `EditForm` takes `context`. Without `EditForm`: `Id` instead of `For`, error in `Error`, and `Label` is required. |
 | The error list above a form | `<TacitValidationSummary />` instead of `<ValidationSummary />` | Links field errors to controls; takes focus after a failed interactive submit. |
 | An action | `<TacitButton @onclick Variant>` | Renders `<button type="button">`. `Type="submit"` in a form. At most one `Primary` per view. `Danger` for irreversible actions. |
@@ -62,7 +62,17 @@ This skill covers **consuming** `Tacit.Brand`: hosts and libraries that render T
 
 ## A sortable, paged grid (QuickGrid)
 
-The host references `Microsoft.AspNetCore.Components.QuickGrid` (11.x for sorting and paging in static SSR); Tacit.Brand only styles it.
+The host references `Tacit.Brand.QuickGrid` (net11.0), which brings `Tacit.Brand` and `Microsoft.AspNetCore.Components.QuickGrid` 11.x (sorting and paging in static SSR). The grid's styles come from `tacit-site.css` in Tacit.Brand; the package adds `TacitPaginator`.
+
+```xml
+<PackageReference Include="Tacit.Brand.QuickGrid" Version="0.4.*" />
+```
+
+```razor
+@* _Imports.razor *@
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using Tacit.Brand.QuickGrid
+```
 
 ```razor
 <div class="t-datagrid">
@@ -76,9 +86,7 @@ The host references `Microsoft.AspNetCore.Components.QuickGrid` (11.x for sortin
             </TemplateColumn>
         </QuickGrid>
     </div>
-    <Paginator State="pagination">
-        <SummaryTemplate>Zdarzeń: <strong>@pagination.TotalItemCount</strong></SummaryTemplate>
-    </Paginator>
+    <TacitPaginator State="pagination" />
 </div>
 
 @code {
@@ -86,7 +94,9 @@ The host references `Microsoft.AspNetCore.Components.QuickGrid` (11.x for sortin
 }
 ```
 
-- `Paginator` goes after the `.t-table` div, not inside it, so it does not scroll sideways with a wide grid.
+- `TacitPaginator` replaces QuickGrid's `<Paginator />`, whose texts ("Page 2 of 5", "Go to next page") are hard-coded English (WCAG 3.1.2 on a non-English page). Its texts default to Polish; in a multilingual app pass `Label`, `FirstPageLabel`, `PreviousPageLabel`, `NextPageLabel`, `LastPageLabel` from `IStringLocalizer`, and `Summary` (`Func<int, string>`) and `PageText` (`Func<int, int, string>`) as functions, because plural forms depend on the language.
+- When the grid has `QueryParameterNameOptions`, pass the same object to `TacitPaginator`: QuickGrid keeps the page parameter name internal, and a mismatch makes the links change a parameter the grid does not read.
+- The paginator goes after the `.t-table` div, not inside it, so it does not scroll sideways with a wide grid.
 - `Class` on a column lands on both `<th>` and `<td>`; `t-mono` there turns the header monospace too.
 - No items means an empty `<tbody>`, not `.t-empty`: render `<TacitEmpty>` instead of the grid when the source is known to be empty.
 
@@ -150,9 +160,10 @@ The package adds a build step (also transitively, through a module UI package) t
 16. **Icon-only buttons without `aria-label`**, and decorative images or logos next to their name without `alt=""`.
 17. **Writing a new table, field or button component in a module library.** ADR-C-0031 point 9 wants module pages to look like one app; extend Tacit.Brand instead.
 18. **QuickGrid without `Theme="tacit"` or outside `.t-datagrid` > `.t-table`.** The default theme brings its own fonts, black SVG icons and a grey paginator, and a wide grid pushes the page sideways. Styling QuickGrid in a module's scoped CSS has the same effect as rule 17.
-19. **`OnRowClick` as the only way to open a row.** QuickGrid's clickable rows (`tr.row-clickable`) get no focus and no role, so keyboard and screen-reader users cannot reach the action (WCAG 2.1.1). Keep a link or `<TacitButton>` in a cell; the row click only shortens it.
-20. **.NET 11's `<Label For>` with `Input*` instead of `<TacitField>`.** It connects the label only: no hint or error through `aria-describedby`, no `aria-invalid`, no link from `TacitValidationSummary`. Same problem as rule 5.
-21. **The field name written both in `[Display]` and in `Label`.** Keep it in `[Display(Name)]` on the model and leave `Label` out, so the field label, the validation message and other views say the same thing.
+19. **QuickGrid's `<Paginator />` on a page.** Its texts are English and cannot be changed. Use `<TacitPaginator>` from `Tacit.Brand.QuickGrid`.
+20. **`OnRowClick` as the only way to open a row.** QuickGrid's clickable rows (`tr.row-clickable`) get no focus and no role, so keyboard and screen-reader users cannot reach the action (WCAG 2.1.1). Keep a link or `<TacitButton>` in a cell; the row click only shortens it.
+21. **.NET 11's `<Label For>` with `Input*` instead of `<TacitField>`.** It connects the label only: no hint or error through `aria-describedby`, no `aria-invalid`, no link from `TacitValidationSummary`. Same problem as rule 5.
+22. **The field name written both in `[Display]` and in `Label`.** Keep it in `[Display(Name)]` on the model and leave `Label` out, so the field label, the validation message and other views say the same thing.
 
 ## Accessibility duties left to the page
 
@@ -168,7 +179,7 @@ Check new pages by keyboard only, at 200% zoom and 320 px width, with axe (zero 
 
 ## Scope
 
-Out of scope of the package: WebAssembly/Auto render modes are not tested; QuickGrid's paginator text ("Page 2 of 5") and its link labels ("Go to next page") are English and cannot be changed in .NET 11 (only `SummaryTemplate` can); there are no icon, modal, tab, toast or date-picker components — build those from `.t-*` classes or propose them for Tacit.Brand. Removing or renaming a token, a `.t-*` class, a component or a parameter is a major version of the packages.
+Out of scope of the package: WebAssembly/Auto render modes are not tested; there are no icon, modal, tab, toast or date-picker components — build those from `.t-*` classes or propose them for Tacit.Brand. Removing or renaming a token, a `.t-*` class, a component or a parameter is a major version of the packages.
 
 ## Review checklist
 
@@ -178,7 +189,7 @@ Out of scope of the package: WebAssembly/Auto render modes are not tested; Quick
 - [ ] Area layouts use `.t-area` with `<TacitNav class="t-area__nav">`; module menus pass `<ModuleNavigation Context="groups">` items to `<TacitNav>`.
 - [ ] Forms use `<TacitField>` with `field.Attributes` on the control and `<TacitValidationSummary />`; no `required` attribute; `Id` given when a model appears twice.
 - [ ] Tables use `<TacitTable>` with `Label`, `RowKey`, `<th scope>` cells and an `Empty` text that says what to do next.
-- [ ] QuickGrid has `Theme="tacit"`, sits in `.t-datagrid` > `.t-table` with `aria-label`, and every `OnRowClick` action is also a link or button in a cell.
+- [ ] QuickGrid has `Theme="tacit"`, sits in `.t-datagrid` > `.t-table` with `aria-label`, pages with `<TacitPaginator>` (same `QueryParameterNameOptions` as the grid), and every `OnRowClick` action is also a link or button in a cell.
 - [ ] Actions are `<TacitButton>` (`<button>`), navigation is `Href` (`<a>`); at most one `Primary` per view; handlers guard against double clicks.
 - [ ] Changing statuses are always-rendered live regions; `Assertive` only for blocking errors.
 - [ ] The skip link and in-page links include the current path; `FocusOnNavigate` targets `h1`.
