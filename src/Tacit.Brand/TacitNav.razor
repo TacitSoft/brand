@@ -12,15 +12,20 @@
     dla użytkownika daje <ModuleNavigation Context="groups"> z Tacit.Modulus.Blazor, a TacitNav w jego treści
     renderuje je tym znacznikiem (wzór w README), więc menu modułów i menu pisane ręcznie wyglądają tak samo.
 
-    Poniżej 64em lista jest zwinięta w <details> pod przyciskiem z etykietą Label, żeby długie menu nie spychało
+    Poniżej 64em lista jest zwinięta w <details> pod przyciskiem SummaryLabel, żeby długie menu nie spychało
     treści strony. Od 64em przycisku nie ma, a lista stoi obok treści rozwinięta. Bez JS, także w statycznym SSR.
+    Po przejściu na inną stronę menu się zwija: stan open ustawia przeglądarka, a nie Blazor, więc w trybie
+    interaktywnym <details> dostaje @key z adresem i powstaje od nowa, zwinięte.
 *@
+
+@implements IDisposable
+@inject NavigationManager Navigation
 
 @if (items.Count > 0)
 {
     <nav @attributes="AdditionalAttributes" class="@Css.Join("t-sidenav", Css.From(AdditionalAttributes))" aria-label="@Label">
-        <details class="t-sidenav__details">
-            <summary class="t-sidenav__summary">@Label</summary>
+        <details class="t-sidenav__details" @key="Navigation.Uri">
+            <summary class="t-sidenav__summary">@SummaryLabel</summary>
             <div class="t-sidenav__body">
                 @{
                     var groupIndex = 0;
@@ -54,11 +59,24 @@
     /// <summary>Przedrostek identyfikatorów tytułów grup. Podaj go, gdy na stronie są dwa menu obszaru.</summary>
     [Parameter] public string IdPrefix { get; set; } = "t-sidenav";
 
+    /// <summary>
+    /// Tekst przycisku, który poniżej 64em rozwija menu. Inny niż <see cref="Label"/>, bo nazwę obszaru czytnik
+    /// ekranu już ogłasza z landmarku. Przekaż przetłumaczony (domyślnie po polsku).
+    /// </summary>
+    [Parameter] public string SummaryLabel { get; set; } = "Menu";
+
     [Parameter(CaptureUnmatchedValues = true)] public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; set; }
 
     private List<TacitNavItem> items = [];
 
+    protected override void OnInitialized() => Navigation.LocationChanged += OnLocationChanged;
+
     protected override void OnParametersSet() => items = Items?.ToList() ?? [];
+
+    // Układ obszaru zostaje między stronami, więc bez tego TacitNav nie przerenderowałby się po nawigacji.
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e) => InvokeAsync(StateHasChanged);
+
+    public void Dispose() => Navigation.LocationChanged -= OnLocationChanged;
 
     private static RenderFragment Links(IEnumerable<TacitNavItem> group) => __builder =>
     {

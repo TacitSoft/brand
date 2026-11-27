@@ -178,7 +178,7 @@ public sealed class NavTests : BunitContext
 	}
 
 	[Fact]
-	public void Collapses_the_lists_under_a_summary_named_after_the_area()
+	public void Collapses_the_lists_under_a_summary_other_than_the_landmark_label()
 	{
 		var cut = Render<TacitNav>(p => p
 			.Add(n => n.Label, "Backoffice")
@@ -187,8 +187,12 @@ public sealed class NavTests : BunitContext
 		// Zwinięte domyślnie: od 64em rozwija je CSS (::details-content), poniżej otwiera użytkownik.
 		var details = cut.Find("nav.t-sidenav > details.t-sidenav__details");
 		Assert.False(details.HasAttribute("open"));
-		Assert.Equal("Backoffice", cut.Find("details > summary.t-sidenav__summary").TextContent);
+		// Nazwę obszaru czytnik ogłasza z landmarku, więc przycisk mówi, co robi.
+		Assert.Equal("Menu", cut.Find("details > summary.t-sidenav__summary").TextContent);
 		Assert.Single(cut.FindAll("details > .t-sidenav__body a"));
+
+		cut.Render(p => p.Add(n => n.SummaryLabel, "Area menu"));
+		Assert.Equal("Area menu", cut.Find("summary").TextContent);
 	}
 
 	[Fact]

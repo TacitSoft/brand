@@ -173,7 +173,7 @@ Pozycje menu modułów daje `<ModuleNavigation>` z Tacit.Modulus.Blazor (ADR-C-0
 ```html
 <nav class="t-sidenav" aria-label="Backoffice">
   <details class="t-sidenav__details">
-    <summary class="t-sidenav__summary">Backoffice</summary>
+    <summary class="t-sidenav__summary">Menu</summary>
     <div class="t-sidenav__body">
       <ul><li><a href="backoffice" aria-current="page">Pulpit</a></li></ul>
       <div>
@@ -185,7 +185,7 @@ Pozycje menu modułów daje `<ModuleNavigation>` z Tacit.Modulus.Blazor (ADR-C-0
 </nav>
 ```
 
-Poniżej 64em lista jest zwinięta pod przyciskiem z etykietą `Label`, żeby długie menu nie spychało treści strony na telefonie. Od 64em przycisku nie ma, a lista stoi obok treści rozwinięta (CSS `::details-content`). Przeglądarka bez `::details-content` pokazuje przycisk także na desktopie, więc menu nadal da się otworzyć. Działa bez JS, także w statycznym SSR.
+Poniżej 64em lista jest zwinięta pod przyciskiem `SummaryLabel` (domyślnie „Menu”; przekaż tłumaczenie), żeby długie menu nie spychało treści strony na telefonie. Przycisk ma inny tekst niż `Label`, bo nazwę obszaru czytnik ekranu ogłasza już z landmarku. Po przejściu na inną stronę menu się zwija, także w trybie interaktywnym. Od 64em przycisku nie ma, a lista stoi obok treści rozwinięta (CSS `::details-content`). Przeglądarka bez `::details-content` pokazuje przycisk także na desktopie, więc menu nadal da się otworzyć. Działa bez JS, także w statycznym SSR.
 
 ## Hex tylko w tokenach
 

@@ -25,8 +25,14 @@
 	html {
 		-webkit-text-size-adjust: 100%;
 		text-size-adjust: 100%;
-		/* Lepki nagłówek nie może zasłaniać elementu z fokusem ani celu kotwicy (WCAG 2.4.11). */
-		scroll-padding-top: calc(var(--tacit-header-height) + var(--tacit-header-border) + var(--tacit-space-4));
+	}
+
+	/* Lepki nagłówek (od 64em) nie może zasłaniać elementu z fokusem ani celu kotwicy (WCAG 2.4.11).
+	   Niżej nagłówek nie jest przyklejony, więc rezerwa zostawiałaby tylko pustą przestrzeń. */
+	@media (min-width: 64em) {
+		html {
+			scroll-padding-top: calc(var(--tacit-header-height) + var(--tacit-header-border) + var(--tacit-space-4));
+		}
 	}
 
 	@media (prefers-reduced-motion: no-preference) {
@@ -420,17 +426,20 @@
 	/* Miniatura widoku trace (ślad wywołań jak w Aspire czy Jaegerze) przed przełącznikami: po lewej nazwy spanów
 	   z wcięciami drzewa, po prawej paski na osi czasu, bursztyn = najdłuższa ścieżka. Sama ozdoba, bez treści,
 	   więc czytnik ekranu jej nie widzi. Od 80em: węższa belka z logowaniem, motywem i językiem nie ma na nią miejsca.
+	   Jest osobnym elementem flex belki (::after ustawiony przez order przed .t-header__end), a nie częścią
+	   .t-header__end: tylko wtedy zwęża się według flex-basis i ustępuje miejsca pierwsza, zanim zwęzi się nawigacja.
 	   Siatka 200 × 41 px: wiersze co 9 px, nazwy 0–40 px, oś 54 px, paski 60–200 px. */
-	@media (min-width: 80em) {
-		.t-header__end::before {
+	@media (min-width: 80em) and (forced-colors: none) {
+		.t-header__inner::after {
 			--_name: color-mix(in srgb, var(--tacit-color-header-muted) 45%, transparent);
 			--_span: color-mix(in srgb, var(--tacit-color-header-muted) 75%, transparent);
 			--_hot: var(--tacit-color-header-accent);
 			content: "";
-			flex: none;
-			width: 200px;
+			order: 1;
+			flex: 0 1000 200px;
+			min-width: 0;
 			height: 41px;
-			margin-inline-end: var(--tacit-space-4);
+			margin-inline: auto var(--tacit-space-4);
 			background:
 				linear-gradient(var(--_name), var(--_name)) 0 1px / 36px 3px no-repeat,
 				linear-gradient(var(--_name), var(--_name)) 5px 10px / 32px 3px no-repeat,
@@ -445,15 +454,10 @@
 				linear-gradient(var(--_span), var(--_span)) 155px 36px / 38px 5px no-repeat;
 		}
 
-		/* Ozdoba ustępuje miejsca: nawigacja główna się nie zwęża. */
-		.t-header .t-nav {
-			flex-shrink: 0;
-		}
-	}
-
-	@media (forced-colors: active) {
-		.t-header__end::before {
-			display: none;
+		/* Wolne miejsce bierze margines miniatury, więc przełączniki stoją tuż za nią. */
+		.t-header__end {
+			order: 2;
+			margin-inline-start: 0;
 		}
 	}
 
@@ -479,15 +483,6 @@
 		.t-header__action {
 			min-width: var(--tacit-target-min-compact);
 			padding-inline: var(--tacit-space-2);
-		}
-
-		.t-header__action-label {
-			position: absolute;
-			width: 1px;
-			height: 1px;
-			overflow: hidden;
-			clip-path: inset(50%);
-			white-space: nowrap;
 		}
 	}
 
@@ -640,31 +635,13 @@
 		color: var(--tacit-color-on-primary);
 	}
 
-	/* W nagłówku (obok języka i konta) przełącznik motywu ma same ikony, a poza nim chowa etykiety
-	   dopiero na wąskim ekranie. Etykiety zostają dla czytnika ekranu, a podpowiedź daje title. */
-	.t-header .t-theme-switch .t-theme-switch__label {
-		position: absolute;
-		width: 1px;
-		height: 1px;
-		overflow: hidden;
-		clip-path: inset(50%);
-		white-space: nowrap;
-	}
-
+	/* Przełącznik motywu z samymi ikonami: w nagłówku zawsze (obok języka i konta), poza nim poniżej 36em.
+	   Etykiety chowa wizualnie warstwa tacit.utilities, czytnik ekranu nadal je czyta, a podpowiedź daje title. */
 	.t-header .t-theme-switch button {
 		padding: 0;
 	}
 
 	@media (max-width: 35.99em) {
-		.t-theme-switch .t-theme-switch__label {
-			position: absolute;
-			width: 1px;
-			height: 1px;
-			overflow: hidden;
-			clip-path: inset(50%);
-			white-space: nowrap;
-		}
-
 		.t-theme-switch button {
 			padding: 0;
 		}
@@ -1727,14 +1704,28 @@
    Narzędzia
    ════════════════════════════════════════════════════════════════════════════ */
 @layer tacit.utilities {
-	/* Ukryte wizualnie, dostępne dla czytników ekranu */
-	.t-visually-hidden:not(:focus):not(:active) {
+	/* Ukryte wizualnie, dostępne dla czytników ekranu. Do tej samej reguły należą etykiety, które komponenty
+	   chowają same: przełącznika motywu w nagłówku (zawsze) oraz motywu i konta na wąskim ekranie. */
+	.t-visually-hidden:not(:focus):not(:active),
+	.t-header .t-theme-switch__label {
 		position: absolute !important;
 		width: 1px !important;
 		height: 1px !important;
 		overflow: hidden !important;
 		clip-path: inset(50%) !important;
 		white-space: nowrap !important;
+	}
+
+	@media (max-width: 35.99em) {
+		.t-theme-switch__label,
+		.t-header__action-label {
+			position: absolute !important;
+			width: 1px !important;
+			height: 1px !important;
+			overflow: hidden !important;
+			clip-path: inset(50%) !important;
+			white-space: nowrap !important;
+		}
 	}
 
 	.t-muted { color: var(--tacit-color-fg-muted); }
