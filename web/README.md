@@ -122,7 +122,7 @@ Hasło do źródła dodaj poza repo: `dotnet nuget update source tacitsoft --use
 ### Blazor
 
 ```xml
-<PackageReference Include="Tacit.Brand" Version="0.2.*" />
+<PackageReference Include="Tacit.Brand" Version="0.5.*" />
 ```
 
 W `_Imports.razor` dodaj `@using Tacit.Brand`. Komponenty stron modułów i ich użycie opisuje [README paczki](../src/Tacit.Brand/README.md). Pliki są pod `_content/Tacit.Brand/…`, a ikony pod `_content/Tacit.Brand/icons/`. `MapStaticAssets` i `@Assets[...]` dają im kompresję i fingerprinting, więc bundler nie jest potrzebny. Wzór `App.razor` i layoutu jest w `src/Tacit.Brand/App.razor.example`.
