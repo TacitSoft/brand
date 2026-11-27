@@ -157,7 +157,7 @@ Gdy tabela ma sortowanie, stronicowanie albo wirtualizację, użyj `QuickGrid` z
 }
 ```
 
-`.t-area` układa menu obok treści od 960 px, a na węższym ekranie nad treścią. Pozycje bez grupy są na górze, a grupy idą w kolejności pierwszego wystąpienia. Bieżącą stronę oznacza `NavLink` (`aria-current="page"`). `Label` musi różnić się od etykiety nawigacji głównej w nagłówku.
+`.t-area` układa menu obok treści od 1024 px (64em), a na węższym ekranie nad treścią. Pozycje bez grupy są na górze, a grupy idą w kolejności pierwszego wystąpienia. Bieżącą stronę oznacza `NavLink` (`aria-current="page"`). `Label` musi różnić się od etykiety nawigacji głównej w nagłówku.
 
 Pozycje menu modułów daje `<ModuleNavigation>` z Tacit.Modulus.Blazor (ADR-C-0031 pkt 5): wybiera pozycje obszaru, które użytkownik może zobaczyć, i układa je według kolejności. Bez treści renderuje własny, prostszy znacznik (`<nav><ul>`, grupa jako `<span>` z zagnieżdżoną listą), bez klas `.t-sidenav`. Żeby menu modułów wyglądało jak menu pisane ręcznie, przekaż widoczne pozycje do `<TacitNav>`:
 
