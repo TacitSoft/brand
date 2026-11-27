@@ -3,7 +3,7 @@
 Marka Tacit dla serwisu Blazor: tokeny `--tacit-*`, fonty, style komponentów `.t-*`, skrypt motywu, `<ThemeSwitch />` i wspólne komponenty stron modułów. Źródło: repo `TacitSoft/brand`, katalog `web/` (ADR-C-0026). Komponenty dla stron modułów wynikają z ADR-C-0031 pkt 9: strony z kilku bibliotek mają wyglądać jak jedna aplikacja.
 
 ```xml
-<PackageReference Include="Tacit.Brand" Version="0.2.*" />
+<PackageReference Include="Tacit.Brand" Version="0.5.*" />
 ```
 
 ```razor
@@ -90,7 +90,7 @@ Komponenty renderują sam znacznik z klasami `.t-*` i nie mają własnych styló
 Gdy tabela ma sortowanie, stronicowanie albo wirtualizację, użyj `QuickGrid` z pakietu `Microsoft.AspNetCore.Components.QuickGrid` z motywem `tacit`, a do stronicowania `TacitPaginator` z paczki `Tacit.Brand.QuickGrid` (net11.0; ciągnie za sobą `Tacit.Brand` i QuickGrid):
 
 ```xml
-<PackageReference Include="Tacit.Brand.QuickGrid" Version="0.4.*" />
+<PackageReference Include="Tacit.Brand.QuickGrid" Version="0.5.*" />
 ```
 
 ```razor

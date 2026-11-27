@@ -1,6 +1,6 @@
 ---
 name: tacit-brand
-description: How to build and review Blazor layouts, module pages and forms with Tacit.Brand — loading the brand assets in App.razor, the --tacit-* tokens and .t-* classes, the area layout (.t-area) with TacitNav fed by Tacit.Modulus.Blazor ModuleNavigation, the components TacitTable, TacitField, TacitValidationSummary, TacitButton, TacitCallout, TacitBreadcrumbs and TacitEmpty, QuickGrid with Theme="tacit" and the translatable TacitPaginator from Tacit.Brand.QuickGrid, field labels from [Display], the hex-only-in-tokens rule and the TBRAND001 warning, and the WCAG 2.2 AA duties of the markup. Use it when a page needs a table or a sortable/paged QuickGrid, form field, validation summary, button, notice, breadcrumbs, empty state or area menu, when styling a component, when Bootstrap or a hard-coded colour appears, and when someone asks why TBRAND001 fires, why the module menu looks different, or why the skip link jumps to the home page.
+description: How to build and review Blazor layouts, module pages and forms with Tacit.Brand — loading the brand assets in App.razor, the --tacit-* tokens and .t-* classes, the area layout (.t-area) with TacitNav fed by Tacit.Modulus.Blazor ModuleNavigation, the components TacitTable, TacitField, TacitValidationSummary, TacitButton, TacitCallout, TacitBreadcrumbs and TacitEmpty, QuickGrid with Theme="tacit" and the translatable TacitPaginator from Tacit.Brand.QuickGrid, field labels from [Display], the hex-only-in-tokens rule and the TBRAND001 warning, and the WCAG 2.2 AA duties of the markup. Use it when a page needs a table or a sortable/paged QuickGrid, form field, validation summary, button, notice, breadcrumbs, empty state or area menu, when styling a component, when building the header (theme, language, account link), when Bootstrap or a hard-coded colour appears, and when someone asks why TBRAND001 fires, why the module menu looks different, or why the skip link jumps to the home page.
 ---
 # Using Tacit.Brand
 
@@ -17,12 +17,12 @@ This skill covers **consuming** `Tacit.Brand`: hosts and libraries that render T
 - **One stylesheet of components.** `tacit-site.css` holds the reset, layout and the `.t-*` classes, inside `@layer tacit.*`, so a component's scoped CSS wins without `!important`.
 - **Components are markup only.** The Razor components render `.t-*` markup with the right `aria-*` wiring. They have no styles or scripts of their own and work in static SSR and Interactive Server. Unmatched attributes (`id`, `class`, `aria-*`, `@onclick`) go to the root element; `class` is appended to the `.t-*` classes.
 - **The host loads the brand once.** A module library ships only its own scoped `*.razor.css`; it never links the brand stylesheets or a second design system.
-- Default texts are Polish. In a multilingual app pass texts from `IStringLocalizer` (`Label`, `EmptyText`, `Title`, `ThemeSwitch` labels).
+- Default texts are Polish. In a multilingual app pass texts from `IStringLocalizer` (`Label`, `EmptyText`, `Title`, `ThemeSwitch` labels, `TacitNav.SummaryLabel`, the account link text).
 
 ## Setting up a host
 
 ```xml
-<PackageReference Include="Tacit.Brand" Version="0.2.*" />
+<PackageReference Include="Tacit.Brand" Version="0.5.*" />
 ```
 
 ```razor
@@ -38,7 +38,9 @@ This skill covers **consuming** `Tacit.Brand`: hosts and libraries that render T
 
 - Remove Bootstrap and `app.css` styling from the Blazor template. Two design systems mean two sources of truth.
 - Icons are under `_content/Tacit.Brand/icons/`. `MapStaticAssets` and `@Assets[...]` fingerprint and compress the files; no bundler is needed.
-- `MainLayout` follows `App.razor.example`: `.t-page`, a `.t-skip-link` first, `.t-header` with `<nav class="t-nav" aria-label="…">` and `<ThemeSwitch />`, `<main id="main" tabindex="-1" class="t-wrap t-main">`, `.t-footer`.
+- `MainLayout` follows `App.razor.example`: `.t-page`, a `.t-skip-link` first, `.t-header` with `<nav class="t-nav" aria-label="…">` and `.t-header__end` holding `<ThemeSwitch />`, the language switch (`<nav class="t-segmented" aria-label="…">` with `lang` and `hreflang` on each link) and the account link, then `<main id="main" tabindex="-1" class="t-wrap t-main">`, `.t-footer`.
+- The header is sticky and one row from 64em; below that it wraps into two rows and scrolls away. In the header `ThemeSwitch` shows icons only (labels stay for screen readers, `title` gives the tooltip). From 80em a decorative trace miniature appears before `.t-header__end`; it is CSS only, needs no markup and yields space first when the header is crowded.
+- The account link is `<a class="t-btn t-btn--sm t-header__action">` with an `aria-hidden` icon and `<span class="t-header__action-label">` inside `<AuthorizeView>`. Below 36em only the icon shows, so the label must never be empty: fall back to a fixed text ("Konto") when `Identity.Name` is null, as `App.razor.example` does.
 - The skip link's `href` is the **current path plus `#main`**, because with `<base href="/">` a bare `#main` goes to the home page. `App.razor.example` shows it with `NavigationManager`.
 - `Routes.razor` has `<FocusOnNavigate RouteData="routeData" Selector="h1" />`, so a screen reader announces each page after enhanced navigation.
 - Starlight and DocFX use the npm package `@tacitsoft/brand` with its adapters, not the NuGet package. Setup is in `web/README.md`.
@@ -65,7 +67,7 @@ This skill covers **consuming** `Tacit.Brand`: hosts and libraries that render T
 The host references `Tacit.Brand.QuickGrid` (net11.0), which brings `Tacit.Brand` and `Microsoft.AspNetCore.Components.QuickGrid` 11.x (sorting and paging in static SSR). The grid's styles come from `tacit-site.css` in Tacit.Brand; the package adds `TacitPaginator`.
 
 ```xml
-<PackageReference Include="Tacit.Brand.QuickGrid" Version="0.4.*" />
+<PackageReference Include="Tacit.Brand.QuickGrid" Version="0.5.*" />
 ```
 
 ```razor
@@ -123,6 +125,7 @@ A host's area layout (the one passed to `AddModuleBlazor(...)` in Tacit.Modulus.
 - `.t-area` is two columns (15rem menu + content) from 64em (1024 px) **only when a `.t-area__nav` child is present**; otherwise the content takes the full width. Below 64em the menu sits above the content.
 - `Label` must differ from the header navigation's label. Two area menus on one page need different `IdPrefix` values.
 - Hand-written menus use the same `<TacitNav>` with a `TacitNavItem[]`. The area's home page uses `Match: NavLinkMatch.All`.
+- Do not write `<nav class="t-sidenav">` markup by hand. Since 0.5 the lists sit in `<details class="t-sidenav__details">` > `<summary class="t-sidenav__summary">` + `<div class="t-sidenav__body">`; older hand-written markup loses its spacing and does not collapse.
 
 ## Styling rules
 
@@ -164,6 +167,8 @@ The package adds a build step (also transitively, through a module UI package) t
 20. **`OnRowClick` as the only way to open a row.** QuickGrid's clickable rows (`tr.row-clickable`) get no focus and no role, so keyboard and screen-reader users cannot reach the action (WCAG 2.1.1). Keep a link or `<TacitButton>` in a cell; the row click only shortens it.
 21. **.NET 11's `<Label For>` with `Input*` instead of `<TacitField>`.** It connects the label only: no hint or error through `aria-describedby`, no `aria-invalid`, no link from `TacitValidationSummary`. Same problem as rule 5.
 22. **The field name written both in `[Display]` and in `Label`.** Keep it in `[Display(Name)]` on the model and leave `Label` out, so the field label, the validation message and other views say the same thing.
+23. **An account link whose label is only `@context.User.Identity?.Name`.** With JWT/OIDC schemes that do not map the Name claim the link has no accessible name, and below 36em no visible text either. Add a fallback text.
+24. **`TacitNav` with `SummaryLabel` equal to `Label`** (or left Polish in an English app). The screen reader then announces the area name twice; the summary says what the button does ("Menu").
 
 ## Accessibility duties left to the page
 
@@ -186,7 +191,8 @@ Out of scope of the package: WebAssembly/Auto render modes are not tested; there
 - [ ] The host loads `tacit-theme.js` (blocking, first) and then fonts → tokens → site, through `@Assets[...]`; no Bootstrap or second design system.
 - [ ] Module libraries ship only scoped `*.razor.css` and link no global stylesheet.
 - [ ] No hex, `rgb()`, `hsl()` or named colour in scoped CSS; only semantic `var(--tacit-color-…)` tokens. TBRAND001 is an error in libraries with UI.
-- [ ] Area layouts use `.t-area` with `<TacitNav class="t-area__nav">`; module menus pass `<ModuleNavigation Context="groups">` items to `<TacitNav>`.
+- [ ] The header has the theme switch, a language switch with `lang`/`hreflang` and an account link whose label is never empty.
+- [ ] Area layouts use `.t-area` with `<TacitNav class="t-area__nav">` (no hand-written `.t-sidenav` markup); module menus pass `<ModuleNavigation Context="groups">` items to `<TacitNav>`; `SummaryLabel` is translated in non-Polish apps.
 - [ ] Forms use `<TacitField>` with `field.Attributes` on the control and `<TacitValidationSummary />`; no `required` attribute; `Id` given when a model appears twice.
 - [ ] Tables use `<TacitTable>` with `Label`, `RowKey`, `<th scope>` cells and an `Empty` text that says what to do next.
 - [ ] QuickGrid has `Theme="tacit"`, sits in `.t-datagrid` > `.t-table` with `aria-label`, pages with `<TacitPaginator>` (same `QueryParameterNameOptions` as the grid), and every `OnRowClick` action is also a link or button in a cell.
