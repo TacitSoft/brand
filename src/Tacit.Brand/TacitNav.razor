@@ -11,29 +11,42 @@
     Kolejność pozycji i grup jest taka jak w Items. Pozycje bez grupy idą na górę. Menu modułów: pozycje widoczne
     dla użytkownika daje <ModuleNavigation Context="groups"> z Tacit.Modulus.Blazor, a TacitNav w jego treści
     renderuje je tym znacznikiem (wzór w README), więc menu modułów i menu pisane ręcznie wyglądają tak samo.
+
+    Poniżej 64em lista jest zwinięta w <details> pod przyciskiem SummaryLabel, żeby długie menu nie spychało
+    treści strony. Od 64em przycisku nie ma, a lista stoi obok treści rozwinięta. Bez JS, także w statycznym SSR.
+    Po przejściu na inną stronę menu się zwija: stan open ustawia przeglądarka, a nie Blazor, więc w trybie
+    interaktywnym <details> dostaje @key z adresem i powstaje od nowa, zwinięte.
 *@
+
+@implements IDisposable
+@inject NavigationManager Navigation
 
 @if (items.Count > 0)
 {
     <nav @attributes="AdditionalAttributes" class="@Css.Join("t-sidenav", Css.From(AdditionalAttributes))" aria-label="@Label">
-        @{
-            var groupIndex = 0;
-        }
-        @foreach (var group in items.GroupBy(i => i.Group).OrderBy(g => g.Key is null ? 0 : 1))
-        {
-            if (group.Key is null)
-            {
-                <ul>@Links(group)</ul>
-            }
-            else
-            {
-                var titleId = $"{IdPrefix}-g{++groupIndex}";
-                <div>
-                    <p class="t-sidenav__title" id="@titleId">@group.Key</p>
-                    <ul aria-labelledby="@titleId">@Links(group)</ul>
-                </div>
-            }
-        }
+        <details class="t-sidenav__details" @key="Navigation.Uri">
+            <summary class="t-sidenav__summary">@SummaryLabel</summary>
+            <div class="t-sidenav__body">
+                @{
+                    var groupIndex = 0;
+                }
+                @foreach (var group in items.GroupBy(i => i.Group).OrderBy(g => g.Key is null ? 0 : 1))
+                {
+                    if (group.Key is null)
+                    {
+                        <ul>@Links(group)</ul>
+                    }
+                    else
+                    {
+                        var titleId = $"{IdPrefix}-g{++groupIndex}";
+                        <div>
+                            <p class="t-sidenav__title" id="@titleId">@group.Key</p>
+                            <ul aria-labelledby="@titleId">@Links(group)</ul>
+                        </div>
+                    }
+                }
+            </div>
+        </details>
     </nav>
 }
 
@@ -46,11 +59,24 @@
     /// <summary>Przedrostek identyfikatorów tytułów grup. Podaj go, gdy na stronie są dwa menu obszaru.</summary>
     [Parameter] public string IdPrefix { get; set; } = "t-sidenav";
 
+    /// <summary>
+    /// Tekst przycisku, który poniżej 64em rozwija menu. Inny niż <see cref="Label"/>, bo nazwę obszaru czytnik
+    /// ekranu już ogłasza z landmarku. Przekaż przetłumaczony (domyślnie po polsku).
+    /// </summary>
+    [Parameter] public string SummaryLabel { get; set; } = "Menu";
+
     [Parameter(CaptureUnmatchedValues = true)] public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; set; }
 
     private List<TacitNavItem> items = [];
 
+    protected override void OnInitialized() => Navigation.LocationChanged += OnLocationChanged;
+
     protected override void OnParametersSet() => items = Items?.ToList() ?? [];
+
+    // Układ obszaru zostaje między stronami, więc bez tego TacitNav nie przerenderowałby się po nawigacji.
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e) => InvokeAsync(StateHasChanged);
+
+    public void Dispose() => Navigation.LocationChanged -= OnLocationChanged;
 
     private static RenderFragment Links(IEnumerable<TacitNavItem> group) => __builder =>
     {

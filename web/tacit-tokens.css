@@ -166,11 +166,13 @@
 	--tacit-header-height: 3.75rem;    /* 60 px, wspólna dla Blazora, Starlight i DocFX */
 	--tacit-header-border: 3px;
 
-	/* Punkty przełamania. Media queries nie przyjmują var(), więc nie ma ich jako tokenów: używaj tylko tych trzech
+	/* Punkty przełamania. Media queries nie przyjmują var(), więc nie ma ich jako tokenów: używaj tylko tych czterech
 	   wartości, także w *.razor.css (min-width: X albo max-width: X - 0.01em).
 	     36em (576 px)  duży telefon: 2 kolumny kart, etykiety przełącznika motywu
-	     48em (768 px)  tablet: nagłówek w jednym wierszu i przyklejony, szerszy margines strony
-	     64em (1024 px) desktop: boczna kolumna strony produktu, menu obszaru obok treści, 3 kolumny kart */
+	     48em (768 px)  tablet: szerszy margines strony
+	     64em (1024 px) desktop: nagłówek w jednym wierszu i przyklejony, menu obszaru rozwinięte obok treści,
+	                    boczna kolumna strony produktu, 3 kolumny kart
+	     80em (1280 px) szeroki desktop: miniatura śladu wywołań w nagłówku (sama ozdoba) */
 
 	/* ── Dostępność ── */
 	--tacit-target-min: 2.75rem;       /* 44 px: cel dotykowy (WCAG 2.5.8 wymaga min. 24 px, dajemy zapas) */
