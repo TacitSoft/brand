@@ -172,13 +172,20 @@ Pozycje menu modułów daje `<ModuleNavigation>` z Tacit.Modulus.Blazor (ADR-C-0
 
 ```html
 <nav class="t-sidenav" aria-label="Backoffice">
-  <ul><li><a href="backoffice" aria-current="page">Pulpit</a></li></ul>
-  <div>
-    <p class="t-sidenav__title" id="t-sidenav-g1">Tożsamość</p>
-    <ul aria-labelledby="t-sidenav-g1"><li><a href="backoffice/clients">Klienci OAuth</a></li></ul>
-  </div>
+  <details class="t-sidenav__details">
+    <summary class="t-sidenav__summary">Backoffice</summary>
+    <div class="t-sidenav__body">
+      <ul><li><a href="backoffice" aria-current="page">Pulpit</a></li></ul>
+      <div>
+        <p class="t-sidenav__title" id="t-sidenav-g1">Tożsamość</p>
+        <ul aria-labelledby="t-sidenav-g1"><li><a href="backoffice/clients">Klienci OAuth</a></li></ul>
+      </div>
+    </div>
+  </details>
 </nav>
 ```
+
+Poniżej 64em lista jest zwinięta pod przyciskiem z etykietą `Label`, żeby długie menu nie spychało treści strony na telefonie. Od 64em przycisku nie ma, a lista stoi obok treści rozwinięta (CSS `::details-content`). Przeglądarka bez `::details-content` pokazuje przycisk także na desktopie, więc menu nadal da się otworzyć. Działa bez JS, także w statycznym SSR.
 
 ## Hex tylko w tokenach
 

@@ -395,8 +395,8 @@
 		padding-top: env(safe-area-inset-top, 0px);
 	}
 
-	/* Poniżej 48em nagłówek łamie się na 2–3 wiersze, więc przyklejony zabierałby ćwierć ekranu telefonu. */
-	@media (min-width: 48em) {
+	/* Poniżej 64em nagłówek łamie się na 2–3 wiersze, więc przyklejony zabierałby za dużo ekranu telefonu i tabletu. */
+	@media (min-width: 64em) {
 		.t-header {
 			position: sticky;
 			top: 0;
@@ -415,6 +415,80 @@
 		display: flex;
 		align-items: center;
 		gap: var(--tacit-space-2);
+	}
+
+	/* Miniatura widoku trace (ślad wywołań jak w Aspire czy Jaegerze) przed przełącznikami: po lewej nazwy spanów
+	   z wcięciami drzewa, po prawej paski na osi czasu, bursztyn = najdłuższa ścieżka. Sama ozdoba, bez treści,
+	   więc czytnik ekranu jej nie widzi. Od 80em: węższa belka z logowaniem, motywem i językiem nie ma na nią miejsca.
+	   Siatka 200 × 41 px: wiersze co 9 px, nazwy 0–40 px, oś 54 px, paski 60–200 px. */
+	@media (min-width: 80em) {
+		.t-header__end::before {
+			--_name: color-mix(in srgb, var(--tacit-color-header-muted) 45%, transparent);
+			--_span: color-mix(in srgb, var(--tacit-color-header-muted) 75%, transparent);
+			--_hot: var(--tacit-color-header-accent);
+			content: "";
+			flex: none;
+			width: 200px;
+			height: 41px;
+			margin-inline-end: var(--tacit-space-4);
+			background:
+				linear-gradient(var(--_name), var(--_name)) 0 1px / 36px 3px no-repeat,
+				linear-gradient(var(--_name), var(--_name)) 5px 10px / 32px 3px no-repeat,
+				linear-gradient(var(--_name), var(--_name)) 10px 19px / 25px 3px no-repeat,
+				linear-gradient(var(--_name), var(--_name)) 10px 28px / 33px 3px no-repeat,
+				linear-gradient(var(--_name), var(--_name)) 5px 37px / 28px 3px no-repeat,
+				linear-gradient(var(--_name), var(--_name)) 54px 0 / 1px 41px no-repeat,
+				linear-gradient(var(--_span), var(--_span)) 60px 0 / 140px 5px no-repeat,
+				linear-gradient(var(--_hot), var(--_hot)) 63px 9px / 87px 5px no-repeat,
+				linear-gradient(var(--_span), var(--_span)) 70px 18px / 27px 5px no-repeat,
+				linear-gradient(var(--_hot), var(--_hot)) 100px 27px / 48px 5px no-repeat,
+				linear-gradient(var(--_span), var(--_span)) 155px 36px / 38px 5px no-repeat;
+		}
+
+		/* Ozdoba ustępuje miejsca: nawigacja główna się nie zwęża. */
+		.t-header .t-nav {
+			flex-shrink: 0;
+		}
+	}
+
+	@media (forced-colors: active) {
+		.t-header__end::before {
+			display: none;
+		}
+	}
+
+	/* Konto (logowanie albo nazwa zalogowanego) na granacie. Znacznik:
+	   <a class="t-btn t-btn--sm t-header__action" href="…"><svg aria-hidden="true">…</svg>
+	      <span class="t-header__action-label">Zaloguj się</span></a>
+	   Poniżej 36em widać samą ikonę, a etykieta zostaje dla czytnika ekranu. */
+	.t-header__action {
+		--_bg: transparent;
+		--_fg: var(--tacit-color-header-fg);
+		--_border: rgb(255 255 255 / 0.35);
+		--_bg-hover: rgb(255 255 255 / 0.08);
+		white-space: nowrap;
+	}
+
+	.t-header__action-label {
+		max-width: 10rem;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	@media (max-width: 35.99em) {
+		.t-header__action {
+			min-width: var(--tacit-target-min-compact);
+			padding-inline: var(--tacit-space-2);
+		}
+
+		.t-header__action-label {
+			position: absolute;
+			width: 1px;
+			height: 1px;
+			overflow: hidden;
+			clip-path: inset(50%);
+			white-space: nowrap;
+		}
 	}
 
 	.t-brand {
@@ -483,7 +557,7 @@
 		border-radius: var(--tacit-radius) var(--tacit-radius) 0 0;
 	}
 
-	@media (max-width: 47.99em) {
+	@media (max-width: 63.99em) {
 		.t-header__inner {
 			flex-wrap: wrap;
 			row-gap: 0;
@@ -566,7 +640,21 @@
 		color: var(--tacit-color-on-primary);
 	}
 
-	/* Na wąskim ekranie etykiety motywu chowają się wizualnie; czytnik ekranu nadal je czyta. */
+	/* W nagłówku (obok języka i konta) przełącznik motywu ma same ikony, a poza nim chowa etykiety
+	   dopiero na wąskim ekranie. Etykiety zostają dla czytnika ekranu, a podpowiedź daje title. */
+	.t-header .t-theme-switch .t-theme-switch__label {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		overflow: hidden;
+		clip-path: inset(50%);
+		white-space: nowrap;
+	}
+
+	.t-header .t-theme-switch button {
+		padding: 0;
+	}
+
 	@media (max-width: 35.99em) {
 		.t-theme-switch .t-theme-switch__label {
 			position: absolute;
@@ -1258,12 +1346,75 @@
 	}
 
 	/* ── Nawigacja obszaru (menu boczne modułów: <TacitNav>, także z pozycjami z <ModuleNavigation>).
-	   Znacznik: <nav class="t-sidenav" aria-label="…"><ul>…</ul>
-	             <p class="t-sidenav__title" id="g1">Grupa</p><ul aria-labelledby="g1">…</ul></nav> ── */
-	.t-sidenav {
+	   Znacznik: <nav class="t-sidenav" aria-label="…"><details class="t-sidenav__details">
+	               <summary class="t-sidenav__summary">Obszar</summary>
+	               <div class="t-sidenav__body"><ul>…</ul>
+	                 <div><p class="t-sidenav__title" id="g1">Grupa</p><ul aria-labelledby="g1">…</ul></div></div>
+	             </details></nav>
+	   Poniżej 64em menu jest zwinięte pod przyciskiem (summary), żeby nie spychało treści strony. Od 64em stoi
+	   obok treści zawsze rozwinięte. Działa bez JS, także w statycznym SSR. ── */
+	.t-sidenav__body {
 		display: grid;
 		gap: var(--tacit-space-4);
 		align-content: start;
+		padding-top: var(--tacit-space-3);
+	}
+
+	.t-sidenav__summary {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: var(--tacit-space-2);
+		min-height: var(--tacit-target-min);
+		padding: var(--tacit-space-2) var(--tacit-space-4);
+		border: var(--tacit-border-width) solid var(--tacit-color-line-strong);
+		border-radius: var(--tacit-radius);
+		background: var(--tacit-color-surface);
+		font-weight: 600;
+		list-style: none;
+		cursor: pointer;
+	}
+
+	.t-sidenav__summary::-webkit-details-marker {
+		display: none;
+	}
+
+	/* Strzałka w dół, po rozwinięciu w górę */
+	.t-sidenav__summary::after {
+		content: "";
+		width: 0.5rem;
+		height: 0.5rem;
+		border-right: 2px solid currentColor;
+		border-bottom: 2px solid currentColor;
+		transform: translateY(-25%) rotate(45deg);
+		transition: transform var(--tacit-duration) var(--tacit-easing);
+	}
+
+	.t-sidenav__details[open] > .t-sidenav__summary::after {
+		transform: translateY(25%) rotate(-135deg);
+	}
+
+	.t-sidenav__summary:hover {
+		background: var(--tacit-color-surface-sunken);
+	}
+
+	/* Od 64em: bez przycisku i zawsze rozwinięte. ::details-content pokazuje treść zamkniętego <details>.
+	   Przeglądarka bez tego pseudoelementu zostawia przycisk, więc menu nadal da się otworzyć. */
+	@supports selector(::details-content) {
+		@media (min-width: 64em) {
+			.t-sidenav__summary {
+				display: none;
+			}
+
+			.t-sidenav__details::details-content {
+				content-visibility: visible;
+				block-size: auto;
+			}
+
+			.t-sidenav__body {
+				padding-top: 0;
+			}
+		}
 	}
 
 	.t-sidenav ul {

@@ -56,7 +56,7 @@ This skill covers **consuming** `Tacit.Brand`: hosts and libraries that render T
 | A notice | `<TacitCallout Tone Title>` | Without `Title` it shows the tone's title, because the kind of message must not be colour only. |
 | A status that changes (saved, N results) | `<TacitCallout Live="TacitLive.Polite">` rendered **always**, changing only its content | `Polite` → `role="status"`, `Assertive` → `role="alert"` (only for errors that stop work). |
 | Breadcrumbs | `<TacitBreadcrumbs Items>` with `TacitBreadcrumb(Text, Href)` | The last item is the current page: no link, `aria-current="page"`. |
-| An area menu | `<TacitNav class="t-area__nav" Label Items>` with `TacitNavItem` | Groups in order of first appearance, ungrouped items on top. Renders nothing without items. |
+| An area menu | `<TacitNav class="t-area__nav" Label Items>` with `TacitNavItem` | Groups in order of first appearance, ungrouped items on top. Renders nothing without items. Below 64em the lists collapse into a `<details>` whose summary shows `Label`; from 64em they are always expanded. |
 | No data | `<TacitEmpty>` | Say what to do next, with a link. |
 | Anything else (cards, badges, chips, panels, facts) | Plain markup with the `.t-*` classes from `web/README.md` | Do not invent a parallel class or component. |
 

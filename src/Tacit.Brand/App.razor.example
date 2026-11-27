@@ -61,6 +61,22 @@
                     <a href="/pl/" lang="pl" hreflang="pl" aria-current="page">PL</a>
                     <a href="/en/" lang="en" hreflang="en">EN</a>
                 </nav>
+                @* Konto. Poniżej 36em widać samą ikonę, a etykietę czyta czytnik ekranu, więc link zawsze ma nazwę.
+                   AuthorizeView wymaga @using Microsoft.AspNetCore.Components.Authorization i AddCascadingAuthenticationState(). *@
+                <AuthorizeView>
+                    <Authorized>
+                        <a class="t-btn t-btn--sm t-header__action" href="/konto">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="12" cy="8" r="4" /><path d="M4 21a8 8 0 0 1 16 0" /></svg>
+                            <span class="t-header__action-label">@context.User.Identity?.Name</span>
+                        </a>
+                    </Authorized>
+                    <NotAuthorized>
+                        <a class="t-btn t-btn--sm t-header__action" href="/konto/logowanie">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="12" cy="8" r="4" /><path d="M4 21a8 8 0 0 1 16 0" /></svg>
+                            <span class="t-header__action-label">Zaloguj się</span>
+                        </a>
+                    </NotAuthorized>
+                </AuthorizeView>
             </div>
         </div>
     </header>
