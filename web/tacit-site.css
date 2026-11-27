@@ -307,9 +307,11 @@
 		}
 	}
 
-	/* Treść + boczna kolumna (strona produktu) */
+	/* Treść + boczna kolumna (strona produktu). Na wąskim ekranie kolumna boczna jest pod treścią.
+	   minmax(0, 1fr): blok kodu i szeroka tabela przewijają się w swoich ramkach zamiast rozpychać stronę. */
 	.t-split {
 		display: grid;
+		grid-template-columns: minmax(0, 1fr);
 		gap: var(--tacit-space-8);
 	}
 
