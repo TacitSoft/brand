@@ -165,7 +165,7 @@ public sealed class NavTests : BunitContext
 		var nav = cut.Find("nav.t-sidenav");
 		Assert.Equal("Backoffice", nav.GetAttribute("aria-label"));
 
-		var lists = cut.FindAll("nav > ul, nav > div > ul");
+		var lists = cut.FindAll(".t-sidenav__body > ul, .t-sidenav__body > div > ul");
 		Assert.Equal(["Pulpit"], lists[0].QuerySelectorAll("a").Select(a => a.TextContent));
 		Assert.Equal(["Klienci OAuth", "Zgody"], lists[1].QuerySelectorAll("a").Select(a => a.TextContent));
 		Assert.Equal(["Klucze"], lists[2].QuerySelectorAll("a").Select(a => a.TextContent));
@@ -175,6 +175,24 @@ public sealed class NavTests : BunitContext
 
 		var current = cut.Find("a[aria-current=page]");
 		Assert.Equal("Klienci OAuth", current.TextContent);
+	}
+
+	[Fact]
+	public void Collapses_the_lists_under_a_summary_other_than_the_landmark_label()
+	{
+		var cut = Render<TacitNav>(p => p
+			.Add(n => n.Label, "Backoffice")
+			.Add(n => n.Items, [new TacitNavItem("Pulpit", "", Match: NavLinkMatch.All)]));
+
+		// Zwinięte domyślnie: od 64em rozwija je CSS (::details-content), poniżej otwiera użytkownik.
+		var details = cut.Find("nav.t-sidenav > details.t-sidenav__details");
+		Assert.False(details.HasAttribute("open"));
+		// Nazwę obszaru czytnik ogłasza z landmarku, więc przycisk mówi, co robi.
+		Assert.Equal("Menu", cut.Find("details > summary.t-sidenav__summary").TextContent);
+		Assert.Single(cut.FindAll("details > .t-sidenav__body a"));
+
+		cut.Render(p => p.Add(n => n.SummaryLabel, "Area menu"));
+		Assert.Equal("Area menu", cut.Find("summary").TextContent);
 	}
 
 	[Fact]

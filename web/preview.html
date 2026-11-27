@@ -50,6 +50,7 @@ body { background: var(--tacit-color-bg); color: var(--tacit-color-fg); font: 40
           <a href="#main" lang="pl" hreflang="pl" aria-current="page">PL</a>
           <a href="#main" lang="en" hreflang="en">EN</a>
         </nav>
+        <a class="t-btn t-btn--sm t-header__action" href="#main"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span class="t-header__action-label">Zaloguj się</span></a>
       </div>
     </div>
   </header>
@@ -196,12 +197,17 @@ return result.Match(Results.Ok, error =&gt; error.ToProblem());</code></pre>
     </section>
 
     <section class="pv-section" id="obszar" aria-labelledby="area-title">
-      <header><h2 id="area-title">Strona modułu w obszarze</h2><p>Układ obszaru <code>.t-area</code> z menu <code>.t-sidenav</code> (<code>&lt;TacitNav&gt;</code>, także z pozycjami z <code>&lt;ModuleNavigation&gt;</code>), okruszkami, tabelą, stanem pustym i komunikatem. Tak wyglądają strony modułów z kilku bibliotek w jednej aplikacji. Znacznik generują komponenty Razor z paczki <code>Tacit.Brand</code>.</p></header>
+      <header><h2 id="area-title">Strona modułu w obszarze</h2><p>Układ obszaru <code>.t-area</code> z menu <code>.t-sidenav</code> (<code>&lt;TacitNav&gt;</code>, także z pozycjami z <code>&lt;ModuleNavigation&gt;</code>; poniżej 1024 px zwinięte pod przyciskiem), okruszkami, tabelą, stanem pustym i komunikatem. Tak wyglądają strony modułów z kilku bibliotek w jednej aplikacji. Znacznik generują komponenty Razor z paczki <code>Tacit.Brand</code>.</p></header>
       <div class="t-area">
         <nav class="t-sidenav t-area__nav" aria-label="Backoffice">
+          <details class="t-sidenav__details">
+          <summary class="t-sidenav__summary">Menu</summary>
+          <div class="t-sidenav__body">
           <ul><li><a href="#obszar">Pulpit</a></li></ul>
           <div><p class="t-sidenav__title" id="nav-g1">Tożsamość</p><ul aria-labelledby="nav-g1"><li><a href="#obszar" aria-current="page">Klienci OAuth</a></li><li><a href="#obszar">Zgody</a></li></ul></div>
           <div><p class="t-sidenav__title" id="nav-g2">Kryptografia</p><ul aria-labelledby="nav-g2"><li><a href="#obszar">Klucze</a></li><li><a href="#obszar">Rotacja</a></li></ul></div>
+          </div>
+          </details>
         </nav>
         <div class="t-stack" style="--tacit-stack-gap: var(--tacit-space-5)">
           <nav class="t-breadcrumbs" aria-label="Okruszki"><ol><li><a href="#obszar">Backoffice</a></li><li aria-current="page">Klienci OAuth</li></ol></nav>

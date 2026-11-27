@@ -60,13 +60,14 @@ Jedynym ozdobnikiem jest motyw z edytora kodu, wzięty z logo: bursztynowa belka
 
 ## Punkty przełamania
 
-Media queries nie przyjmują `var()`, więc punkty przełamania nie są tokenami. Używamy tylko trzech, także w `*.razor.css` (`min-width: X` albo `max-width: X - 0.01em`):
+Media queries nie przyjmują `var()`, więc punkty przełamania nie są tokenami. Używamy tylko czterech, także w `*.razor.css` (`min-width: X` albo `max-width: X - 0.01em`):
 
 | Punkt | px | Co się zmienia |
 |---|---|---|
 | `36em` | 576 | 2 kolumny kart, etykiety przełącznika motywu, większy odstęp w kartach |
-| `48em` | 768 | nagłówek w jednym wierszu i przyklejony, szerszy margines strony |
-| `64em` | 1024 | boczna kolumna strony produktu, menu obszaru obok treści, 3 kolumny kart |
+| `48em` | 768 | szerszy margines strony |
+| `64em` | 1024 | nagłówek w jednym wierszu i przyklejony, menu obszaru rozwinięte obok treści, boczna kolumna strony produktu, 3 kolumny kart |
+| `80em` | 1280 | miniatura śladu wywołań w nagłówku (sama ozdoba) |
 
 Rosyjska wersja stron jest wstrzymana, więc fonty nie mają cyrylicy (poza kodem). Gdy wróci, cyrylicę dołożymy w `tacit-fonts.css` osobnymi blokami `@font-face` z `unicode-range`, bez ruszania łacińskich. Wszystkie fonty są na licencji SIL OFL 1.1 (`fonts/OFL-*.txt`) i są hostowane lokalnie, bez Google Fonts: nie przekazujemy adresów IP odwiedzających podmiotowi trzeciemu i nie zależymy od zewnętrznego CDN.
 
@@ -186,10 +187,11 @@ import './tacit-theme-sync.js';
 |---|---|
 | `.t-page`, `.t-wrap`, `.t-main` | Szkielet strony, kontener szerokości, główny obszar |
 | `.t-area`, `.t-area__nav` | Układ obszaru modułów: menu obszaru obok treści (od 1024 px), na węższym ekranie nad treścią |
-| `.t-sidenav`, `.t-sidenav__title` | Menu obszaru z grupami (`<TacitNav>`, także z pozycjami z `<ModuleNavigation>`). Bieżąca strona: `aria-current="page"` albo `.active` |
+| `.t-sidenav`, `.t-sidenav__details`, `.t-sidenav__summary`, `.t-sidenav__body`, `.t-sidenav__title` | Menu obszaru z grupami (`<TacitNav>`, także z pozycjami z `<ModuleNavigation>`). Poniżej 64em zwinięte w `<details>` pod przyciskiem, od 64em rozwinięte obok treści. Bieżąca strona: `aria-current="page"` albo `.active` |
 | `.t-skip-link` | „Przejdź do treści” |
-| `.t-header`, `.t-header__inner`, `.t-header__end`, `.t-brand`, `.t-nav` | Granatowy nagłówek z nawigacją (`aria-current="page"` albo `.active` z `NavLink`) |
-| `.t-segmented` | Przełącznik segmentowy: motyw (`aria-pressed`) i język (`aria-current`) |
+| `.t-header`, `.t-header__inner`, `.t-header__end`, `.t-brand`, `.t-nav` | Granatowy nagłówek z nawigacją (`aria-current="page"` albo `.active` z `NavLink`). Od 80em przed `.t-header__end` stoi miniatura śladu wywołań (ozdoba w CSS, bez znacznika) |
+| `.t-header__action`, `.t-header__action-label` | Konto w nagłówku: logowanie albo nazwa zalogowanego, ikona + etykieta. Poniżej 36em sama ikona, etykieta zostaje dla czytnika ekranu (wzór w `App.razor.example`) |
+| `.t-segmented` | Przełącznik segmentowy: motyw (`aria-pressed`) i język (`aria-current`). W nagłówku przełącznik motywu ma same ikony z podpowiedzią `title` |
 | `.t-btn` + `--primary`, `--ghost`, `--danger`, `--sm`, `--block` | Przyciski. Stan ładowania przez `aria-busy="true"` |
 | `.t-hero`, `.t-lead`, `.t-eyebrow` | Nagłówek strony głównej z numerami linii i kursorem, lead, etykieta z bursztynowym znacznikiem |
 | `.t-grid`, `.t-split`, `.t-stack`, `.t-cluster`, `.t-prose` | Układy: siatka kart 1→2→3, treść z boczną kolumną, odstępy, szpalta czytelnicza |
