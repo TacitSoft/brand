@@ -44,11 +44,29 @@ Kolejność dołączania jest wszędzie ta sama: **fonty → tokeny → style lu
 
 | Rodzina | Krój | Cyrylica |
 |---|---|---|
-| Tacit Display (nagłówki, 700) | Public Sans | nie |
-| Tacit Sans (tekst) | Public Sans | nie |
+| Tacit Display (nagłówki h1–h3, 450–600) | Newsreader | nie |
+| Tacit Sans (tekst, interfejs, h4) | Public Sans | nie |
 | Tacit Mono (kod) | JetBrains Mono | tak |
 
-Nagłówki i tekst mają ten sam krój, więc przeglądarka pobiera pliki Public Sans raz. „Tacit Display” zostaje osobną rodziną, żeby krój nagłówków dało się zmienić w jednym miejscu. Odstęp liter zależy od rozmiaru: `--tacit-tracking-display` (−0,02em) dla hero i h1, `--tacit-tracking-heading` (−0,01em) dla h2 i h3, h4 i mniejsze bez zmiany.
+Każdy krój ma jedną rolę: szeryfowy Newsreader tylko w nagłówkach h1–h3 (także tytuły kart i paneli), Public Sans w tekście i całym interfejsie (przyciski, pola, etykiety, tabele, menu, h4), JetBrains Mono tylko w kodzie. Wersje i liczby w metadanych mają cyfry tabelaryczne Public Sans, nie monospace. Etykiety piszemy zdaniowo, bez wersalików. „Tacit Display” jest osobną rodziną, żeby krój nagłówków dało się zmienić w jednym miejscu. Odstęp liter zależy od rozmiaru: `--tacit-tracking-display` (−0,015em) dla hero i h1, `--tacit-tracking-heading` (−0,005em) dla h2 i h3, h4 i mniejsze bez zmiany.
+
+## Motyw edytora
+
+Jedynym ozdobnikiem jest motyw z edytora kodu, wzięty z logo: bursztynowa belka pod trzonem T to kursor `_`.
+
+- `.t-hero` jest złożone jak plik: każde bezpośrednie dziecko to linia z numerem w rynnie, `h1` to bieżąca linia, a po nim stoi bursztynowy kursor, który mruga trzy razy po załadowaniu (bez animacji przy `prefers-reduced-motion`). Numery i kursor mają pusty tekst alternatywny, więc czytnik ekranu ich nie czyta.
+- Przycisk główny ma bursztynową dolną krawędź, a karta z linkiem zmienia górną krawędź na bursztyn po najechaniu.
+- Bursztyn jest tu wyłącznie ozdobą (w jasnym motywie ma 2:1), więc żaden stan nie zależy tylko od niego.
+
+## Punkty przełamania
+
+Media queries nie przyjmują `var()`, więc punkty przełamania nie są tokenami. Używamy tylko trzech, także w `*.razor.css` (`min-width: X` albo `max-width: X - 0.01em`):
+
+| Punkt | px | Co się zmienia |
+|---|---|---|
+| `36em` | 576 | 2 kolumny kart, etykiety przełącznika motywu, większy odstęp w kartach |
+| `48em` | 768 | nagłówek w jednym wierszu i przyklejony, szerszy margines strony |
+| `64em` | 1024 | boczna kolumna strony produktu, menu obszaru obok treści, 3 kolumny kart |
 
 Rosyjska wersja stron jest wstrzymana, więc fonty nie mają cyrylicy (poza kodem). Gdy wróci, cyrylicę dołożymy w `tacit-fonts.css` osobnymi blokami `@font-face` z `unicode-range`, bez ruszania łacińskich. Wszystkie fonty są na licencji SIL OFL 1.1 (`fonts/OFL-*.txt`) i są hostowane lokalnie, bez Google Fonts: nie przekazujemy adresów IP odwiedzających podmiotowi trzeciemu i nie zależymy od zewnętrznego CDN.
 
@@ -167,16 +185,16 @@ import './tacit-theme-sync.js';
 | Klasa | Zastosowanie |
 |---|---|
 | `.t-page`, `.t-wrap`, `.t-main` | Szkielet strony, kontener szerokości, główny obszar |
-| `.t-area`, `.t-area__nav` | Układ obszaru modułów: menu obszaru obok treści (od 960 px), na wąskim ekranie nad treścią |
+| `.t-area`, `.t-area__nav` | Układ obszaru modułów: menu obszaru obok treści (od 1024 px), na węższym ekranie nad treścią |
 | `.t-sidenav`, `.t-sidenav__title` | Menu obszaru z grupami (`<TacitNav>`, także z pozycjami z `<ModuleNavigation>`). Bieżąca strona: `aria-current="page"` albo `.active` |
 | `.t-skip-link` | „Przejdź do treści” |
 | `.t-header`, `.t-header__inner`, `.t-header__end`, `.t-brand`, `.t-nav` | Granatowy nagłówek z nawigacją (`aria-current="page"` albo `.active` z `NavLink`) |
 | `.t-segmented` | Przełącznik segmentowy: motyw (`aria-pressed`) i język (`aria-current`) |
 | `.t-btn` + `--primary`, `--ghost`, `--danger`, `--sm`, `--block` | Przyciski. Stan ładowania przez `aria-busy="true"` |
-| `.t-hero`, `.t-lead`, `.t-eyebrow` | Nagłówek strony głównej, lead, etykieta z pomarańczowym znacznikiem |
+| `.t-hero`, `.t-lead`, `.t-eyebrow` | Nagłówek strony głównej z numerami linii i kursorem, lead, etykieta z bursztynowym znacznikiem |
 | `.t-grid`, `.t-split`, `.t-stack`, `.t-cluster`, `.t-prose` | Układy: siatka kart 1→2→3, treść z boczną kolumną, odstępy, szpalta czytelnicza |
 | `.t-card` + `__head`, `__link`, `__foot` | Karta. Link tylko w tytule, cała karta klikalna |
-| `.t-panel`, `.t-facts`, `.t-links`, `.t-kicker` | Panele boczne, lista klucz–wartość, lista powiązań, etykieta wersalikami |
+| `.t-panel`, `.t-facts`, `.t-links`, `.t-kicker` | Panele boczne, lista klucz–wartość, lista powiązań, mała etykieta (rodzaj produktu) |
 | `.t-badge` + `--accent`, `--success`, `--danger`, `.t-tags` | Odznaki i tagi |
 | `.t-chips`, `.t-chip`, `.t-chip__count` | Filtry z `aria-pressed` |
 | `.t-field`, `.t-label`, `.t-hint`, `.t-error`, `.t-input`, `.t-select`, `.t-textarea`, `.t-check`, `.t-search` | Formularze. Obsługują też klasy z `EditForm` (`.invalid`, `.validation-message`, `.validation-errors`) |

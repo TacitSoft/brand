@@ -88,21 +88,21 @@ body { background: var(--tacit-color-bg); color: var(--tacit-color-fg); font: 40
         <h2><a class="t-card__link" href="#produkt">Tacit.Results</a></h2>
         <p>Obsługa błędów bez wyjątków: Result&lt;T&gt; z czytelnym modelem błędów.</p>
         <ul class="t-tags"><li>Result pattern</li><li>Async pipeline</li></ul>
-        <div class="t-card__foot"><span>v1.0.2</span><span>net10.0 · net11.0</span><span>MIT</span></div>
+        <div class="t-card__foot"><span>v1.0.2</span><span>net10.0, net11.0</span><span>MIT</span></div>
       </article>
       <article class="t-card">
         <div class="t-card__head"><span class="t-kicker">Biblioteka</span></div>
         <h2><a class="t-card__link" href="#produkt">Tacit.Diagnostics</a></h2>
         <p>Tracing i metryki dla .NET zgodne z OpenTelemetry, bez ręcznego klejenia.</p>
         <ul class="t-tags"><li>Tracing</li><li>Metryki</li><li>Propagacja kontekstu</li></ul>
-        <div class="t-card__foot"><span>v1.2.0</span><span>net10.0 · net11.0</span><span>MIT</span></div>
+        <div class="t-card__foot"><span>v1.2.0</span><span>net10.0, net11.0</span><span>MIT</span></div>
       </article>
       <article class="t-card">
         <div class="t-card__head"><span class="t-kicker">Biblioteka</span><span class="t-badge t-badge--danger">Wycofywany do 31.12.2026</span></div>
         <h2><a class="t-card__link" href="#produkt">Tacit.Unicus</a></h2>
         <p>Generator identyfikatorów ULID dla encji i zdarzeń.</p>
         <ul class="t-tags"><li>Identyfikatory ULID</li></ul>
-        <div class="t-card__foot"><span>v0.1.0</span><span>net10.0 · net11.0</span><span>MIT</span></div>
+        <div class="t-card__foot"><span>v0.1.0</span><span>net10.0, net11.0</span><span>MIT</span></div>
       </article>
     </div>
 
@@ -149,7 +149,7 @@ return result.Match(Results.Ok, error =&gt; error.ToProblem());</code></pre>
         <aside class="t-stack" aria-label="Szczegóły produktu">
           <div class="t-panel">
             <h3>Cena</h3>
-            <div style="font: 700 var(--tacit-text-xl) var(--tacit-font-display)">Zapytaj o ofertę</div>
+            <div style="font: 500 var(--tacit-text-xl) var(--tacit-font-display)">Zapytaj o ofertę</div>
             <p class="t-small t-muted">Cennik pojawi się w kolejnym etapie.</p>
             <a class="t-btn t-btn--primary t-btn--block" href="#formularz">Zapytaj o ofertę</a>
           </div>
@@ -272,11 +272,11 @@ return result.Match(Results.Ok, error =&gt; error.ToProblem());</code></pre>
     </section>
 
     <section class="pv-section" aria-labelledby="type-title">
-      <header><h2 id="type-title">Typografia</h2><p>Tacit Display do nagłówków, Tacit Sans do tekstu (obie to Public Sans), Tacit Mono do kodu.</p></header>
+      <header><h2 id="type-title">Typografia</h2><p>Tacit Display (Newsreader) do nagłówków h1–h3, Tacit Sans (Public Sans) do tekstu i interfejsu, Tacit Mono (JetBrains Mono) tylko do kodu.</p></header>
       <div class="pv-type">
-        <div><small>--tacit-text-display · Tacit Display 700</small><span style="font: 700 var(--tacit-text-display)/1.05 var(--tacit-font-display); letter-spacing: var(--tacit-tracking-display)">Prosto i przewidywalnie</span></div>
-        <div><small>--tacit-text-base · Tacit Sans 400</small><p style="max-width: var(--tacit-measure)">Zażółć gęślą jaźń. Każda operacja zwraca sukces albo nazwany błąd, a kod wywołujący widzi wszystkie ścieżki w sygnaturze.</p></div>
-        <div><small>--tacit-text-sm · Tacit Mono</small><code style="background: none; padding: 0">Result&lt;Order&gt; Ensure(Func&lt;T, bool&gt;) → 0O1lI</code></div>
+        <div><small>--tacit-text-display, Tacit Display 450</small><span style="font: 450 var(--tacit-text-display)/1.02 var(--tacit-font-display); letter-spacing: var(--tacit-tracking-display)">Prosto i przewidywalnie</span></div>
+        <div><small>--tacit-text-base, Tacit Sans 400</small><p style="max-width: var(--tacit-measure)">Zażółć gęślą jaźń. Każda operacja zwraca sukces albo nazwany błąd, a kod wywołujący widzi wszystkie ścieżki w sygnaturze.</p></div>
+        <div><small>--tacit-text-sm, Tacit Mono</small><code style="background: none; padding: 0">Result&lt;Order&gt; Ensure(Func&lt;T, bool&gt;) → 0O1lI</code></div>
       </div>
     </section>
 
@@ -288,7 +288,7 @@ return result.Match(Results.Ok, error =&gt; error.ToProblem());</code></pre>
 
   <footer class="t-footer">
     <div class="t-wrap t-footer__inner">
-      <span>© Tacit · przykładnica dla profesjonalnego oprogramowania</span>
+      <span>© Tacit, przykładnica dla profesjonalnego oprogramowania</span>
       <ul><li><a href="#main">Deklaracja dostępności</a></li><li><a href="#main">Prywatność</a></li><li><a href="#main">Dokumentacja</a></li></ul>
     </div>
   </footer>

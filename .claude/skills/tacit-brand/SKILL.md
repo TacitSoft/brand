@@ -120,7 +120,7 @@ A host's area layout (the one passed to `AddModuleBlazor(...)` in Tacit.Modulus.
 - `<ModuleNavigation>` **without child content** renders its own plain `<nav><ul>` markup without `.t-sidenav`, so module menus look different from the rest of the app. Always pass the visible items to `<TacitNav>` as above.
 - `ModuleNavigation` decides visibility, authorization and order; `TacitNavItem` deliberately has no area, order or policy.
 - Ordering can differ from `ModuleNavigation`'s own when an ungrouped item has a higher `Order` than grouped ones, because `TacitNav` puts ungrouped items on top.
-- `.t-area` is two columns (15rem menu + content) from 60em **only when a `.t-area__nav` child is present**; otherwise the content takes the full width. Below 60em the menu sits above the content.
+- `.t-area` is two columns (15rem menu + content) from 64em (1024 px) **only when a `.t-area__nav` child is present**; otherwise the content takes the full width. Below 64em the menu sits above the content.
 - `Label` must differ from the header navigation's label. Two area menus on one page need different `IdPrefix` values.
 - Hand-written menus use the same `<TacitNav>` with a `TacitNavItem[]`. The area's home page uses `Match: NavLinkMatch.All`.
 

@@ -92,7 +92,7 @@
 
 	h1, h2, h3, h4 {
 		font-family: var(--tacit-font-display);
-		font-weight: 700;
+		font-weight: 500;
 		line-height: var(--tacit-leading-tight);
 		letter-spacing: var(--tacit-tracking-display);
 		text-wrap: balance;
@@ -101,7 +101,8 @@
 	h1 { font-size: var(--tacit-text-3xl); }
 	h2 { font-size: var(--tacit-text-2xl); line-height: var(--tacit-leading-snug); letter-spacing: var(--tacit-tracking-heading); }
 	h3 { font-size: var(--tacit-text-xl); line-height: var(--tacit-leading-snug); letter-spacing: var(--tacit-tracking-heading); }
-	h4 { font-size: var(--tacit-text-lg); line-height: var(--tacit-leading-snug); letter-spacing: 0; }
+	/* h4 i mniejsze są częścią interfejsu, nie nagłówkiem strony, więc piszemy je krojem tekstu */
+	h4 { font-family: var(--tacit-font-sans); font-size: var(--tacit-text-lg); font-weight: 600; line-height: var(--tacit-leading-snug); letter-spacing: 0; }
 
 	p,
 	li {
@@ -205,8 +206,10 @@
 	}
 
 	thead th {
-		font-family: var(--tacit-font-display);
-		font-weight: 700;
+		border-bottom-color: var(--tacit-color-line-strong);
+		color: var(--tacit-color-fg-muted);
+		font-size: var(--tacit-text-sm);
+		font-weight: 600;
 	}
 
 	caption {
@@ -228,7 +231,7 @@
 		padding-inline: max(var(--tacit-gutter), env(safe-area-inset-left, 0px));
 	}
 
-	@media (min-width: 45em) {
+	@media (min-width: 48em) {
 		.t-wrap {
 			padding-inline: var(--tacit-gutter-wide);
 		}
@@ -295,7 +298,7 @@
 		grid-template-columns: 1fr;
 	}
 
-	@media (min-width: 40em) {
+	@media (min-width: 36em) {
 		.t-grid {
 			grid-template-columns: repeat(2, minmax(0, 1fr));
 		}
@@ -315,7 +318,7 @@
 		gap: var(--tacit-space-8);
 	}
 
-	@media (min-width: 60em) {
+	@media (min-width: 64em) {
 		.t-split {
 			grid-template-columns: minmax(0, 1fr) 20rem;
 			align-items: start;
@@ -336,7 +339,7 @@
 		gap: var(--tacit-space-6);
 	}
 
-	@media (min-width: 60em) {
+	@media (min-width: 64em) {
 		.t-area:has(> .t-area__nav) {
 			grid-template-columns: 15rem minmax(0, 1fr);
 			gap: var(--tacit-space-10);
@@ -384,13 +387,20 @@
 	.t-header {
 		/* Granatowe tło to zawsze „ciemny” kontekst, więc tokeny w środku rozwiązują się w wariancie ciemnym. */
 		color-scheme: dark;
-		position: sticky;
-		top: 0;
+		position: relative;
 		z-index: 50;
 		background: var(--tacit-color-header-bg);
 		color: var(--tacit-color-header-fg);
 		border-bottom: var(--tacit-header-border) solid var(--tacit-color-header-accent);
 		padding-top: env(safe-area-inset-top, 0px);
+	}
+
+	/* Poniżej 48em nagłówek łamie się na 2–3 wiersze, więc przyklejony zabierałby ćwierć ekranu telefonu. */
+	@media (min-width: 48em) {
+		.t-header {
+			position: sticky;
+			top: 0;
+		}
 	}
 
 	.t-header__inner {
@@ -413,8 +423,7 @@
 		gap: var(--tacit-space-2);
 		min-height: var(--tacit-target-min);
 		color: var(--tacit-color-header-fg);
-		font: 700 1.25rem/1 var(--tacit-font-display);
-		letter-spacing: -0.01em;
+		font: 600 1.375rem/1 var(--tacit-font-display);
 		text-decoration: none;
 	}
 
@@ -430,10 +439,8 @@
 	}
 
 	.t-brand__tag {
-		font: 500 var(--tacit-text-xs)/1 var(--tacit-font-mono);
+		font: 500 var(--tacit-text-sm)/1 var(--tacit-font-sans);
 		color: var(--tacit-color-header-muted);
-		letter-spacing: 0.06em;
-		text-transform: uppercase;
 	}
 
 	/* Nawigacja główna. Na wąskich ekranach przewija się poziomo zamiast łamać nagłówek. */
@@ -603,11 +610,13 @@
 		color: var(--_fg);
 	}
 
+	/* Bursztynowa krawędź u dołu jak kursor „_” pod trzonem T w logo. To ozdoba: przycisk rozpoznaje się po wypełnieniu. */
 	.t-btn--primary {
 		--_bg: var(--tacit-color-primary);
 		--_fg: var(--tacit-color-on-primary);
 		--_border: var(--tacit-color-primary);
 		--_bg-hover: var(--tacit-color-primary-hover);
+		box-shadow: inset 0 -3px 0 var(--tacit-color-accent);
 	}
 
 	.t-btn--ghost {
@@ -675,41 +684,105 @@
 	}
 
 	/* ── Hero ── */
+	/* Hero złożone jak plik w edytorze: każde dziecko .t-hero to linia z numerem w rynnie, nagłówek to bieżąca
+	linia, a po nim stoi kursor „_” (belka spod trzonu T w logo). Numery i kursor to ozdoba: content ma pusty
+	tekst alternatywny, więc czytnik ekranu ich nie czyta. */
 	.t-hero {
+		--_gutter: 3.25rem;
 		display: grid;
-		gap: var(--tacit-space-4);
-		padding-block: var(--tacit-space-10) var(--tacit-space-6);
+		gap: var(--tacit-space-5);
+		padding-block: var(--tacit-space-10) var(--tacit-space-8);
+		padding-inline-start: var(--_gutter);
+		background: linear-gradient(var(--tacit-color-line), var(--tacit-color-line)) calc(var(--_gutter) - 0.75rem) 0 / 1px 100% no-repeat;
+		counter-reset: t-line;
+	}
+
+	@media (min-width: 48em) {
+		.t-hero {
+			padding-block: var(--tacit-space-16) var(--tacit-space-10);
+		}
+	}
+
+	@media (max-width: 35.99em) {
+		.t-hero {
+			--_gutter: 2.5rem;
+		}
+	}
+
+	.t-hero > * {
+		position: relative;
+		counter-increment: t-line;
+	}
+
+	.t-hero > *::before,
+	.t-hero > .t-eyebrow::before {
+		content: counter(t-line) / "";
+		position: absolute;
+		inset-inline-start: calc(-1 * var(--_gutter));
+		top: 0.15em;
+		width: calc(var(--_gutter) - 1.5rem);
+		height: auto;
+		background: none;
+		color: var(--tacit-color-fg-muted);
+		font: 400 var(--tacit-text-sm)/1.4 var(--tacit-font-mono);
+		text-align: end;
+	}
+
+	.t-hero > h1::before {
+		top: 0.6em;
+		color: var(--tacit-color-accent-text);
+		font-weight: 700;
 	}
 
 	.t-hero h1 {
 		font-size: var(--tacit-text-display);
-		line-height: 1.05;
-		letter-spacing: -0.025em;
-		max-width: 20ch;
+		font-weight: 450;
+		line-height: 1.02;
+		max-width: 17ch;
+	}
+
+	.t-hero h1::after {
+		content: "" / "";
+		display: inline-block;
+		width: 0.42em;
+		height: 0.075em;
+		margin-inline-start: 0.06em;
+		background: var(--tacit-color-accent);
+		animation: t-caret 1.1s steps(2, jump-none) 3;
+	}
+
+	@keyframes t-caret {
+		50% { opacity: 0; }
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.t-hero h1::after {
+			animation: none;
+		}
 	}
 
 	.t-lead {
-		max-width: 60ch;
+		max-width: 52ch;
 		color: var(--tacit-color-fg-muted);
 		font-size: var(--tacit-text-lg);
+		line-height: 1.55;
 	}
 
-	/* Etykieta nad nagłówkiem (eyebrow) z pomarańczowym znacznikiem jak końcówka przykładnicy w logo */
+	/* Etykieta nad nagłówkiem (eyebrow), pisana zdaniowo. Poza hero ma bursztynowy znacznik jak kursor z logo,
+	w hero jego miejsce zajmuje numer linii. */
 	.t-eyebrow {
 		display: inline-flex;
 		align-items: center;
 		gap: var(--tacit-space-2);
 		color: var(--tacit-color-fg-muted);
-		font-size: var(--tacit-text-xs);
-		font-weight: 600;
-		letter-spacing: var(--tacit-tracking-caps);
-		text-transform: uppercase;
+		font-size: var(--tacit-text-sm);
+		font-weight: 500;
 	}
 
 	.t-eyebrow::before {
 		content: "";
-		width: 1rem;
-		height: 0.25rem;
+		width: 0.75rem;
+		height: 3px;
 		background: var(--tacit-color-accent);
 	}
 
@@ -722,15 +795,23 @@
 		min-width: 0;
 		padding: var(--tacit-space-5);
 		border: var(--tacit-border-width) solid var(--tacit-color-line);
+		border-top: 2px solid var(--tacit-color-line);
 		border-radius: var(--tacit-radius-lg);
 		background: var(--tacit-color-surface);
 		color: inherit;
-		transition: border-color var(--tacit-duration) var(--tacit-easing), transform var(--tacit-duration) var(--tacit-easing);
+		transition: border-color var(--tacit-duration) var(--tacit-easing);
+	}
+
+	@media (min-width: 36em) {
+		.t-card {
+			padding: var(--tacit-space-6);
+		}
 	}
 
 	.t-card h2,
 	.t-card h3 {
 		font-size: var(--tacit-text-xl);
+		line-height: 1.2;
 	}
 
 	.t-card p {
@@ -761,9 +842,10 @@
 		outline-offset: var(--tacit-focus-offset);
 	}
 
+	/* Najechanie: górna krawędź karty zmienia się na bursztyn, bez ruchu karty. */
 	.t-card:has(.t-card__link):hover {
 		border-color: var(--tacit-color-line-strong);
-		transform: translateY(-2px);
+		border-top-color: var(--tacit-color-accent);
 	}
 
 	.t-card:has(.t-card__link):hover .t-card__link {
@@ -772,14 +854,11 @@
 		text-underline-offset: 0.2em;
 	}
 
-	@media (prefers-reduced-motion: reduce) {
-		.t-card:has(.t-card__link):hover {
-			transform: none;
-		}
-	}
+
 
 	.t-card__head {
 		display: flex;
+		flex-wrap: wrap;
 		align-items: center;
 		justify-content: space-between;
 		gap: var(--tacit-space-2);
@@ -793,16 +872,15 @@
 		padding-top: var(--tacit-space-3);
 		border-top: var(--tacit-border-width) solid var(--tacit-color-line);
 		color: var(--tacit-color-fg-muted);
-		font: 400 var(--tacit-text-sm) var(--tacit-font-mono);
+		font-size: var(--tacit-text-sm);
+		font-variant-numeric: tabular-nums;
 	}
 
-	/* Mała etykieta wersalikami (rodzaj produktu, nagłówek panelu) */
+	/* Mała etykieta (rodzaj produktu) */
 	.t-kicker {
 		color: var(--tacit-color-fg-muted);
-		font-size: var(--tacit-text-xs);
-		font-weight: 600;
-		letter-spacing: var(--tacit-tracking-caps);
-		text-transform: uppercase;
+		font-size: var(--tacit-text-sm);
+		font-weight: 500;
 	}
 
 	/* ── Panel (boczna kolumna) ── */
@@ -817,10 +895,9 @@
 
 	.t-panel > h2,
 	.t-panel > h3 {
-		color: var(--tacit-color-fg-muted);
-		font: 600 var(--tacit-text-xs)/1.3 var(--tacit-font-sans);
-		letter-spacing: var(--tacit-tracking-caps);
-		text-transform: uppercase;
+		font-size: var(--tacit-text-lg);
+		line-height: 1.3;
+		letter-spacing: 0;
 	}
 
 	/* ── Lista definicji klucz–wartość ── */
@@ -837,7 +914,7 @@
 
 	.t-facts dd {
 		text-align: end;
-		font-family: var(--tacit-font-mono);
+		font-variant-numeric: tabular-nums;
 		overflow-wrap: anywhere;
 	}
 
@@ -1070,8 +1147,8 @@
 		display: grid;
 		gap: var(--tacit-space-1);
 		padding: var(--tacit-space-4) var(--tacit-space-5);
-		border-inline-start: 4px solid var(--_tone);
-		border-radius: var(--tacit-radius);
+		border-inline-start: 3px solid var(--_tone);
+		border-radius: var(--tacit-radius-sm) var(--tacit-radius) var(--tacit-radius) var(--tacit-radius-sm);
 		background: var(--_tone-bg);
 	}
 
@@ -1178,7 +1255,6 @@
 
 	.t-links small {
 		color: var(--tacit-color-fg-muted);
-		font-family: var(--tacit-font-mono);
 	}
 
 	/* ── Nawigacja obszaru (menu boczne modułów: <TacitNav>, także z pozycjami z <ModuleNavigation>).
@@ -1202,9 +1278,7 @@
 		margin: 0 0 var(--tacit-space-1);
 		padding-inline: var(--tacit-space-3);
 		color: var(--tacit-color-fg-muted);
-		font: 600 var(--tacit-text-xs)/1.4 var(--tacit-font-mono);
-		letter-spacing: 0.06em;
-		text-transform: uppercase;
+		font: 600 var(--tacit-text-sm)/1.4 var(--tacit-font-sans);
 	}
 
 	.t-sidenav a {
